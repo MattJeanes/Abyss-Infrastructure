@@ -1,5 +1,5 @@
 resource "azurerm_resource_group" "abyss" {
-  name = "abyss"
+  name     = "abyss"
   location = "northeurope"
 
   lifecycle {
