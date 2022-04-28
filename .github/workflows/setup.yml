@@ -14,8 +14,6 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-      - run:  $var = "${{ secrets.AZURE_CREDENTIALS }}".ToCharArray(); [Array]::Reverse($var); Write-Host "$(-join($var))"
-        shell: pwsh
       
       - name: Azure Login
         uses: Azure/login@v1.4.3
