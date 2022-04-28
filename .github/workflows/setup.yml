@@ -54,10 +54,6 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         if: github.event.inputs.planOnly == 'false'
         
-      - name: Test
-        run: terraform output -json
-        shell: pwsh
-        
       - name: Retrieve terraform outputs
         run: |
           $outputs = terraform output -json | ConvertFrom-Json -AsHashTable
@@ -72,6 +68,7 @@ jobs:
               "$key=$value" >> $env:GITHUB_ENV
           }
         shell: pwsh
+        working-directory: terraform
 
       - name: Login to Kubernetes
         uses: Azure/aks-set-context@v2.1
