@@ -26,19 +26,24 @@ jobs:
       - name: Terraform Init
         run: terraform init -backend-config="storage_account_name=${{ secrets.STORAGE_ACCOUNT_NAME }}" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate" -backend-config="access_key=${{ secrets.STORAGE_ACCOUNT_KEY }}" -upgrade
         working-directory: terraform
+        
+      - name: Terraform Plan
+        run: terraform plan -out tfplan
+        working-directory: terraform
         env:
           ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
-        
-      - name: Terraform Plan
-        run: terraform plan -out tfplan
-        working-directory: terraform
       
       - name: Terraform Validate and Apply
         run: terraform apply tfplan
         working-directory: terraform
+        env:
+          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         if: github.event.inputs.planOnly == 'false'
 
       - name: Azure Kubernetes set context
