@@ -1,10 +1,10 @@
-name: Setup Kubernetes Cluster
+name: Setup
 
 on:
   workflow_dispatch:
     inputs:
       planOnly:
-        description: 'Terraform plan only (do not apply)'     
+        description: 'Terraform plan only (do not apply)'
         required: true
         default: 'false'
 
