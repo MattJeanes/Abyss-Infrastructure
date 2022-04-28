@@ -67,6 +67,7 @@ jobs:
               Write-Host "$key = $(($sensitive ? "***" : $value))"
               "$key=$value" >> $env:GITHUB_ENV
           }
+        shell: pwsh
 
       - name: Login to Kubernetes
         uses: Azure/aks-set-context@v2.1
