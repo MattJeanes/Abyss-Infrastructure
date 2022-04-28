@@ -6,7 +6,7 @@ on:
       planOnly:
         description: 'Terraform plan only (do not apply)'
         required: true
-        default: 'false'
+        default: 'true'
 
 jobs:
   deploy:
