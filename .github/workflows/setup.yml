@@ -29,6 +29,6 @@ jobs:
           
       - name: Install Nginx Ingress
         run: |
-          helm upgrade --install --wait ingress-nginx ingress-nginx \
+          helm upgrade --install --wait --atomic --debug ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
             --namespace ingress-nginx --create-namespace
