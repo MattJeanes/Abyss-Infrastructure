@@ -17,6 +17,8 @@ jobs:
                     
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_wrapper: false
         
       - name: Terraform Init
         run: terraform init -backend-config="storage_account_name=abyssterraform" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate" -backend-config="access_key=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}" -upgrade
@@ -51,10 +53,7 @@ jobs:
         
       - name: Retrieve terraform outputs
         run: |
-          $outputJson = terraform output -json
-          [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($outputJson))
-          $outputs = $outputJson | ConvertFrom-Json -AsHashTable
-
+          $outputs = terraform output -json | ConvertFrom-Json -AsHashTable
           $outputs.Keys | ForEach-Object {
               $key = $_
               $output = $outputs[$key]
