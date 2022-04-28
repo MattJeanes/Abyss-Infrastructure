@@ -14,11 +14,6 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Azure Login
-        uses: Azure/login@v1.4.3
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
                     
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v2.0.0
@@ -71,6 +66,11 @@ jobs:
           }
         shell: pwsh
         working-directory: terraform
+      
+      - name: Azure Login
+        uses: Azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to Kubernetes
         uses: Azure/aks-set-context@v2.1
