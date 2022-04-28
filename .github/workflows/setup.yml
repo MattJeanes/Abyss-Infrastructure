@@ -9,7 +9,7 @@ on:
         default: 'true'
 
 jobs:
-  deploy:
+  setup:
     runs-on: ubuntu-latest
     
     steps:
