@@ -9,19 +9,16 @@ on:
         default: 'true'
 
 jobs:
-  deploy:
+  setup:
     runs-on: ubuntu-latest
     
     steps:
       - uses: actions/checkout@v3
-      
-      - name: Azure Login
-        uses: Azure/login@v1.4.3
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
                     
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_wrapper: false
         
       - name: Terraform Init
         run: terraform init -backend-config="storage_account_name=abyssterraform" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate" -backend-config="access_key=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}" -upgrade
@@ -57,7 +54,6 @@ jobs:
       - name: Retrieve terraform outputs
         run: |
           $outputs = terraform output -json | ConvertFrom-Json -AsHashTable
-
           $outputs.Keys | ForEach-Object {
               $key = $_
               $output = $outputs[$key]
@@ -67,6 +63,13 @@ jobs:
               Write-Host "$key = $(($sensitive ? "***" : $value))"
               "$key=$value" >> $env:GITHUB_ENV
           }
+        shell: pwsh
+        working-directory: terraform
+      
+      - name: Azure Login
+        uses: Azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to Kubernetes
         uses: Azure/aks-set-context@v2.1
