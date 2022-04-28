@@ -52,7 +52,7 @@ jobs:
       - name: Retrieve terraform outputs
         run: |
           $outputJson = terraform output -json
-          [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($outputs))
+          [System.Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes($outputJson))
           $outputs = $outputJson | ConvertFrom-Json -AsHashTable
 
           $outputs.Keys | ForEach-Object {
