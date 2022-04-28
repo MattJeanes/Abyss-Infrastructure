@@ -46,3 +46,9 @@ resource "azurerm_kubernetes_cluster" "abyss" {
     ]
   }
 }
+
+resource "azurerm_role_assignment" "aks_abyss_networkcontributor" {
+  scope                = data.azurerm_subscription.current.id
+  role_definition_name = "Network Contributor"
+  principal_id         = azurerm_kubernetes_cluster.abyss.identity[0].principal_id
+}
