@@ -27,7 +27,6 @@ jobs:
         run: terraform init -backend-config="storage_account_name=abyssterraform" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate" -backend-config="access_key=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}" -upgrade
         working-directory: terraform
         
-        
       - name: Set Terraform variables
         run: |
           tee terraform.tfvars <<EOF
@@ -54,8 +53,22 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         if: github.event.inputs.planOnly == 'false'
+        
+      - name: Retrieve terraform outputs
+        run: |
+          $outputs = terraform output -json | ConvertFrom-Json -AsHashTable
 
-      - name: Azure Kubernetes set context
+          $outputs.Keys | ForEach-Object {
+              $key = $_
+              $output = $outputs[$key]
+              $value = $output.value
+              $sensitive = $output.sensitive
+              
+              Write-Host "$key = $(($sensitive ? "***" : $value))"
+              "$key=$value" >> $env:GITHUB_ENV
+          }
+
+      - name: Login to Kubernetes
         uses: Azure/aks-set-context@v2.1
         with:
           resource-group: abyss
@@ -65,4 +78,6 @@ jobs:
         run: |
           helm upgrade --install --wait --atomic --debug ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
-            --namespace ingress-nginx --create-namespace
+            --namespace ingress-nginx --create-namespace \
+            --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"="abyss" \
+            --set controller.service.loadBalancerIP="${{ env.public_ip_address }}"
