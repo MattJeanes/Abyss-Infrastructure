@@ -3,6 +3,6 @@ resource "azurerm_public_ip" "abyss_public" {
   resource_group_name = azurerm_resource_group.abyss.name
   location            = azurerm_resource_group.abyss.location
   allocation_method   = "Static"
-  domain_name_label   = "abyss"
+  domain_name_label   = "abyss-public"
   sku                 = "Basic"
 }
