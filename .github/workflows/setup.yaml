@@ -29,6 +29,7 @@ jobs:
           tee terraform.tfvars <<EOF
           kubernetes_version = "${{ secrets.KUBERNETES_VERSION }}"
           ssh_public_key = "${{ secrets.SSH_PUBLIC_KEY }}"
+          cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
           EOF
         working-directory: terraform
         
@@ -108,6 +109,5 @@ jobs:
         run: |
           helm upgrade --install --wait --atomic --debug \
             hello-world ./hello-world \
-            --repo https://kubernetes.github.io/ingress-nginx \
             --namespace default
         working-directory: kubernetes
