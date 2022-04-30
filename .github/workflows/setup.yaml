@@ -117,3 +117,4 @@ jobs:
       - name: Wait for Hello World certificate to be ready
         run: ./WaitForCertificate.ps1 -CertificateName "hello-world-tls"
         shell: pwsh
+        working-directory: scripts
