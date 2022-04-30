@@ -113,3 +113,7 @@ jobs:
             --namespace default \
             --set host="${{ secrets.HELLO_WORLD_HOST }}"
         working-directory: kubernetes
+
+      - name: Wait for Hello World certificate to be ready
+        run: ./WaitForCertificate.ps1 -CertificateName "hello-world-tls"
+        shell: pwsh
