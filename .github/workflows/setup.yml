@@ -83,4 +83,5 @@ jobs:
             --repo https://kubernetes.github.io/ingress-nginx \
             --namespace ingress-nginx --create-namespace \
             --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"="abyss" \
-            --set controller.service.loadBalancerIP="${{ env.public_ip_address }}"
+            --set controller.service.loadBalancerIP="${{ env.public_ip_address }}" \
+            --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz # https://github.com/Azure/AKS/issues/2903
