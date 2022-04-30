@@ -52,3 +52,18 @@ resource "azurerm_role_assignment" "aks_abyss_networkcontributor" {
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.abyss.identity[0].principal_id
 }
+
+# https://github.com/hashicorp/terraform-provider-azurerm/issues/9733
+data "azurerm_user_assigned_identity" "aks_abyss_aci" {
+  name                = "aciconnectorlinux-${azurerm_kubernetes_cluster.abyss.name}"
+  resource_group_name = azurerm_kubernetes_cluster.abyss.node_resource_group
+  depends_on = [
+    azurerm_kubernetes_cluster.abyss,
+  ]
+}
+
+resource "azurerm_role_assignment" "aks_abyss_aci_network_contributor_subnet" {
+  scope                = azurerm_subnet.abyss_aci.id
+  role_definition_name = "Network Contributor"
+  principal_id         = data.azurerm_user_assigned_identity.aks_abyss_aci.principal_id
+}
