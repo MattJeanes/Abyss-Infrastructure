@@ -110,5 +110,6 @@ jobs:
         run: |
           helm upgrade --install --wait --atomic --debug \
             hello-world ./hello-world \
-            --namespace default
+            --namespace default \
+            --set host="${{ secrets.HELLO_WORLD_HOST }}"
         working-directory: kubernetes
