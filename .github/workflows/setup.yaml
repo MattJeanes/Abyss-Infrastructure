@@ -30,6 +30,7 @@ jobs:
           kubernetes_version = "${{ secrets.KUBERNETES_VERSION }}"
           ssh_public_key = "${{ secrets.SSH_PUBLIC_KEY }}"
           cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
           EOF
         working-directory: terraform
         
