@@ -1,6 +1,38 @@
 $ErrorActionPreference = "Stop"
 
-function Test-Certificate {
+function Invoke-Kubectl {
+    param(
+        [Parameter(Mandatory = $true, Position = 0)]
+        [string[]]$Parameters,
+
+        [Parameter(Mandatory = $false)]
+        [switch]$NoParse
+    )
+
+    if (-not $NoParse) {
+        $null = $Parameters += "-o"
+        $null = $Parameters += "json"
+    }
+
+    Write-Debug "Invoking kubectl with parameters $($Parameters -join ",")"
+
+    try {
+        $result = kubectl $Parameters
+        if ($NoParse) {
+            return $result
+        }
+        else {
+            return $result | ConvertFrom-Json
+        }
+    }
+    finally {
+        if ($LASTEXITCODE -ne 0) {
+            Write-Error "kubectl exited with code $LASTEXITCODE"
+        }
+    }
+}
+
+function Test-KubeCertificate {
     param(
         [Parameter(Mandatory = $true)]
         [string]$Name,
@@ -9,10 +41,37 @@ function Test-Certificate {
         [string]$Namespace = "default"
     )
 
-    $certificate = kubectl get certificate $Name --namespace $Namespace --output json | ConvertFrom-Json
-    if ($LASTEXITCODE -ne 0) {
-        Write-Error "kubectl exited with code $LASTEXITCODE"
-    }
+    $certificate = Invoke-Kubectl "get", "certificate", $Name, "--namespace", $Namespace
     $readyStatus = $certificate.status.conditions | Where-Object { $_.type -eq "Ready" }
     return $readyStatus.status
+}
+
+function Wait-KubeCertificate {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$CertificateName,
+        
+        [Parameter(Mandatory = $false)]
+        [string]$Namespace = "default",
+
+        [Parameter(Mandatory = $false)]
+        [int]$TimeoutSeconds = 300,
+
+        [Parameter(Mandatory = $false)]
+        [int]$CheckInterval = 10
+    )
+
+    $attempts = 0
+    $maxAttempts = $TimeoutSeconds / $CheckInterval
+
+    while (-not (Test-KubeCertificate $CertificateName)) {
+        if ($attempts -ge $maxAttempts) {
+            Write-Error "Certificate is not ready after $TimeoutSeconds seconds"
+        }
+        $attempts++
+        Write-Host "[$attempts/$maxAttempts] Certificate is not yet ready"
+        Start-Sleep -Seconds $CheckInterval
+    }
+
+    Write-Host "Certificate is ready"
 }
