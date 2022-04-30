@@ -6,7 +6,7 @@ on:
       planOnly:
         description: 'Terraform plan only (do not apply)'
         required: true
-        default: 'true'
+        default: 'false'
 
 jobs:
   setup:
@@ -29,6 +29,8 @@ jobs:
           tee terraform.tfvars <<EOF
           kubernetes_version = "${{ secrets.KUBERNETES_VERSION }}"
           ssh_public_key = "${{ secrets.SSH_PUBLIC_KEY }}"
+          cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
           EOF
         working-directory: terraform
         
@@ -79,9 +81,34 @@ jobs:
           
       - name: Install Nginx Ingress
         run: |
-          helm upgrade --install --wait --atomic --debug ingress-nginx ingress-nginx \
+          helm upgrade --install --wait --atomic --debug \
+            ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
-            --namespace ingress-nginx --create-namespace \
+            --namespace ingress-nginx \
+            --create-namespace \
+            --version 4.1.0
             --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"="abyss" \
             --set controller.service.loadBalancerIP="${{ env.public_ip_address }}" \
             --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz # https://github.com/Azure/AKS/issues/2903
+            
+      - name: Install Cert Manager
+        run: |
+          helm repo add jetstack https://charts.jetstack.io
+          helm repo update
+          helm install  --install --wait --atomic --debug \
+            cert-manager jetstack/cert-manager \
+            --namespace cert-manager \
+            --create-namespace \
+            --version v1.8.0 \
+            --set installCRDs=true
+            
+      - name: Add cluster issuers
+        run: sed 's/${email}/${{ secrets.EMAIL }}/g' cluster-issuer.yaml | kubectl apply -f -
+        working-directory: kubernetes
+        
+      - name: Install Hello World
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            hello-world ./hello-world \
+            --namespace default
+        working-directory: kubernetes
