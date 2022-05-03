@@ -115,6 +115,8 @@ jobs:
         working-directory: kubernetes
 
       - name: Wait for Hello World certificate to be ready
-        run: ./WaitForCertificate.ps1 -CertificateName "hello-world-tls"
+        run: |
+          . "./Common/Helpers.ps1"
+          Wait-KubeCertificate -CertificateName "hello-world-tls"
         shell: pwsh
         working-directory: scripts
