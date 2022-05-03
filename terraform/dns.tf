@@ -1,6 +1,7 @@
 locals {
   dns_records = {
     "hello-world" = "hello-world",
+    "abyss" = "abyss",
   }
   proxied_records = {
     "hello-world" = true,
