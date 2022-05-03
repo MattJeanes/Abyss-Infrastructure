@@ -31,6 +31,7 @@ jobs:
           ssh_public_key = "${{ secrets.SSH_PUBLIC_KEY }}"
           cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
           cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
+          home_ip = "${{ secrets.HOME_IP }}"
           EOF
         working-directory: terraform
         
