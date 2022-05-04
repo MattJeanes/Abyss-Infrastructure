@@ -13,9 +13,9 @@ resource "azurerm_network_security_rule" "abyss_ssh" {
   direction                  = "Inbound"
   access                     = "Allow"
   protocol                   = "Tcp"
-  source_address_prefix      = "*"
+  source_address_prefix      = var.home_ip
   source_port_range          = "*"
-  destination_address_prefix = var.home_ip
+  destination_address_prefix = "*"
   destination_port_range     = "22"
 }
 
