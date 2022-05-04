@@ -88,6 +88,7 @@ jobs:
             --namespace ingress-nginx \
             --create-namespace \
             --version 4.1.0 \
+            --set controller.service.externalTrafficPolicy=Local \
             --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-resource-group"="abyss" \
             --set controller.service.loadBalancerIP="${{ env.public_ip_address }}" \
             --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz # https://github.com/Azure/AKS/issues/2903
