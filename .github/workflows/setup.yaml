@@ -121,7 +121,7 @@ jobs:
             --namespace dashboard \
             --set metricsScraper.enabled=true \
             --set ingress.enabled=true \
-            --set ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt \
+            --set ingress.annotations."cert-manager\.io/cluster-issuer"=letsencrypt-prod \
             --set ingress.hosts[0]="${{ secrets.DASHBOARD_HOST }}" \
             --set ingress.tls[0].hosts[0]="${{ secrets.DASHBOARD_HOST }}" \
             --set ingress.tls[0].secretName=dashboard-tls \
