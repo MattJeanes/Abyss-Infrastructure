@@ -130,7 +130,7 @@ jobs:
       - name: Wait for dashboard certificate to be ready
         run: |
           . "./Common/Helpers.ps1"
-          Wait-KubeCertificate -CertificateName "dashboard-tls" -Namespace "dashboard"
+          Wait-KubeCertificate -Name "dashboard-tls" -Namespace "dashboard"
         shell: pwsh
         working-directory: scripts
         
@@ -160,6 +160,6 @@ jobs:
       - name: Wait for Hello World certificate to be ready
         run: |
           . "./Common/Helpers.ps1"
-          Wait-KubeCertificate -CertificateName "hello-world-tls"
+          Wait-KubeCertificate -Name "hello-world-tls"
         shell: pwsh
         working-directory: scripts
