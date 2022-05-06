@@ -11,13 +11,13 @@ spec:
     - {{ required "host is required" .Values.host }}
     secretName: hello-world-tls
   rules:
-    - host: {{ required "host is required" .Values.host }}
-      http:
-        paths:
-        - path: /
-          pathType: Prefix
-          backend:
-            service:
-              name: hello-world
-              port:
-                number: 80
+  - host: {{ required "host is required" .Values.host }}
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: hello-world
+            port:
+              number: 80
