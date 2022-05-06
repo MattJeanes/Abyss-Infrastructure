@@ -130,7 +130,8 @@ jobs:
             --set ingress.hosts[0]="${{ secrets.DASHBOARD_HOST }}" \
             --set ingress.tls[0].hosts[0]="${{ secrets.DASHBOARD_HOST }}" \
             --set ingress.tls[0].secretName=dashboard-tls \
-            --set settings.clusterName=Abyss
+            --set settings.clusterName=Abyss \
+            --set settings.itemsPerPage=20
             
       - name: Wait for dashboard certificate to be ready
         run: |
