@@ -63,6 +63,9 @@ jobs:
               $value = $output.value
               $sensitive = $output.sensitive
               
+              if ($sensitive) {
+                Write-Host "::add-mask::$value"
+              }
               Write-Host "$key = $(($sensitive ? "***" : $value))"
               "$key=$value" >> $env:GITHUB_ENV
           }
