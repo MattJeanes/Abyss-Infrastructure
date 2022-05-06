@@ -1,18 +1,19 @@
 locals {
-  dns_records = {
-    "hello-world" = "hello-world",
-    "abyss" = "abyss",
-    "gpt" = "gpt",
-  }
+  dns_records = [
+    "kubedashboard",
+    "hello-world",
+    "abyss",
+    "gpt",
+  ]
   proxied_records = {
     "hello-world" = true,
   }
 }
 
 resource "cloudflare_record" "dns" {
-  for_each = local.dns_records
+  for_each = toset(local.dns_records)
   zone_id  = var.cloudflare_zone_id
-  name     = each.value
+  name     = each.key
   type     = "CNAME"
   value    = azurerm_public_ip.abyss_public.fqdn
   ttl      = 1
