@@ -49,7 +49,7 @@ function Test-KubeCertificate {
 function Wait-KubeCertificate {
     param(
         [Parameter(Mandatory = $true)]
-        [string]$CertificateName,
+        [string]$Name,
         
         [Parameter(Mandatory = $false)]
         [string]$Namespace = "default",
@@ -64,7 +64,7 @@ function Wait-KubeCertificate {
     $attempts = 0
     $maxAttempts = $TimeoutSeconds / $CheckInterval
 
-    while (-not (Test-KubeCertificate $CertificateName)) {
+    while (-not (Test-KubeCertificate -Name $Name -Namespace $Namespace)) {
         if ($attempts -ge $maxAttempts) {
             Write-Error "Certificate is not ready after $TimeoutSeconds seconds"
         }
