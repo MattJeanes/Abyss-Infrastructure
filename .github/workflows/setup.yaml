@@ -88,7 +88,7 @@ jobs:
           helm repo update
           
       - name: Install Nginx Ingress
-        run: |
+        run: | # https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx
           helm upgrade --install --wait --atomic --debug \
             ingress-nginx ingress-nginx \
             --repo https://kubernetes.github.io/ingress-nginx \
@@ -101,7 +101,7 @@ jobs:
             --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz # https://github.com/Azure/AKS/issues/2903
             
       - name: Install Cert Manager
-        run: |
+        run: | # https://artifacthub.io/packages/helm/cert-manager/cert-manager
           helm upgrade --install --wait --atomic --debug \
             cert-manager jetstack/cert-manager \
             --namespace cert-manager \
@@ -114,11 +114,12 @@ jobs:
         working-directory: kubernetes
         
       - name: Install kubernetes-dashboard
-        run: |
+        run: | # https://artifacthub.io/packages/helm/k8s-dashboard/kubernetes-dashboard
           helm upgrade --install --wait --atomic --debug \
             kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
             --create-namespace \
             --namespace dashboard \
+            --version v5.4.1 \
             --set metricsScraper.enabled=true \
             --set ingress.enabled=true \
             --set ingress.annotations."kubernetes\.io/ingress\.class"=nginx \
@@ -139,16 +140,18 @@ jobs:
         run: kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
         
       - name: Install kube-state-metrics
-        run: |          
+        run: | # https://artifacthub.io/packages/helm/prometheus-community/kube-state-metrics
           helm upgrade --install --wait --atomic --debug \
             kube-state-metrics prometheus-community/kube-state-metrics \
-            --namespace monitoring
+            --namespace monitoring \
+            --version v4.7.0
 
       - name: Install Prometheus
-        run: |          
+        run: | # https://artifacthub.io/packages/helm/prometheus-community/prometheus
           helm upgrade --install --wait --atomic --debug \
             prometheus prometheus-community/prometheus \
-            --namespace monitoring
+            --namespace monitoring \
+            --version v15.8.5
         
       - name: Install Hello World
         run: |
