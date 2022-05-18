@@ -89,6 +89,7 @@ jobs:
           helm repo add jetstack https://charts.jetstack.io
           helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
           helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
+          helm repo add bitnami https://charts.bitnami.com/bitnami
           helm repo update
           
       - name: Install Nginx Ingress
@@ -157,6 +158,16 @@ jobs:
             prometheus prometheus-community/prometheus \
             --namespace monitoring \
             --version v15.8.5
+            
+      - name: Install MariaDB
+        run: | # https://artifacthub.io/packages/helm/bitnami/mariadb
+          helm upgrade --install --wait --atomic --debug \
+            mariadb bitnami/mariadb \
+            --namespace default \
+            --version v11.0.4 \
+            --set metrics.enabled=true \
+            --set metrics.serviceMonitor.enabled=true \
+            --set metrics.serviceMonitor.namespace=monitoring
         
       - name: Install Hello World
         run: |
