@@ -3,3 +3,6 @@ metrics:
   serviceMonitor:
     enabled: true
     namespace: monitoring
+primary:
+  persistence:
+    existingClaim: mariadb

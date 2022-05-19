@@ -48,9 +48,23 @@ resource "azurerm_kubernetes_cluster" "abyss" {
 }
 
 resource "azurerm_role_assignment" "aks_abyss_networkcontributor" {
-  scope                = data.azurerm_subscription.current.id
+  scope                = azurerm_resource_group.abyss.id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.abyss.identity[0].principal_id
+}
+
+data "azurerm_user_assigned_identity" "aks_abyss_agentpool" {
+  name                = "${azurerm_kubernetes_cluster.abyss.name}-agentpool"
+  resource_group_name = azurerm_kubernetes_cluster.abyss.node_resource_group
+  depends_on = [
+    azurerm_kubernetes_cluster.abyss,
+  ]
+}
+
+resource "azurerm_role_assignment" "aks_abyss_diskaccess" {
+  scope                = azurerm_resource_group.abyss.id
+  role_definition_name = azurerm_role_definition.diskaccess.name
+  principal_id         = data.azurerm_user_assigned_identity.aks_abyss_agentpool.principal_id
 }
 
 # https://github.com/hashicorp/terraform-provider-azurerm/issues/9733

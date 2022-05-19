@@ -8,15 +8,15 @@ resource "azurerm_network_security_rule" "abyss_ssh" {
   network_security_group_name = azurerm_network_security_group.abyss.name
   resource_group_name         = azurerm_network_security_group.abyss.resource_group_name
 
-  name                       = "SSH"
+  name                       = "Home"
   priority                   = 300
   direction                  = "Inbound"
   access                     = "Allow"
-  protocol                   = "Tcp"
+  protocol                   = "*"
   source_address_prefix      = var.home_ip
   source_port_range          = "*"
   destination_address_prefix = "*"
-  destination_port_range     = "22"
+  destination_port_range     = "*"
 }
 
 resource "azurerm_network_security_rule" "abyss_http" {
@@ -58,7 +58,7 @@ resource "azurerm_network_security_rule" "abyss_postgresql" {
   direction                  = "Inbound"
   access                     = "Allow"
   protocol                   = "Tcp"
-  source_address_prefixes    = [var.home_ip, azurerm_public_ip.abyss_public.ip_address]
+  source_address_prefix      = azurerm_public_ip.abyss_public.ip_address
   source_port_range          = "*"
   destination_address_prefix = "*"
   destination_port_range     = "5432"
@@ -88,7 +88,7 @@ resource "azurerm_network_security_rule" "abyss_mariadb" {
   direction                  = "Inbound"
   access                     = "Allow"
   protocol                   = "Tcp"
-  source_address_prefixes    = [var.home_ip, azurerm_public_ip.abyss_public.ip_address]
+  source_address_prefix      = azurerm_public_ip.abyss_public.ip_address
   source_port_range          = "*"
   destination_address_prefix = "*"
   destination_port_range     = "3306"
@@ -103,7 +103,7 @@ resource "azurerm_network_security_rule" "abyss_mongodb" {
   direction                  = "Inbound"
   access                     = "Allow"
   protocol                   = "Tcp"
-  source_address_prefixes    = [var.home_ip, azurerm_public_ip.abyss_public.ip_address]
+  source_address_prefix      = azurerm_public_ip.abyss_public.ip_address
   source_port_range          = "*"
   destination_address_prefix = "*"
   destination_port_range     = "27017"
