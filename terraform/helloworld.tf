@@ -2,6 +2,7 @@ resource "helm_release" "helloworld" {
   name      = "hello-world"
   chart     = "../kubernetes/hello-world"
   namespace = "default"
+  version   = "1.0.1"
   atomic    = true
 
   set {
