@@ -86,7 +86,12 @@ resource "null_resource" "aks_login" {
   triggers = {
     always_run = timestamp()
   }
+  
   provisioner "local-exec" {
     command = "az aks get-credentials --resource-group \"${azurerm_kubernetes_cluster.abyss.resource_group_name}\" --name \"${azurerm_kubernetes_cluster.abyss.name}\" --admin"
   }
+
+  depends_on = [
+    azurerm_kubernetes_cluster.abyss
+  ]
 }
