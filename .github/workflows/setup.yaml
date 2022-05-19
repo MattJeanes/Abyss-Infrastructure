@@ -144,20 +144,13 @@ jobs:
         
       - name: Create monitoring namespace
         run: kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
-        
-      - name: Install kube-state-metrics
-        run: | # https://artifacthub.io/packages/helm/prometheus-community/kube-state-metrics
-          helm upgrade --install --wait --atomic --debug \
-            kube-state-metrics prometheus-community/kube-state-metrics \
-            --namespace monitoring \
-            --version v4.7.0
 
       - name: Install Prometheus
-        run: | # https://artifacthub.io/packages/helm/prometheus-community/prometheus
+        run: | # https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
           helm upgrade --install --wait --atomic --debug \
-            prometheus prometheus-community/prometheus \
+            kube-prometheus-stack prometheus-community/kube-prometheus-stack \
             --namespace monitoring \
-            --version v15.8.5
+            --version v35.2.0
             
       - name: Install MariaDB
         run: | # https://artifacthub.io/packages/helm/bitnami/mariadb
