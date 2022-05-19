@@ -33,6 +33,10 @@ jobs:
           cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
           cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
           home_ip = "${{ secrets.HOME_IP }}"
+          mariadb_root_password = "${{ secrets.MARIADB_ROOT_PASSWORD }}"
+          email = "${{ secrets.EMAIL }}"
+          dashboard_host = "${{ secrets.DASHBOARD_HOST }}"
+          hello_world_host = "${{ secrets.HELLO_WORLD_HOST }}"
           EOF
         working-directory: terraform
         
@@ -54,122 +58,3 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         if: github.event.inputs.planOnly == 'false'
-        
-      - name: Retrieve terraform outputs
-        run: |
-          $outputs = terraform output -json | ConvertFrom-Json -AsHashTable
-          $outputs.Keys | ForEach-Object {
-              $key = $_
-              $output = $outputs[$key]
-              $value = $output.value
-              $sensitive = $output.sensitive
-              
-              if ($sensitive) {
-                Write-Host "::add-mask::$value"
-              }
-              Write-Host "$key = $(($sensitive ? "***" : $value))"
-              "$key=$value" >> $env:GITHUB_ENV
-          }
-        shell: pwsh
-        working-directory: terraform
-      
-      - name: Azure Login
-        uses: Azure/login@v1.4.3
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Login to Kubernetes
-        uses: Azure/aks-set-context@v2.1
-        with:
-          resource-group: abyss
-          cluster-name: abyss
-      
-      - name: Install Helm repos and update
-        run: |
-          helm repo add jetstack https://charts.jetstack.io
-          helm repo add prometheus-community https://prometheus-community.github.io/helm-charts
-          helm repo add kubernetes-dashboard https://kubernetes.github.io/dashboard/
-          helm repo add bitnami https://charts.bitnami.com/bitnami
-          helm repo update
-          
-      - name: Install Nginx Ingress
-        run: | # https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx
-          helm upgrade --install --wait --atomic --debug \
-            ingress-nginx ingress-nginx \
-            --repo https://kubernetes.github.io/ingress-nginx \
-            --namespace ingress-nginx \
-            --create-namespace \
-            --version 4.1.0 \
-            -f ingress-nginx.yaml \
-            --set controller.service.loadBalancerIP="${{ env.public_ip_address }}"
-        working-directory: kubernetes/releases
-            
-      - name: Install Cert Manager
-        run: | # https://artifacthub.io/packages/helm/cert-manager/cert-manager
-          helm upgrade --install --wait --atomic --debug \
-            cert-manager jetstack/cert-manager \
-            --namespace cert-manager \
-            --create-namespace \
-            --version v1.8.0 \
-            -f cert-manager.yaml
-        working-directory: kubernetes/releases
-            
-      - name: Add cluster issuers
-        run: sed 's/${email}/${{ secrets.EMAIL }}/g' cluster-issuer.yaml | kubectl apply -f -
-        working-directory: kubernetes
-        
-      - name: Install kubernetes-dashboard
-        run: | # https://artifacthub.io/packages/helm/k8s-dashboard/kubernetes-dashboard
-          helm upgrade --install --wait --atomic --debug \
-            kubernetes-dashboard kubernetes-dashboard/kubernetes-dashboard \
-            --create-namespace \
-            --namespace dashboard \
-            --version v5.4.1 \
-            -f kubernetes-dashboard.yaml \
-            --set ingress.hosts[0]="${{ secrets.DASHBOARD_HOST }}" \
-            --set ingress.tls[0].hosts[0]="${{ secrets.DASHBOARD_HOST }}"
-        working-directory: kubernetes/releases
-            
-      - name: Wait for dashboard certificate to be ready
-        run: |
-          . "./Common/Helpers.ps1"
-          Wait-KubeCertificate -Name "dashboard-tls" -Namespace "dashboard"
-        shell: pwsh
-        working-directory: scripts
-        
-      - name: Create monitoring namespace
-        run: kubectl create namespace monitoring --dry-run=client -o yaml | kubectl apply -f -
-
-      - name: Install Prometheus
-        run: | # https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
-          helm upgrade --install --wait --atomic --debug \
-            kube-prometheus-stack prometheus-community/kube-prometheus-stack \
-            --namespace monitoring \
-            --version v35.2.0 \
-            -f kube-prometheus-stack.yaml
-        working-directory: kubernetes/releases
-            
-      - name: Install MariaDB
-        run: | # https://artifacthub.io/packages/helm/bitnami/mariadb
-          helm upgrade --install --wait --atomic --debug \
-            mariadb bitnami/mariadb \
-            --namespace default \
-            --version v11.0.4 \
-            -f mariadb.yaml \
-            --set auth.rootPassword="${{ secrets.MARIADB_ROOT_PASSWORD }}"
-        working-directory: kubernetes/releases
-        
-      - name: Install Hello World
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            hello-world ./hello-world \
-            --namespace default \
-            --set host="${{ secrets.HELLO_WORLD_HOST }}"
-        working-directory: kubernetes
-
-      - name: Wait for Hello World certificate to be ready
-        run: |
-          . "./Common/Helpers.ps1"
-          Wait-KubeCertificate -Name "hello-world-tls"
-        shell: pwsh
-        working-directory: scripts
