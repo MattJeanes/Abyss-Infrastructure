@@ -33,6 +33,7 @@ jobs:
           cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
           cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
           home_ip = "${{ secrets.HOME_IP }}"
+          mariadb_root_password = "${{ secrets.MARIADB_ROOT_PASSWORD }}"
           EOF
         working-directory: terraform
         
