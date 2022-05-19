@@ -81,3 +81,9 @@ resource "azurerm_role_assignment" "aks_abyss_aci_network_contributor_subnet" {
   role_definition_name = "Network Contributor"
   principal_id         = data.azurerm_user_assigned_identity.aks_abyss_aci.principal_id
 }
+
+resource "null_resource" "aks_login" {
+  provisioner "local-exec" {
+    command = "az aks get-credentials --resource-group \"${azurerm_kubernetes_cluster.abyss.resource_group_name}\" --name \"${azurerm_kubernetes_cluster.abyss.name}\" --admin"
+  }
+}

@@ -26,4 +26,8 @@ resource "helm_release" "dashboard" {
     interpreter = ["pwsh", "-Command"]
     working_dir = "../scripts"
   }
+
+  depends_on = [
+    null_resource.aks_login
+  ]
 }
