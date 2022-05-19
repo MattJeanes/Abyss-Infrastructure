@@ -155,7 +155,8 @@ jobs:
             mariadb bitnami/mariadb \
             --namespace default \
             --version v11.0.4 \
-            -f mariadb.yaml
+            -f mariadb.yaml \
+            --set auth.rootPassword="${{ secrets.MARIADB_ROOT_PASSWORD }}"
         working-directory: kubernetes/releases
         
       - name: Install Hello World
