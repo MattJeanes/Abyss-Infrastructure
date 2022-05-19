@@ -1,0 +1,12 @@
+metricsScraper:
+  enabled: true
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  tls:
+  - secretName: dashboard-tls
+settings:
+  clusterName: Abyss
+  itemsPerPage: 20
