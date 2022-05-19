@@ -10,7 +10,7 @@ resource "helm_release" "helloworld" {
   }
 
   provisioner "local-exec" {
-    command     = "WaitKubeCertificate.ps1 -Name 'hello-world-tls'"
+    command     = "./WaitKubeCertificate.ps1 -Name 'hello-world-tls'"
     interpreter = ["pwsh", "-Command"]
     working_dir = "../scripts"
   }

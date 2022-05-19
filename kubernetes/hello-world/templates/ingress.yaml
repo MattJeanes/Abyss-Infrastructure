@@ -3,7 +3,7 @@ kind: Ingress
 metadata:
   name: hello-world
   annotations:
-    cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    cert-manager.io/cluster-issuer: "letsencrypt-staging"
     kubernetes.io/ingress.class: "nginx"
 spec:
   tls:

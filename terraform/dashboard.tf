@@ -22,7 +22,7 @@ resource "helm_release" "dashboard" {
   }
 
   provisioner "local-exec" {
-    command     = "WaitKubeCertificate.ps1 -Name 'dashboard-tls' -Namespace 'dashboard'"
+    command     = "./WaitKubeCertificate.ps1 -Name 'dashboard-tls' -Namespace 'dashboard'"
     interpreter = ["pwsh", "-Command"]
     working_dir = "../scripts"
   }
