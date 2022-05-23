@@ -57,6 +57,7 @@ jobs:
           email = "${{ secrets.EMAIL }}"
           dashboard_host = "${{ secrets.DASHBOARD_HOST }}"
           hello_world_host = "${{ secrets.HELLO_WORLD_HOST }}"
+          aks_login = ${{ env.aks_login }}
           EOF
         working-directory: terraform
         
