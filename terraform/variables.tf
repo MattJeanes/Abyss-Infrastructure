@@ -33,3 +33,7 @@ variable "dashboard_host" {
 variable "hello_world_host" {
   sensitive = true
 }
+
+variable "aks_login" {
+  type = bool
+}

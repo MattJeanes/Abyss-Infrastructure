@@ -84,7 +84,7 @@ resource "azurerm_role_assignment" "aks_abyss_aci_network_contributor_subnet" {
 
 resource "null_resource" "aks_login" {
   triggers = {
-    always_run = timestamp()
+    always_run = var.aks_login ? timestamp() : "false"
   }
   
   provisioner "local-exec" {
