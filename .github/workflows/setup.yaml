@@ -21,7 +21,8 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
           
-      - run: |
+      - name: Check for existing AKS cluster
+        run: |
           if ((az group exists -n abyss) -eq "true" -and (az aks list -g "abyss" -o json | ConvertFrom-Json).name -eq "abyss") {
               Write-Host "Cluster already exists, logging in"
               az aks get-credentials --resource-group abyss --name abyss --admin
