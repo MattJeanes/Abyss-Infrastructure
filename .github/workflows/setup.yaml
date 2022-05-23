@@ -20,6 +20,21 @@ jobs:
         uses: Azure/login@v1.4.3
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
+          
+      - run: |
+          if ((az group exists -n abyss) -eq "true" -and (az aks list -g "abyss" -o json | ConvertFrom-Json).name -eq "abyss") {
+              Write-Host "Cluster already exists, logging in"
+              az aks get-credentials --resource-group abyss --name abyss --admin
+              if ($LASTEXITCODE -ne 0) {
+                  Write-Error "az exited with code $LASTEXITCODE"
+              }
+              "aks_login=false" >> $env:GITHUB_ENV
+
+          } else {
+              Write-Host "Cluster does not yet exist, setting Terraform to perform login after creation"
+              "aks_login=true" >> $env:GITHUB_ENV
+          }
+        shell: pwsh
                     
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v2.0.0
