@@ -1,3 +1,7 @@
+locals {
+  dashboard_host = "kubedashboard.${var.host}"
+}
+
 resource "helm_release" "dashboard" {
   name             = "kubernetes-dashboard"
   repository       = "https://kubernetes.github.io/dashboard"
@@ -13,12 +17,12 @@ resource "helm_release" "dashboard" {
 
   set {
     name  = "ingress.hosts[0]"
-    value = var.dashboard_host
+    value = local.dashboard_host
   }
 
   set {
     name  = "ingress.tls[0].hosts[0]"
-    value = var.dashboard_host
+    value = local.dashboard_host
   }
 
   provisioner "local-exec" {

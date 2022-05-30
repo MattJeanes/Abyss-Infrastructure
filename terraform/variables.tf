@@ -26,11 +26,7 @@ variable "email" {
   sensitive = true
 }
 
-variable "dashboard_host" {
-  sensitive = true
-}
-
-variable "hello_world_host" {
+variable "host" {
   sensitive = true
 }
 

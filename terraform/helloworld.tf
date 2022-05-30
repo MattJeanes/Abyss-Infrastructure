@@ -1,3 +1,7 @@
+locals {
+  hello_world_host = "hello-world.${var.host}"
+}
+
 resource "helm_release" "helloworld" {
   name      = "hello-world"
   chart     = "../kubernetes/hello-world"
@@ -7,7 +11,7 @@ resource "helm_release" "helloworld" {
 
   set {
     name  = "host"
-    value = var.hello_world_host
+    value = local.hello_world_host
   }
 
   provisioner "local-exec" {

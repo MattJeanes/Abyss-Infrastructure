@@ -56,8 +56,7 @@ jobs:
           home_ip = "${{ secrets.HOME_IP }}"
           mariadb_root_password = "${{ secrets.MARIADB_ROOT_PASSWORD }}"
           email = "${{ secrets.EMAIL }}"
-          dashboard_host = "${{ secrets.DASHBOARD_HOST }}"
-          hello_world_host = "${{ secrets.HELLO_WORLD_HOST }}"
+          host = "${{ secrets.HOST }}"
           aks_login = ${{ env.aks_login }}
           EOF
         working-directory: terraform
