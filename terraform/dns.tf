@@ -4,6 +4,10 @@ locals {
     "hello-world",
     "abyss",
     "gpt",
+    "alertmanager",
+    "newgrafana",
+    "prometheus",
+    "auth"
   ]
   proxied_records = {
     "hello-world" = true,

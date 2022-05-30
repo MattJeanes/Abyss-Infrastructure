@@ -2,14 +2,19 @@ locals {
   dashboard_host = "kubedashboard.${var.host}"
 }
 
+resource "kubernetes_namespace" "dashboard" {
+  metadata {
+    name = "dashboard"
+  }
+}
+
 resource "helm_release" "dashboard" {
-  name             = "kubernetes-dashboard"
-  repository       = "https://kubernetes.github.io/dashboard"
-  chart            = "kubernetes-dashboard"
-  namespace        = "dashboard"
-  version          = "v5.4.1"
-  atomic           = true
-  create_namespace = true
+  name       = "kubernetes-dashboard"
+  repository = "https://kubernetes.github.io/dashboard"
+  chart      = "kubernetes-dashboard"
+  namespace  = kubernetes_namespace.dashboard.metadata[0].name
+  version    = "v5.4.1"
+  atomic     = true
 
   values = [
     file("../kubernetes/releases/kubernetes-dashboard.yaml")
@@ -25,6 +30,21 @@ resource "helm_release" "dashboard" {
     value = local.dashboard_host
   }
 
+  set {
+    name  = "ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/configuration-snippet"
+    value = "proxy_set_header Authorization \"Bearer ${data.kubernetes_secret.dashboard.data.token}\";"
+  }
+
+  set {
+    name  = "ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url"
+    value = local.auth_url
+  }
+
+  set {
+    name  = "ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin"
+    value = local.auth_signin
+  }
+
   provisioner "local-exec" {
     command     = "./WaitKubeCertificate.ps1 -Name 'dashboard-tls' -Namespace 'dashboard'"
     interpreter = ["pwsh", "-Command"]
@@ -32,6 +52,52 @@ resource "helm_release" "dashboard" {
   }
 
   depends_on = [
-    null_resource.aks_login
+    null_resource.aks_login,
+    kubernetes_namespace.dashboard
   ]
+}
+
+resource "kubernetes_service_account" "dashboard" {
+  metadata {
+    name      = "admin-user"
+    namespace = kubernetes_namespace.dashboard.metadata[0].name
+  }
+}
+
+resource "kubernetes_cluster_role_binding" "dashboard" {
+  metadata {
+    name = "admin-user"
+  }
+  role_ref {
+    api_group = "rbac.authorization.k8s.io"
+    kind      = "ClusterRole"
+    name      = "cluster-admin"
+  }
+  subject {
+    kind      = "ServiceAccount"
+    name      = kubernetes_service_account.dashboard.metadata[0].name
+    namespace = kubernetes_namespace.dashboard.metadata[0].name
+  }
+
+  depends_on = [
+    kubernetes_service_account.dashboard
+  ]
+}
+
+data "kubernetes_service_account" "dashboard" {
+  metadata {
+    name      = kubernetes_service_account.dashboard.metadata[0].name
+    namespace = kubernetes_namespace.dashboard.metadata[0].name
+  }
+
+  depends_on = [
+    kubernetes_service_account.dashboard
+  ]
+}
+
+data "kubernetes_secret" "dashboard" {
+  metadata {
+    name      = data.kubernetes_service_account.dashboard.default_secret_name
+    namespace = kubernetes_namespace.dashboard.metadata[0].name
+  }
 }

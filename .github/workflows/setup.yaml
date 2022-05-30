@@ -58,6 +58,9 @@ jobs:
           email = "${{ secrets.EMAIL }}"
           host = "${{ secrets.HOST }}"
           aks_login = ${{ env.aks_login }}
+          oauth2_client_id = "${{ secrets.OAUTH2_CLIENT_ID }}"
+          oauth2_client_secret = "${{ secrets.OAUTH2_CLIENT_SECRET }}"
+          oauth2_cookie_secret = "${{ secrets.OAUTH2_COOKIE_SECRET }}"
           EOF
         working-directory: terraform
         

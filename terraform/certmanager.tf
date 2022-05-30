@@ -1,14 +1,23 @@
+resource "kubernetes_namespace" "certmanager" {
+  metadata {
+    name = "cert-manager"
+  }
+}
+
 resource "helm_release" "certmanager" {
   name             = "cert-manager"
   repository       = "https://charts.jetstack.io"
   chart            = "cert-manager"
-  namespace        = "cert-manager"
+  namespace        = kubernetes_namespace.certmanager.metadata[0].name
   version          = "v1.8.0"
   atomic           = true
-  create_namespace = true
 
   values = [
     file("../kubernetes/releases/cert-manager.yaml")
+  ]
+
+  depends_on = [
+    kubernetes_namespace.certmanager
   ]
 }
 
@@ -38,6 +47,10 @@ resource "kubernetes_manifest" "cluster_issuer_letsencrypt_staging" {
       }
     }
   }
+
+  depends_on = [
+    helm_release.certmanager
+  ]
 }
 
 resource "kubernetes_manifest" "cluster_issuer_letsencrypt_prod" {

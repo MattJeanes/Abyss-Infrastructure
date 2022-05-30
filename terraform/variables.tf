@@ -33,3 +33,15 @@ variable "host" {
 variable "aks_login" {
   type = bool
 }
+
+variable "oauth2_client_id" {
+  sensitive = true
+}
+
+variable "oauth2_client_secret" {
+  sensitive = true
+}
+
+variable "oauth2_cookie_secret" {
+  sensitive = true
+}

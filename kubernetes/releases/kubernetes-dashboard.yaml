@@ -10,3 +10,6 @@ ingress:
 settings:
   clusterName: Abyss
   itemsPerPage: 20
+  logsAutoRefreshTimeInterval: 5
+  resourceAutoRefreshTimeInterval: 5
+  disableAccessDeniedNotifications: false
