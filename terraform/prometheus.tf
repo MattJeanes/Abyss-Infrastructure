@@ -11,12 +11,12 @@ resource "kubernetes_namespace" "monitoring" {
 }
 
 resource "helm_release" "prometheus" {
-  name             = "kube-prometheus-stack"
-  repository       = "https://prometheus-community.github.io/helm-charts"
-  chart            = "kube-prometheus-stack"
-  namespace        = kubernetes_namespace.monitoring.metadata[0].name
-  version          = "v35.2.0"
-  atomic           = true
+  name       = "kube-prometheus-stack"
+  repository = "https://prometheus-community.github.io/helm-charts"
+  chart      = "kube-prometheus-stack"
+  namespace  = kubernetes_namespace.monitoring.metadata[0].name
+  version    = "v35.2.0"
+  atomic     = true
 
   values = [
     file("../kubernetes/releases/kube-prometheus-stack.yaml")
@@ -50,6 +50,11 @@ resource "helm_release" "prometheus" {
   set {
     name  = "grafana.ingress.tls[0].hosts[0]"
     value = local.grafana_host
+  }
+
+  set {
+    name  = "grafana.adminPassword"
+    value = var.grafana_admin_password
   }
 
   set {

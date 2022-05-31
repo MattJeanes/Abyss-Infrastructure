@@ -17,6 +17,13 @@ alertmanager:
     tls:
     - secretName: alertmanager-tls
 grafana:
+  sidecar:
+    dashboards:
+      enabled: true
+      searchNamespace: ALL
+    datasources:
+      enabled: true
+      searchNamespace: ALL
   ingress:
     enabled: true
     annotations:
@@ -32,3 +39,26 @@ prometheus:
       cert-manager.io/cluster-issuer: letsencrypt-prod
     tls:
     - secretName: prometheus-tls
+kubeScheduler:
+  enabled: false
+kubeControllerManager:
+  enabled: false
+kubeProxy:
+  enabled: false
+defaultRules:
+  disabled:
+    TargetDown: true
+additionalPrometheusRulesMap:
+  patched-default-rules:
+    groups:
+    - name: general.rules
+      rules:
+      - alert: TargetDown
+        annotations:
+          description: '{{ printf "%.4g" $value }}% of the {{ $labels.job }}/{{ $labels.service }} targets in {{ $labels.namespace }} namespace are down.'
+          summary: One or more targets are unreachable.
+        # Ignore virtual node
+        expr: 100 * (count by(job, namespace, service) (up{node != "virtual-node-aci-linux"} == 0) / count by(job, namespace, service) (up{node != "virtual-node-aci-linux"})) > 10
+        for: 10m
+        labels:
+          severity: warning

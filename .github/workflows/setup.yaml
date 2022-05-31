@@ -61,6 +61,7 @@ jobs:
           oauth2_client_id = "${{ secrets.OAUTH2_CLIENT_ID }}"
           oauth2_client_secret = "${{ secrets.OAUTH2_CLIENT_SECRET }}"
           oauth2_cookie_secret = "${{ secrets.OAUTH2_COOKIE_SECRET }}"
+          grafana_admin_password = "${{ secrets.GRAFANA_ADMIN_PASSWORD }}"
           EOF
         working-directory: terraform
         

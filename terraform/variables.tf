@@ -45,3 +45,7 @@ variable "oauth2_client_secret" {
 variable "oauth2_cookie_secret" {
   sensitive = true
 }
+
+variable "grafana_admin_password" {
+  sensitive = true
+}
