@@ -53,6 +53,13 @@ resource "azurerm_role_assignment" "aks_abyss_networkcontributor" {
   principal_id         = azurerm_kubernetes_cluster.abyss.identity[0].principal_id
 }
 
+
+resource "azurerm_role_assignment" "aks_abyss_diskaccess" {
+  scope                = azurerm_resource_group.abyss.id
+  role_definition_name = azurerm_role_definition.diskaccess.name
+  principal_id         = azurerm_kubernetes_cluster.abyss.identity[0].principal_id
+}
+
 data "azurerm_user_assigned_identity" "aks_abyss_agentpool" {
   name                = "${azurerm_kubernetes_cluster.abyss.name}-agentpool"
   resource_group_name = azurerm_kubernetes_cluster.abyss.node_resource_group
@@ -61,7 +68,7 @@ data "azurerm_user_assigned_identity" "aks_abyss_agentpool" {
   ]
 }
 
-resource "azurerm_role_assignment" "aks_abyss_diskaccess" {
+resource "azurerm_role_assignment" "aks_abyss_agentpool_diskaccess" {
   scope                = azurerm_resource_group.abyss.id
   role_definition_name = azurerm_role_definition.diskaccess.name
   principal_id         = data.azurerm_user_assigned_identity.aks_abyss_agentpool.principal_id
@@ -86,7 +93,7 @@ resource "null_resource" "aks_login" {
   triggers = {
     always_run = var.aks_login ? timestamp() : "false"
   }
-  
+
   provisioner "local-exec" {
     command = "az aks get-credentials --resource-group \"${azurerm_kubernetes_cluster.abyss.resource_group_name}\" --name \"${azurerm_kubernetes_cluster.abyss.name}\" --admin"
   }

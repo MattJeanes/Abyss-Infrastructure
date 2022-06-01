@@ -16,6 +16,19 @@ alertmanager:
       cert-manager.io/cluster-issuer: letsencrypt-prod
     tls:
     - secretName: alertmanager-tls
+  config:
+    route:
+      receiver: pagerduty
+      routes:
+      - receiver: deadmanssnitch
+        match:
+          alertname: Watchdog
+        repeat_interval: 30m
+    receivers:
+    - name: pagerduty
+    - name: deadmanssnitch
+      webhook_configs:
+      - send_resolved: false
 grafana:
   sidecar:
     dashboards:

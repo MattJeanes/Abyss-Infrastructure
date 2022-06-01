@@ -49,3 +49,15 @@ variable "oauth2_cookie_secret" {
 variable "grafana_admin_password" {
   sensitive = true
 }
+
+variable "pagerduty_url" {
+  sensitive = true
+}
+
+variable "pagerduty_integration_key" {
+  sensitive = true
+}
+
+variable "dead_mans_snitch_webhook_url" {
+  sensitive = true
+}

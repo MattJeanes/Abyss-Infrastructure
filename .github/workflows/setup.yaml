@@ -62,6 +62,9 @@ jobs:
           oauth2_client_secret = "${{ secrets.OAUTH2_CLIENT_SECRET }}"
           oauth2_cookie_secret = "${{ secrets.OAUTH2_COOKIE_SECRET }}"
           grafana_admin_password = "${{ secrets.GRAFANA_ADMIN_PASSWORD }}"
+          pagerduty_url = "${{ secrets.PAGERDUTY_URL }}"
+          pagerduty_integration_key = "${{ secrets.PAGERDUTY_INTEGRATION_KEY }}"
+          dead_mans_snitch_webhook_url = "${{ secrets.DEAD_MANS_SNITCH_WEBHOOK_URL }}"
           EOF
         working-directory: terraform
         

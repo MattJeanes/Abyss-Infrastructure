@@ -2,12 +2,9 @@ resource "azurerm_managed_disk" "mariadb" {
   name                 = "mariadb"
   location             = azurerm_resource_group.abyss.location
   resource_group_name  = azurerm_resource_group.abyss.name
-  storage_account_type = "Standard_LRS"
+  storage_account_type = "StandardSSD_LRS"
   create_option        = "Empty"
-  disk_size_gb         = "1"
-  tags = {
-    environment = azurerm_resource_group.abyss.name
-  }
+  disk_size_gb         = 4
 }
 
 resource "kubernetes_persistent_volume" "mariadb" {
@@ -16,7 +13,7 @@ resource "kubernetes_persistent_volume" "mariadb" {
   }
   spec {
     capacity = {
-      storage = "1Gi"
+      storage = "4Gi"
     }
     access_modes                     = ["ReadWriteOnce"]
     persistent_volume_reclaim_policy = "Retain"
@@ -39,14 +36,14 @@ resource "kubernetes_persistent_volume_claim" "mariadb" {
     name = "mariadb"
   }
   spec {
-    access_modes = ["ReadWriteOnce"]
+    access_modes = kubernetes_persistent_volume.mariadb.spec[0].access_modes
     resources {
       requests = {
-        storage = "1Gi"
+        storage = kubernetes_persistent_volume.mariadb.spec[0].capacity.storage
       }
     }
     volume_name        = kubernetes_persistent_volume.mariadb.metadata.0.name
-    storage_class_name = "managed-csi"
+    storage_class_name = kubernetes_persistent_volume.mariadb.spec[0].storage_class_name
   }
 }
 
