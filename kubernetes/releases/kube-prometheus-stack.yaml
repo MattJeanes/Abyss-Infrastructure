@@ -23,7 +23,7 @@ alertmanager:
       - receiver: deadmanssnitch
         match:
           alertname: Watchdog
-        repeat_interval: 30m
+        repeat_interval: 15m
     receivers:
     - name: pagerduty
     - name: deadmanssnitch
