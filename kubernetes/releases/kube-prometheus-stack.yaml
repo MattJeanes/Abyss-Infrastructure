@@ -26,12 +26,13 @@ alertmanager:
         repeat_interval: 15m
       - matchers:
         - alertname = InfoInhibitor
-        receiver: null
+        receiver: "null"
     receivers:
     - name: pagerduty
     - name: deadmanssnitch
       webhook_configs:
       - send_resolved: false
+    - name: "null"
     inhibit_rules:
     - equal:
       - namespace
