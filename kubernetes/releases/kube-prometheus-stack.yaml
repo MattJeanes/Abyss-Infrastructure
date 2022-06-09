@@ -20,15 +20,39 @@ alertmanager:
     route:
       receiver: pagerduty
       routes:
-      - receiver: deadmanssnitch
-        match:
-          alertname: Watchdog
+      - matchers:
+        - alertname = Watchdog
+        receiver: deadmanssnitch
         repeat_interval: 15m
+      - matchers:
+        - alertname = InfoInhibitor
+        receiver: null
     receivers:
     - name: pagerduty
     - name: deadmanssnitch
       webhook_configs:
       - send_resolved: false
+    inhibit_rules:
+    - equal:
+      - namespace
+      - alertname
+      source_matchers:
+      - severity = critical
+      target_matchers:
+      - severity =~ warning|info
+    - equal:
+      - namespace
+      - alertname
+      source_matchers:
+      - severity = warning
+      target_matchers:
+      - severity = info
+    - equal:
+      - namespace
+      source_matchers:
+      - alertname = InfoInhibitor
+      target_matchers:
+      - severity = info
 grafana:
   sidecar:
     dashboards:
