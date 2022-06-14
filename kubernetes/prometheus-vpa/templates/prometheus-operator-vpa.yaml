@@ -1,0 +1,18 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: prometheus-operator-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: kube-prometheus-stack-operator
+  resourcePolicy:
+    containerPolicies:
+    - containerName: "*"
+      maxAllowed:
+        cpu: 50m
+        memory: 500Mi
+      mode: Auto
+  updatePolicy:
+    updateMode: Auto

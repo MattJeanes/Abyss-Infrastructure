@@ -1,0 +1,18 @@
+apiVersion: autoscaling.k8s.io/v1
+kind: VerticalPodAutoscaler
+metadata:
+  name: prometheus-vpa
+spec:
+  targetRef:
+    apiVersion: apps/v1
+    kind: StatefulSet
+    name: prometheus-kube-prometheus-stack-prometheus
+  resourcePolicy:
+    containerPolicies:
+    - containerName: "*"
+      maxAllowed:
+        cpu: 800m
+        memory: 2Gi
+      mode: Auto
+  updatePolicy:
+    updateMode: Auto

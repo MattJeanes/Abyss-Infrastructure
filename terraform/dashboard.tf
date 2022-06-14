@@ -9,11 +9,12 @@ resource "kubernetes_namespace" "dashboard" {
 }
 
 resource "helm_release" "dashboard" {
+  # https://artifacthub.io/packages/helm/k8s-dashboard/kubernetes-dashboard
   name       = "kubernetes-dashboard"
   repository = "https://kubernetes.github.io/dashboard"
   chart      = "kubernetes-dashboard"
   namespace  = kubernetes_namespace.dashboard.metadata[0].name
-  version    = "v5.4.1"
+  version    = "5.7.0"
   atomic     = true
 
   values = [

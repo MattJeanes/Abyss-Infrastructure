@@ -77,11 +77,12 @@ resource "kubernetes_namespace" "monitoring" {
 }
 
 resource "helm_release" "prometheus" {
+  # https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
   name       = "kube-prometheus-stack"
   repository = "https://prometheus-community.github.io/helm-charts"
   chart      = "kube-prometheus-stack"
   namespace  = kubernetes_namespace.monitoring.metadata[0].name
-  version    = "v35.2.0"
+  version    = "36.0.1"
   atomic     = true
 
   values = [
@@ -200,5 +201,17 @@ resource "helm_release" "prometheus" {
 
   depends_on = [
     kubernetes_namespace.monitoring
+  ]
+}
+
+resource "helm_release" "prometheus_vpa" {
+  name      = "prometheus-vpa"
+  chart     = "../kubernetes/prometheus-vpa"
+  namespace = kubernetes_namespace.monitoring.metadata[0].name
+  version   = "1.0.0"
+  atomic    = true
+
+  depends_on = [
+    helm_release.vpa
   ]
 }

@@ -5,11 +5,12 @@ resource "kubernetes_namespace" "certmanager" {
 }
 
 resource "helm_release" "certmanager" {
+  # https://artifacthub.io/packages/helm/cert-manager/cert-manager
   name             = "cert-manager"
   repository       = "https://charts.jetstack.io"
   chart            = "cert-manager"
   namespace        = kubernetes_namespace.certmanager.metadata[0].name
-  version          = "v1.8.0"
+  version          = "1.8.0"
   atomic           = true
 
   values = [

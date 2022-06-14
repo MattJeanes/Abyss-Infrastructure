@@ -11,11 +11,12 @@ resource "kubernetes_namespace" "oauth2_proxy" {
 }
 
 resource "helm_release" "oauth2_proxy" {
+  # https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy
   name             = "oauth2-proxy"
   repository       = "https://oauth2-proxy.github.io/manifests"
   chart            = "oauth2-proxy"
   namespace        = kubernetes_namespace.oauth2_proxy.metadata[0].name
-  version          = "v6.2.1"
+  version          = "6.2.1"
   atomic           = true
 
   values = [

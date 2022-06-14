@@ -48,11 +48,12 @@ resource "kubernetes_persistent_volume_claim" "mariadb" {
 }
 
 resource "helm_release" "mariadb" {
+  # https://artifacthub.io/packages/helm/bitnami/mariadb
   name       = "mariadb"
   repository = "https://charts.bitnami.com/bitnami"
   chart      = "mariadb"
   namespace  = "default"
-  version    = "11.0.4"
+  version    = "11.0.13"
   atomic     = true
 
   values = [

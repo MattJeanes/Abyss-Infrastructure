@@ -5,11 +5,12 @@ resource "kubernetes_namespace" "nginx" {
 }
 
 resource "helm_release" "nginx" {
+  # https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx
   name             = "ingress-nginx"
   repository       = "https://kubernetes.github.io/ingress-nginx"
   chart            = "ingress-nginx"
   namespace        = kubernetes_namespace.nginx.metadata[0].name
-  version          = "v4.1.0"
+  version          = "4.1.4"
   atomic           = true
 
   values = [
