@@ -65,6 +65,11 @@ resource "helm_release" "mariadb" {
     value = var.mariadb_root_password
   }
 
+  set {
+    name  = "primary.service.loadBalancerIP"
+    value = azurerm_public_ip.abyss_public.ip_address
+  }
+
   depends_on = [
     azurerm_role_assignment.aks_abyss_diskaccess
   ]

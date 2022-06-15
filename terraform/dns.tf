@@ -7,7 +7,8 @@ locals {
     "alertmanager",
     "newgrafana",
     "prometheus",
-    "auth"
+    "auth",
+    "ts"
   ]
   proxied_records = {
     "hello-world" = true,

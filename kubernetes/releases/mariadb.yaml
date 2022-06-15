@@ -4,5 +4,15 @@ metrics:
     enabled: true
     namespace: monitoring
 primary:
+  resources:
+    requests:
+      memory: 250Mi
+      cpu: 25m
+    limits:
+      memory: 250Mi
   persistence:
     existingClaim: mariadb
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss

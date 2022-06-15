@@ -65,6 +65,8 @@ jobs:
           pagerduty_url = "${{ secrets.PAGERDUTY_URL }}"
           pagerduty_integration_key = "${{ secrets.PAGERDUTY_INTEGRATION_KEY }}"
           dead_mans_snitch_webhook_url = "${{ secrets.DEAD_MANS_SNITCH_WEBHOOK_URL }}"
+          teamspeak_serveradmin_password = "${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
+          teamspeak_database_password = "${{ secrets.TEAMSPEAK_DATABASE_PASSWORD }}"
           EOF
         working-directory: terraform
         

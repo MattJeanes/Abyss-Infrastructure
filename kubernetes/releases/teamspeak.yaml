@@ -1,0 +1,35 @@
+metrics:
+  enabled: true
+  prometheusRule:
+    enabled: true
+env:
+  TS3SERVER_DB_PLUGIN: ts3db_mariadb
+  TS3SERVER_DB_SQLCREATEPATH: create_mariadb
+  TS3SERVER_DB_HOST: mariadb
+  TS3SERVER_DB_USER: teamspeak
+  TS3SERVER_DB_NAME: teamspeak
+  TS3SERVER_DB_WAITUNTILREADY: 30
+  TS3SERVER_LICENSE: accept
+service:
+  main:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
+    ports:
+      voice:
+        enabled: false
+  udp:
+    enabled: true
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
+    ports:
+      voice:
+        enabled: true
+        port: 9987
+        protocol: UDP
+persistence:
+  data:
+    enabled: true
+    type: pvc
+    existingClaim: teamspeak
