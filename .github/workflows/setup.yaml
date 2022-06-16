@@ -15,7 +15,7 @@ jobs:
     
     steps:
       - uses: actions/checkout@v3
-      
+
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
@@ -34,12 +34,6 @@ jobs:
           cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
           home_ip = "${{ secrets.HOME_IP }}"
           mariadb_root_password = "${{ secrets.MARIADB_ROOT_PASSWORD }}"
-          email = "${{ secrets.EMAIL }}"
-          host = "${{ secrets.HOST }}"
-          aks_login = ${{ env.aks_login }}
-          oauth2_client_id = "${{ secrets.OAUTH2_CLIENT_ID }}"
-          oauth2_client_secret = "${{ secrets.OAUTH2_CLIENT_SECRET }}"
-          oauth2_cookie_secret = "${{ secrets.OAUTH2_COOKIE_SECRET }}"
           grafana_admin_password = "${{ secrets.GRAFANA_ADMIN_PASSWORD }}"
           pagerduty_url = "${{ secrets.PAGERDUTY_URL }}"
           pagerduty_integration_key = "${{ secrets.PAGERDUTY_INTEGRATION_KEY }}"
@@ -100,6 +94,9 @@ jobs:
           $variables = @{
             hello_world_host = "hello-world.${{ secrets.HOST }}"
             dashboard_host = "kubedashboard.${{ secrets.HOST }}"
+            alertmanager_host = "alertmanager.${{ secrets.HOST }}"
+            grafana_host = "newgrafana.${{ secrets.HOST }}"
+            prometheus_host = "prometheus.${{ secrets.HOST }}"
             auth_host = "auth.${{ secrets.HOST }}"
             auth_url = "http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth"
             auth_signin = "https://auth.${{ secrets.HOST }}/oauth2/start?rd=`$scheme://`$host`$request_uri"

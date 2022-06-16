@@ -22,30 +22,6 @@ variable "mariadb_root_password" {
   sensitive = true
 }
 
-variable "email" {
-  sensitive = true
-}
-
-variable "host" {
-  sensitive = true
-}
-
-variable "aks_login" {
-  type = bool
-}
-
-variable "oauth2_client_id" {
-  sensitive = true
-}
-
-variable "oauth2_client_secret" {
-  sensitive = true
-}
-
-variable "oauth2_cookie_secret" {
-  sensitive = true
-}
-
 variable "grafana_admin_password" {
   sensitive = true
 }
