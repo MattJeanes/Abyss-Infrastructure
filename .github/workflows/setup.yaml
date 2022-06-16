@@ -93,6 +93,7 @@ jobs:
             grafana_host = "newgrafana.${{ secrets.HOST }}"
             prometheus_host = "prometheus.${{ secrets.HOST }}"
             sinusbot_host = "musicbot.${{ secrets.HOST }}"
+            teamspeak_host = "ts.${{ secrets.HOST }}"
             auth_host = "auth.${{ secrets.HOST }}"
             auth_url = "http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth"
             auth_signin = "https://auth.${{ secrets.HOST }}/oauth2/start?rd=`$scheme://`$host`$request_uri"
@@ -363,6 +364,20 @@ jobs:
             --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}" \
             --set env.TS3SERVER_DB_PASSWORD="${{ secrets.TEAMSPEAK_DATABASE_PASSWORD }}"
         working-directory: kubernetes/releases
+      
+      - name: Install redirect for teamspeak
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            teamspeak-redirect ./ingress-redirect \
+            --namespace default \
+            --set host="${{ env.teamspeak_host }}" \
+            --set redirect="ts3server://\$HOST"
+        working-directory: kubernetes/charts
+
+      - name: Wait for teamspeak redirect certificate to be ready
+        run: ./WaitKubeCertificate.ps1 -Name "teamspeak-redirect-tls"
+        shell: pwsh
+        working-directory: scripts
 
       - name: Install persistent volume for teamspeak-alt
         run: |

@@ -1,0 +1,4 @@
+apiVersion: v2
+name: ingress-redirect
+type: application
+version: 1.0.0
