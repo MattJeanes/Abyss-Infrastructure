@@ -1,0 +1,13 @@
+ingress:
+  main:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    tls:
+    - secretName: sinusbot-tls
+persistence:
+  sinusbot:
+    enabled: true
+    type: pvc
+    existingClaim: sinusbot

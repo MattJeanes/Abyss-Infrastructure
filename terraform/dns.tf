@@ -8,10 +8,12 @@ locals {
     "newgrafana",
     "prometheus",
     "auth",
-    "ts"
+    "ts",
+    "musicbot"
   ]
   proxied_records = {
     "hello-world" = true,
+    "musicbot" = true
   }
 }
 
