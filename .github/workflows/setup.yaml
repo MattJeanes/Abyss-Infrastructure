@@ -16,27 +16,6 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       
-      - name: Azure Login
-        uses: Azure/login@v1.4.3
-        with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-          
-      - name: Check for existing AKS cluster
-        run: |
-          if ((az group exists -n abyss) -eq "true" -and (az aks list -g "abyss" -o json | ConvertFrom-Json).name -eq "abyss") {
-              Write-Host "Cluster already exists, logging in"
-              az aks get-credentials --resource-group abyss --name abyss --admin
-              if ($LASTEXITCODE -ne 0) {
-                  Write-Error "az exited with code $LASTEXITCODE"
-              }
-              "aks_login=false" >> $env:GITHUB_ENV
-
-          } else {
-              Write-Host "Cluster does not yet exist, setting Terraform to perform login after creation"
-              "aks_login=true" >> $env:GITHUB_ENV
-          }
-        shell: pwsh
-                    
       - name: HashiCorp - Setup Terraform
         uses: hashicorp/setup-terraform@v2.0.0
         with:
@@ -88,3 +67,178 @@ jobs:
           ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
         if: github.event.inputs.planOnly == 'false'
+
+      - name: Retrieve terraform outputs
+        run: |
+          $outputs = terraform output -json | ConvertFrom-Json -AsHashTable
+          $outputs.Keys | ForEach-Object {
+              $key = $_
+              $output = $outputs[$key]
+              $value = $output.value
+              $sensitive = $output.sensitive
+              
+              Write-Host "$key = $(($sensitive ? "***" : $value))"
+              Write-Host "::add-mask::$value"
+              "$key=$value" >> $env:GITHUB_ENV
+          }
+        shell: pwsh
+        working-directory: terraform
+
+      - name: Azure Login
+        uses: Azure/login@v1.4.3
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Kubernetes
+        uses: Azure/aks-set-context@v2.1
+        with:
+          resource-group: abyss
+          cluster-name: abyss
+
+      - name: Set common variables
+        run: |
+          $variables = @{
+            hello_world_host = "hello-world.${{ secrets.HOST }}"
+            dashboard_host = "kubedashboard.${{ secrets.HOST }}"
+            auth_host = "auth.${{ secrets.HOST }}"
+            auth_url = "http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth"
+            auth_signin = "https://auth.${{ secrets.HOST }}/oauth2/start?rd=`$scheme://`$host`$request_uri"
+          }
+          $variables.Keys | ForEach-Object {
+              $key = $_
+              $value = $variables[$key]
+              Write-Host "$key = $value"
+              "$key=$value" >> $env:GITHUB_ENV
+          }
+        shell: pwsh
+      
+      # https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx
+      - name: Install ingress-nginx
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            ingress-nginx ingress-nginx \
+            --repo https://kubernetes.github.io/ingress-nginx \
+            --namespace ingress-nginx \
+            --create-namespace \
+            --version 4.1.4 \
+            -f ingress-nginx.yaml \
+            --set controller.service.loadBalancerIP="${{ env.public_ip_address }}"
+        working-directory: kubernetes/releases
+
+      # https://artifacthub.io/packages/helm/cert-manager/cert-manager
+      - name: Install cert-manager
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            cert-manager cert-manager \
+            --repo https://charts.jetstack.io \
+            --namespace cert-manager \
+            --create-namespace \
+            --version 1.8.0 \
+            -f cert-manager.yaml
+        working-directory: kubernetes/releases
+
+      - name: Install certificate-issuers
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            certificate-issuers ./certificate-issuers \
+            --namespace cert-manager \
+            --set letsEncrypt.email="${{ secrets.EMAIL }}"
+        working-directory: kubernetes/charts
+
+      - name: Install Hello World
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            hello-world ./hello-world \
+            --namespace default \
+            --set host="${{ env.hello_world_host }}"
+        working-directory: kubernetes/charts
+
+      - name: Wait for hello world certificate to be ready
+        run: ./WaitKubeCertificate.ps1 -Name "hello-world-tls"
+        shell: pwsh
+        working-directory: scripts
+
+      # https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy
+      - name: Install oauth2-proxy
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            oauth2-proxy oauth2-proxy \
+            --repo https://oauth2-proxy.github.io/manifests \
+            --namespace oauth2-proxy \
+            --create-namespace \
+            --version 6.2.1 \
+            -f oauth2-proxy.yaml \
+            --set config.clientID="${{ secrets.OAUTH2_CLIENT_ID }}" \
+            --set config.clientSecret="${{ secrets.OAUTH2_CLIENT_SECRET }}" \
+            --set config.cookieSecret="${{ secrets.OAUTH2_COOKIE_SECRET }}" \
+            --set authenticatedEmailsFile.restricted_access="${{ secrets.EMAIL }}" \
+            --set ingress.hosts[0]="${{ env.auth_host }}" \
+            --set ingress.tls[0].hosts[0]="${{ env.auth_host }}" \
+            --set extraArgs.whitelist-domain=".${{ secrets.HOST }}" \
+            --set extraArgs.cookie-domain=".${{ secrets.HOST }}"
+        working-directory: kubernetes/releases
+      
+      - name: Create dashboard account
+        run: |
+          Write-Host "Creating namespace"
+          kubectl create namespace dashboard --dry-run=client -o yaml | kubectl apply -f -
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "Failed to create namespace"
+          }
+
+          Write-Host "Creating service account"
+          kubectl apply -f dashboard-service-account.yaml
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "Failed to create service account"
+          }
+
+          Write-Host "Creating cluster role binding"
+          kubectl apply -f dashboard-cluster-role-binding.yaml
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "Failed to create cluster role binding"
+          }
+
+          Write-Host "Retrieving dashboard token"
+          $dashboardSecrets = (kubectl get secret -n dashboard -o json | ConvertFrom-Json).items
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "Failed to get dashboard token"
+          }
+          $tokenBase64 = ($dashboardSecrets | Where-Object { $_.metadata.name.StartsWith("admin-user-token") }).data.token
+          $token = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($tokenBase64))
+          Write-Host "::add-mask::$token"
+          "dashboard_token=$token" >> $env:GITHUB_ENV
+        working-directory: kubernetes/manifests
+
+      # https://artifacthub.io/packages/helm/k8s-dashboard/kubernetes-dashboard
+      - name: Install kubernetes-dashboard
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            kubernetes-dashboard kubernetes-dashboard \
+            --repo https://kubernetes.github.io/dashboard \
+            --namespace dashboard \
+            --create-namespace \
+            --version 5.7.0 \
+            -f kubernetes-dashboard.yaml \
+            --set ingress.hosts[0]="${{ env.dashboard_host }}" \
+            --set ingress.tls[0].hosts[0]="${{ env.dashboard_host }}" \
+            --set ingress.annotations.nginx\.ingress\.kubernetes\.io/configuration-snippet="proxy_set_header Authorization \"Bearer ${{ env.dashboard_token }}\";" \
+            --set ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-url="${{ env.auth_url }}"
+            --set ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-signin="${{ env.auth_signin }}"
+        working-directory: kubernetes/releases
+
+      - name: Wait for dashboard certificate to be ready
+        run: ./WaitKubeCertificate.ps1 -Name "dashboard-tls" -Namespace "dashboard"
+        shell: pwsh
+        working-directory: scripts
+
+      # https://artifacthub.io/packages/helm/fairwinds-stable/vpa
+      - name: Install vpa
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            vpa vpa \
+            --repo https://charts.fairwinds.com/stable \
+            --namespace vpa \
+            --create-namespace \
+            --version 1.4.0 \
+            -f vpa.yaml
+        working-directory: kubernetes/releases

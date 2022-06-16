@@ -1,0 +1,4 @@
+letsEncrypt:
+  email: ${letsencrypt_email}
+cloudflare:
+  apiToken: ${cloudflare_api_token}

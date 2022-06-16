@@ -1,4 +1,4 @@
 apiVersion: v2
-name: certificates
+name: certificate-issuers
 type: application
 version: 1.0.0

@@ -1,0 +1,13 @@
+apiVersion: cert-manager.io/v1
+kind: Certificate
+metadata:
+  name: abyss
+  namespace: default
+spec:
+  dnsNames:
+  - '*.{{ required "host is required" .Values.host }}'
+  - {{ required "host is required" .Values.host }}
+  issuerRef:
+    kind: ClusterIssuer
+    name: letsencrypt-prod
+  secretName: abyss-tls
