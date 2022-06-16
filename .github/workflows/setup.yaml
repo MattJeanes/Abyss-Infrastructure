@@ -227,8 +227,8 @@ jobs:
             -f kube-prometheus-stack.yaml \
             --set alertmanager.ingress.hosts[0]="${{ env.alertmanager_host }}" \
             --set alertmanager.ingress.tls[0].hosts[0]="${{ env.alertmanager_host }}" \
-            --set alertmanager.ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-url="${{ env.auth_url }}" \
-            --set alertmanager.ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-signin="${{ env.auth_signin }}" \
+            --set alertmanager.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
+            --set alertmanager.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}" \
             --set alertmanager.config.global.pagerduty_url="${{ secrets.PAGERDUTY_URL }}" \
             --set alertmanager.config.receivers[0].pagerduty_configs[0].routing_key="${{ secrets.PAGERDUTY_INTEGRATION_KEY }}" \
             --set alertmanager.config.receivers[1].webhook_configs[0].url="${{ secrets.DEAD_MANS_SNITCH_WEBHOOK_URL }}" \
@@ -237,8 +237,8 @@ jobs:
             --set grafana.adminPassword="${{ secrets.GRAFANA_ADMIN_PASSWORD }}" \
             --set prometheus.ingress.hosts[0]="${{ env.prometheus_host }}" \
             --set prometheus.ingress.tls[0].hosts[0]="${{ env.prometheus_host }}" \
-            --set prometheus.ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-url="${{ env.auth_url }}" \
-            --set prometheus.ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-signin="${{ env.auth_signin }}"
+            --set prometheus.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
+            --set prometheus.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}"
         working-directory: kubernetes/releases
 
       - name: Install prometheus-vpa
@@ -291,9 +291,9 @@ jobs:
             -f kubernetes-dashboard.yaml \
             --set ingress.hosts[0]="${{ env.dashboard_host }}" \
             --set ingress.tls[0].hosts[0]="${{ env.dashboard_host }}" \
-            --set ingress.annotations.nginx\.ingress\.kubernetes\.io/configuration-snippet="proxy_set_header Authorization \"Bearer ${{ env.dashboard_token }}\";" \
-            --set ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-url="${{ env.auth_url }}"
-            --set ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-signin="${{ env.auth_signin }}"
+            --set ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/configuration-snippet="proxy_set_header Authorization \"Bearer ${{ env.dashboard_token }}\";" \
+            --set ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}"
+            --set ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}"
         working-directory: kubernetes/releases
 
       - name: Wait for dashboard certificate to be ready
