@@ -11,6 +11,7 @@ env:
   TS3SERVER_DB_WAITUNTILREADY: 30
   TS3SERVER_LICENSE: accept
 service:
+  # Services can be merged in Kubernetes >= 1.24 with feature gate MixedProtocolLBService
   main:
     type: LoadBalancer
     annotations:
