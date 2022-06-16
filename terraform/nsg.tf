@@ -79,7 +79,7 @@ resource "azurerm_network_security_rule" "abyss_teamspeak" {
   destination_port_ranges    = ["9987", "10011", "30033"]
 }
 
-resource "azurerm_network_security_rule" "abyss_teamspeak" {
+resource "azurerm_network_security_rule" "abyss_teamspeak_alt" {
   network_security_group_name = azurerm_network_security_group.abyss.name
   resource_group_name         = azurerm_network_security_group.abyss.resource_group_name
 
