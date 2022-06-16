@@ -76,7 +76,22 @@ resource "azurerm_network_security_rule" "abyss_teamspeak" {
   source_address_prefix      = "*"
   source_port_range          = "*"
   destination_address_prefix = "*"
-  destination_port_ranges    = ["9987", "10011", "30033", "19987"]
+  destination_port_ranges    = ["9987", "10011", "30033"]
+}
+
+resource "azurerm_network_security_rule" "abyss_teamspeak" {
+  network_security_group_name = azurerm_network_security_group.abyss.name
+  resource_group_name         = azurerm_network_security_group.abyss.resource_group_name
+
+  name                       = "TeamSpeak Alt"
+  priority                   = 341
+  direction                  = "Inbound"
+  access                     = "Allow"
+  protocol                   = "*"
+  source_address_prefix      = "*"
+  source_port_range          = "*"
+  destination_address_prefix = "*"
+  destination_port_ranges    = ["9988", "10012", "30034"]
 }
 
 resource "azurerm_network_security_rule" "abyss_mariadb" {

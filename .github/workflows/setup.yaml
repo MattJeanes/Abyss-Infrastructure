@@ -362,3 +362,28 @@ jobs:
             --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}" \
             --set env.TS3SERVER_DB_PASSWORD="${{ secrets.TEAMSPEAK_DATABASE_PASSWORD }}"
         working-directory: kubernetes/releases
+
+      - name: Install persistent volume for teamspeak-alt
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            teamspeak-alt-persistentvolume ./azure-persistentvolume \
+            --namespace default \
+            --set name=teamspeak-alt \
+            --set disk.capacity=4Gi \
+            --set disk.id="${{ env.teamspeak_alt_disk_id }}"
+        working-directory: kubernetes/charts
+
+      # https://artifacthub.io/packages/helm/k8s-at-home/teamspeak
+      - name: Install teamspeak-alt
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            teamspeak-alt teamspeak \
+            --repo https://k8s-at-home.com/charts \
+            --namespace default \
+            --version 0.5.2 \
+            -f teamspeak-alt.yaml \
+            --set service.main.loadBalancerIP="${{ env.public_ip_address }}" \
+            --set service.udp.loadBalancerIP="${{ env.public_ip_address }}" \
+            --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}" \
+            --set env.TS3SERVER_DB_PASSWORD="${{ secrets.TEAMSPEAK_ALT_DATABASE_PASSWORD }}"
+        working-directory: kubernetes/releases
