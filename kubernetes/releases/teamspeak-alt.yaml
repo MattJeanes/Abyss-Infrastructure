@@ -37,6 +37,22 @@ service:
         enabled: true
         port: 9988
         protocol: UDP
+probes:
+  readiness:
+    custom: true
+    spec:
+      tcpSocket:
+        port: 10012
+  liveness:
+    custom: true
+    spec:
+      tcpSocket:
+        port: 10012
+  startup:
+    custom: true
+    spec:
+      tcpSocket:
+        port: 10012
 persistence:
   data:
     enabled: true
