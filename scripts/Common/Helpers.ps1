@@ -66,12 +66,12 @@ function Wait-KubeCertificate {
 
     while (-not (Test-KubeCertificate -Name $Name -Namespace $Namespace)) {
         if ($attempts -ge $maxAttempts) {
-            Write-Error "Certificate is not ready after $TimeoutSeconds seconds"
+            Write-Error "Certificate $Name in $Namespace is not ready after $TimeoutSeconds seconds"
         }
         $attempts++
-        Write-Host "[$attempts/$maxAttempts] Certificate is not yet ready"
+        Write-Host "[$attempts/$maxAttempts] Certificate $Name in $Namespace is not yet ready"
         Start-Sleep -Seconds $CheckInterval
     }
 
-    Write-Host "Certificate is ready"
+    Write-Host "Certificate $Name in $Namespace is ready"
 }
