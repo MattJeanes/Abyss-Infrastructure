@@ -178,6 +178,11 @@ jobs:
             --set extraArgs.whitelist-domain=".${{ secrets.HOST }}" \
             --set extraArgs.cookie-domain=".${{ secrets.HOST }}"
         working-directory: kubernetes/releases
+      
+      - name: Wait for oauth2-proxy certificate to be ready
+        run: ./WaitKubeCertificate.ps1 -Name "oauth2-proxy" -Namespace "oauth2-proxy"
+        shell: pwsh
+        working-directory: scripts
 
       # https://artifacthub.io/packages/helm/fairwinds-stable/vpa
       - name: Install vpa
@@ -247,6 +252,14 @@ jobs:
             prometheus-vpa ./prometheus-vpa \
             --namespace monitoring
         working-directory: kubernetes/charts
+
+      - name: Wait for kube-prometheus-stack certificates to be ready
+        run: |
+          ./WaitKubeCertificate.ps1 -Name "prometheus-tls" -Namespace "monitoring"
+          ./WaitKubeCertificate.ps1 -Name "alertmanager-tls" -Namespace "monitoring"
+          ./WaitKubeCertificate.ps1 -Name "grafana-tls" -Namespace "monitoring"
+        shell: pwsh
+        working-directory: scripts
       
       - name: Create dashboard account
         run: |
