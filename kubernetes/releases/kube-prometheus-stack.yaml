@@ -9,6 +9,17 @@ prometheus-node-exporter:
             values:
             - virtual-kubelet
 alertmanager:
+  alertmanagerSpec:
+    storage:
+      volumeClaimTemplate:
+        spec:
+          volumeName: alertmanager
+          resources:
+            requests:
+              storage: 4Gi
+          accessModes:
+          - ReadWriteOnce
+          storageClassName: managed-csi
   ingress:
     enabled: true
     annotations:
@@ -71,6 +82,16 @@ grafana:
     - secretName: grafana-tls
 prometheus:
   prometheusSpec:
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          volumeName: prometheus
+          resources:
+            requests:
+              storage: 4Gi
+          accessModes:
+          - ReadWriteOnce
+          storageClassName: managed-csi
     ruleSelectorNilUsesHelmValues: false
     serviceMonitorSelectorNilUsesHelmValues: false
     podMonitorSelectorNilUsesHelmValues: false

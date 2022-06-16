@@ -33,13 +33,6 @@ jobs:
           cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
           cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
           home_ip = "${{ secrets.HOME_IP }}"
-          mariadb_root_password = "${{ secrets.MARIADB_ROOT_PASSWORD }}"
-          grafana_admin_password = "${{ secrets.GRAFANA_ADMIN_PASSWORD }}"
-          pagerduty_url = "${{ secrets.PAGERDUTY_URL }}"
-          pagerduty_integration_key = "${{ secrets.PAGERDUTY_INTEGRATION_KEY }}"
-          dead_mans_snitch_webhook_url = "${{ secrets.DEAD_MANS_SNITCH_WEBHOOK_URL }}"
-          teamspeak_serveradmin_password = "${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
-          teamspeak_database_password = "${{ secrets.TEAMSPEAK_DATABASE_PASSWORD }}"
           EOF
         working-directory: terraform
         
@@ -72,7 +65,9 @@ jobs:
               $sensitive = $output.sensitive
               
               Write-Host "$key = $(($sensitive ? "***" : $value))"
-              Write-Host "::add-mask::$value"
+              if ($sensitive) {
+                Write-Host "::add-mask::$value"
+              }
               "$key=$value" >> $env:GITHUB_ENV
           }
         shell: pwsh
@@ -108,6 +103,15 @@ jobs:
               "$key=$value" >> $env:GITHUB_ENV
           }
         shell: pwsh
+
+      - name: Install storage-account-secret
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            storage-account-secret ./storage-account-secret \
+            --namespace default \
+            --set storageAccountName="${{ env.storage_account_name }}" \
+            --set storageAccountKey="${{ env.storage_account_key }}"
+        working-directory: kubernetes/charts
       
       # https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx
       - name: Install ingress-nginx
@@ -174,6 +178,75 @@ jobs:
             --set extraArgs.whitelist-domain=".${{ secrets.HOST }}" \
             --set extraArgs.cookie-domain=".${{ secrets.HOST }}"
         working-directory: kubernetes/releases
+
+      # https://artifacthub.io/packages/helm/fairwinds-stable/vpa
+      - name: Install vpa
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            vpa vpa \
+            --repo https://charts.fairwinds.com/stable \
+            --namespace vpa \
+            --create-namespace \
+            --version 1.4.0 \
+            -f vpa.yaml
+        working-directory: kubernetes/releases
+
+      - name: Install persistent volume for prometheus
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            prometheus-persistentvolume ./azure-persistentvolume \
+            --namespace monitoring \
+            --create-namespace \
+            --set name=prometheus \
+            --set disk.capacity=4Gi \
+            --set disk.id="${{ env.prometheus_disk_id }}" \
+            --set persistentVolumeClaim.enabled=false
+        working-directory: kubernetes/charts
+
+      - name: Install persistent volume for alertmanager
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            alertmanager-persistentvolume ./azure-persistentvolume \
+            --namespace monitoring \
+            --create-namespace \
+            --set name=alertmanager \
+            --set disk.capacity=4Gi \
+            --set disk.id="${{ env.alertmanager_disk_id }}" \
+            --set persistentVolumeClaim.enabled=false
+        working-directory: kubernetes/charts
+
+      # https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy
+      - name: Install prometheus
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            kube-prometheus-stack kube-prometheus-stack \
+            --repo https://prometheus-community.github.io/helm-charts \
+            --namespace monitoring \
+            --create-namespace \
+            --version 36.0.1 \
+            -f kube-prometheus-stack.yaml \
+            --set alertmanager.ingress.hosts[0]="${{ env.alertmanager_host }}" \
+            --set alertmanager.ingress.tls[0].hosts[0]="${{ env.alertmanager_host }}" \
+            --set alertmanager.ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-url="${{ env.auth_url }}" \
+            --set alertmanager.ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-signin="${{ env.auth_signin }}" \
+            --set alertmanager.config.global.pagerduty_url="${{ secrets.PAGERDUTY_URL }}" \
+            --set alertmanager.config.receivers[0].pagerduty_configs[0].routing_key="${{ secrets.PAGERDUTY_INTEGRATION_KEY }}" \
+            --set alertmanager.config.receivers[1].webhook_configs[0].url="${{ secrets.DEAD_MANS_SNITCH_WEBHOOK_URL }}" \
+            --set grafana.ingress.hosts[0]="${{ env.grafana_host }}" \
+            --set grafana.ingress.tls[0].hosts[0]="${{ env.grafana_host }}" \
+            --set grafana.adminPassword="${{ secrets.GRAFANA_ADMIN_PASSWORD }}" \
+            --set prometheus.ingress.hosts[0]="${{ env.prometheus_host }}" \
+            --set prometheus.ingress.tls[0].hosts[0]="${{ env.prometheus_host }}" \
+            --set prometheus.ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-url="${{ env.auth_url }}" \
+            --set prometheus.ingress.annotations.nginx\.ingress\.kubernetes\.io/auth-signin="${{ env.auth_signin }}"
+        working-directory: kubernetes/releases
+
+      - name: Install prometheus-vpa
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            prometheus-vpa ./prometheus-vpa \
+            --namespace monitoring
+        working-directory: kubernetes/charts
       
       - name: Create dashboard account
         run: |
@@ -228,14 +301,50 @@ jobs:
         shell: pwsh
         working-directory: scripts
 
-      # https://artifacthub.io/packages/helm/fairwinds-stable/vpa
-      - name: Install vpa
+      - name: Install persistent volume for mariadb
         run: |
           helm upgrade --install --wait --atomic --debug \
-            vpa vpa \
-            --repo https://charts.fairwinds.com/stable \
-            --namespace vpa \
-            --create-namespace \
-            --version 1.4.0 \
-            -f vpa.yaml
+            mariadb-persistentvolume ./azure-persistentvolume \
+            --namespace default \
+            --set name=mariadb \
+            --set disk.capacity=4Gi \
+            --set disk.id="${{ env.mariadb_disk_id }}"
+        working-directory: kubernetes/charts
+
+      # https://artifacthub.io/packages/helm/bitnami/mariadb
+      - name: Install mariadb
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            mariadb mariadb \
+            --repo https://charts.bitnami.com/bitnami \
+            --namespace default \
+            --version 11.0.3 \
+            -f mariadb.yaml \
+            --set auth.rootPassword="${{ secrets.MARIADB_ROOT_PASSWORD }}" \
+            --set primary.service.loadBalancerIP="${{ env.public_ip_address }}"
+        working-directory: kubernetes/releases
+
+      - name: Install persistent volume for teamspeak
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            teamspeak-persistentvolume ./azure-persistentvolume \
+            --namespace default \
+            --set name=teamspeak \
+            --set disk.capacity=4Gi \
+            --set disk.id="${{ env.teamspeak_disk_id }}"
+        working-directory: kubernetes/charts
+
+      # https://artifacthub.io/packages/helm/k8s-at-home/teamspeak
+      - name: Install teamspeak
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            teamspeak teamspeak \
+            --repo https://k8s-at-home.com/charts \
+            --namespace default \
+            --version 0.5.2 \
+            -f teamspeak.yaml \
+            --set service.main.loadBalancerIP="${{ env.public_ip_address }}" \
+            --set service.udp.loadBalancerIP="${{ env.public_ip_address }}" \
+            --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
+            --set env.TS3SERVER_DB_PASSWORD="${{ secrets.TEAMSPEAK_DATABASE_PASSWORD }}"
         working-directory: kubernetes/releases

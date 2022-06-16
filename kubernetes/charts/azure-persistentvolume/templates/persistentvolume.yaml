@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ required "name is required" .Values.name }}
+spec:
+  accessModes:
+  - ReadWriteOnce
+  capacity:
+    storage: {{ required "disk.capacity is required" .Values.disk.capacity }}
+  csi:
+    driver: disk.csi.azure.com
+    volumeAttributes:
+      fsType: ext4
+    volumeHandle: {{ required "disk.id is required" .Values.disk.id }}
+  persistentVolumeReclaimPolicy: Retain
+  storageClassName: managed-csi

@@ -19,15 +19,12 @@ resource "azurerm_storage_share" "abyss_gpt" {
   quota                = "10"
 }
 
-resource "kubernetes_secret" "name" {
-  metadata {
-    name = "azure-storage-account"
-  }
+output "storage_account_name" {
+  value = azurerm_storage_account.abyss.name
+  sensitive = true
+}
 
-  data = {
-    azurestorageaccountname = azurerm_storage_account.abyss.name
-    azurestorageaccountkey  = azurerm_storage_account.abyss.primary_access_key
-  }
-
-  type = "Opaque"
+output "storage_account_key" {
+  value = azurerm_storage_account.abyss.primary_access_key
+  sensitive = true
 }

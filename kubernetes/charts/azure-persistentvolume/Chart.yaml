@@ -1,0 +1,4 @@
+apiVersion: v2
+name: azure-persistentvolume
+type: application
+version: 1.0.0
