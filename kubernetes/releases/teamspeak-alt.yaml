@@ -10,6 +10,10 @@ env:
   TS3SERVER_DB_NAME: teamspeak-alt
   TS3SERVER_DB_WAITUNTILREADY: 30
   TS3SERVER_LICENSE: accept
+  TS3SERVER_DEFAULT_VOICE_PORT: 9988
+  TS3SERVER_QUERY_PORT: 10012
+  TS3SERVER_FILETRANSFER_PORT: 30034
+  TS3SERVER_FILETRANSFER_IP: 0.0.0.0
 service:
   # Services can be merged in Kubernetes >= 1.24 with feature gate MixedProtocolLBService
   main:
@@ -21,10 +25,8 @@ service:
         enabled: false
       serverquery:
         port: 10012
-        targetPort: 10011
       filetransfer:
         port: 30034
-        targetPort: 30033
   udp:
     enabled: true
     type: LoadBalancer
@@ -34,7 +36,6 @@ service:
       voice:
         enabled: true
         port: 9988
-        targetPort: 9987
         protocol: UDP
 persistence:
   data:
