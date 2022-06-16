@@ -96,7 +96,7 @@ jobs:
             teamspeak_host = "ts.${{ secrets.HOST }}"
             auth_host = "auth.${{ secrets.HOST }}"
             auth_url = "http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth"
-            auth_signin = "https://auth.${{ secrets.HOST }}/oauth2/start?rd=`$scheme://`$host`$request_uri"
+            auth_signin = "https://auth.${{ secrets.HOST }}/oauth2/start?rd=\`$scheme://\`$host\`$request_uri"
           }
           $variables.Keys | ForEach-Object {
               $key = $_
