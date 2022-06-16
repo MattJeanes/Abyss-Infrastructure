@@ -306,7 +306,7 @@ jobs:
             --set ingress.hosts[0]="${{ env.dashboard_host }}" \
             --set ingress.tls[0].hosts[0]="${{ env.dashboard_host }}" \
             --set ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/configuration-snippet="proxy_set_header Authorization \"Bearer ${{ env.dashboard_token }}\";" \
-            --set ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}"
+            --set ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
             --set ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}"
         working-directory: kubernetes/releases
 
@@ -359,6 +359,6 @@ jobs:
             -f teamspeak.yaml \
             --set service.main.loadBalancerIP="${{ env.public_ip_address }}" \
             --set service.udp.loadBalancerIP="${{ env.public_ip_address }}" \
-            --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
+            --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}" \
             --set env.TS3SERVER_DB_PASSWORD="${{ secrets.TEAMSPEAK_DATABASE_PASSWORD }}"
         working-directory: kubernetes/releases
