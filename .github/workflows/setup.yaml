@@ -408,7 +408,7 @@ jobs:
             --namespace default \
             --version 0.4.2 \
             -f sinusbot.yaml \
-            --set ingress.main.hosts[0]="${{ env.sinusbot_host }}" \
+            --set ingress.main.hosts[0].host="${{ env.sinusbot_host }}" \
             --set ingress.main.tls[0].hosts[0]="${{ env.sinusbot_host }}"
         working-directory: kubernetes/releases
 
