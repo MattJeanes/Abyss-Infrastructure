@@ -20,8 +20,10 @@ service:
         enabled: false
       serverquery:
         port: 10012
+        targetPort: 10011
       filetransfer:
         port: 30034
+        targetPort: 30033
   udp:
     enabled: true
     type: LoadBalancer
@@ -31,6 +33,7 @@ service:
       voice:
         enabled: true
         port: 9988
+        targetPort: 9987
         protocol: UDP
 persistence:
   data:
