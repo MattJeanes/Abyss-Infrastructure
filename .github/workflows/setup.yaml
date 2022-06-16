@@ -277,6 +277,7 @@ jobs:
           $token = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($tokenBase64))
           Write-Host "::add-mask::$token"
           "dashboard_token=$token" >> $env:GITHUB_ENV
+        shell: pwsh
         working-directory: kubernetes/manifests
 
       # https://artifacthub.io/packages/helm/k8s-dashboard/kubernetes-dashboard
