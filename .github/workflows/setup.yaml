@@ -180,7 +180,7 @@ jobs:
         working-directory: kubernetes/releases
       
       - name: Wait for oauth2-proxy certificate to be ready
-        run: ./WaitKubeCertificate.ps1 -Name "oauth2-proxy" -Namespace "oauth2-proxy"
+        run: ./WaitKubeCertificate.ps1 -Name "oauth2-proxy-tls" -Namespace "oauth2-proxy"
         shell: pwsh
         working-directory: scripts
 
