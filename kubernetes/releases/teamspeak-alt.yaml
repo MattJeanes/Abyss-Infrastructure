@@ -1,7 +1,9 @@
-metrics:
-  enabled: true
-  prometheusRule:
-    enabled: true
+# NOTE: Metrics are disabled for now as it not possible to query a port other than 10011 in the Helm chart
+# TODO: Raise a PR to fix this in the chart
+# metrics:
+#   enabled: true
+#   prometheusRule:
+#     enabled: true
 env:
   TS3SERVER_DB_PLUGIN: ts3db_mariadb
   TS3SERVER_DB_SQLCREATEPATH: create_mariadb
