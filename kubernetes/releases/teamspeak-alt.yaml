@@ -1,9 +1,10 @@
-# NOTE: Metrics are disabled for now as it not possible to query a port other than 10011 in the Helm chart
-# TODO: Raise a PR to fix this in the chart
-# metrics:
-#   enabled: true
-#   prometheusRule:
-#     enabled: true
+metrics:
+  enabled: true
+  prometheusRule:
+    enabled: true
+  exporter:
+    env:
+      remote: localhost:10012 # Needs https://github.com/k8s-at-home/charts/pull/1621
 env:
   TS3SERVER_DB_PLUGIN: ts3db_mariadb
   TS3SERVER_DB_SQLCREATEPATH: create_mariadb
