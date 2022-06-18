@@ -10,6 +10,12 @@ env:
   TS3SERVER_DB_NAME: teamspeak
   TS3SERVER_DB_WAITUNTILREADY: 30
   TS3SERVER_LICENSE: accept
+resources:
+  requests:
+    cpu: 20m
+    memory: 35Mi
+  limits:
+    memory: 35Mi
 service:
   main:
     type: LoadBalancer

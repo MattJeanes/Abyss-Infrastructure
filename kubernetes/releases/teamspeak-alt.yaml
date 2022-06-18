@@ -17,6 +17,12 @@ env:
   TS3SERVER_QUERY_PORT: 10012
   TS3SERVER_FILETRANSFER_PORT: 30034
   TS3SERVER_FILETRANSFER_IP: 0.0.0.0
+resources:
+  requests:
+    cpu: 20m
+    memory: 30Mi
+  limits:
+    memory: 30Mi
 service:
   main:
     type: LoadBalancer
