@@ -11,24 +11,10 @@ env:
   TS3SERVER_DB_WAITUNTILREADY: 30
   TS3SERVER_LICENSE: accept
 service:
-  # Services can be merged in Kubernetes >= 1.24 with feature gate MixedProtocolLBService
   main:
     type: LoadBalancer
     annotations:
       service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
-    ports:
-      voice:
-        enabled: false
-  udp:
-    enabled: true
-    type: LoadBalancer
-    annotations:
-      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
-    ports:
-      voice:
-        enabled: true
-        port: 9987
-        protocol: UDP
 persistence:
   data:
     enabled: true
