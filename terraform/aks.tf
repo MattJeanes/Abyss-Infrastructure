@@ -5,6 +5,10 @@ resource "azurerm_kubernetes_cluster" "abyss" {
   dns_prefix          = "abyss"
   kubernetes_version  = var.kubernetes_version
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
   identity {
     type = "SystemAssigned"
   }
