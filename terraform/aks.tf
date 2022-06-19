@@ -7,6 +7,9 @@ resource "azurerm_kubernetes_cluster" "abyss" {
 
   lifecycle {
     prevent_destroy = true
+    ignore_changes = [
+      default_node_pool[0].node_count
+    ]
   }
 
   identity {
@@ -42,12 +45,6 @@ resource "azurerm_kubernetes_cluster" "abyss" {
     dns_service_ip     = "10.250.0.10"
     docker_bridge_cidr = "172.17.0.1/16"
     service_cidr       = "10.250.0.0/16"
-  }
-
-  lifecycle {
-    ignore_changes = [
-      default_node_pool[0].node_count
-    ]
   }
 }
 
