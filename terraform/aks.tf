@@ -30,7 +30,7 @@ resource "azurerm_kubernetes_cluster" "abyss" {
     node_count           = 1
     min_count            = 1
     max_count            = 5
-    vm_size              = "Standard_B2s"
+    vm_size              = "Standard_B2s" # This is actually Standard_D2as_v5 (VMSS manually changed)
     vnet_subnet_id       = azurerm_subnet.abyss_aks.id
     orchestrator_version = var.kubernetes_version
   }
