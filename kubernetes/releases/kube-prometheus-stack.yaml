@@ -82,6 +82,12 @@ grafana:
     - secretName: grafana-tls
 prometheus:
   prometheusSpec:
+    resources:
+      requests:
+        cpu: 50m
+        memory: 800Mi
+      limits:
+        memory: 800Mi
     storageSpec:
       volumeClaimTemplate:
         spec:
