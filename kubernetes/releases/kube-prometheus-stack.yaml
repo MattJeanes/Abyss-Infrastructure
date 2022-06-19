@@ -115,6 +115,11 @@ prometheus:
       cert-manager.io/cluster-issuer: letsencrypt-prod
     tls:
     - secretName: prometheus-tls
+prometheusOperator:
+  prometheusConfigReloader:
+    resources:
+      limits:
+        cpu: null
 kubeScheduler:
   enabled: false
 kubeControllerManager:
