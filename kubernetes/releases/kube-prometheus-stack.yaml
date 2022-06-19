@@ -66,6 +66,12 @@ alertmanager:
       target_matchers:
       - severity = info
 grafana:
+  resources:
+    requests:
+      cpu: 15m
+      memory: 300Mi
+    limits:
+      memory: 300Mi
   sidecar:
     dashboards:
       enabled: true
@@ -132,3 +138,10 @@ additionalPrometheusRulesMap:
         for: 10m
         labels:
           severity: warning
+kube-state-metrics:
+  resources:
+    requests:
+      cpu: 5m
+      memory: 100Mi
+    limits:
+      memory: 100Mi

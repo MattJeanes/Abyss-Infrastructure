@@ -7,6 +7,12 @@ ingress:
     cert-manager.io/cluster-issuer: letsencrypt-prod
   tls:
   - secretName: oauth2-proxy-tls
+resources:
+  requests:
+    cpu: 5m
+    memory: 30Mi
+  limits:
+    memory: 30Mi
 config:
   configFile: |-
     email_domains = []

@@ -10,6 +10,12 @@ ingress:
       - path: /
     tls:
     - secretName: sinusbot-tls
+resources:
+  requests:
+    cpu: 15m
+    memory: 200Mi
+  limits:
+    memory: 200Mi
 persistence:
   sinusbot:
     enabled: true
