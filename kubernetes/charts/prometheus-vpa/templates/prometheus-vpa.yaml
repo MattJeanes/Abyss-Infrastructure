@@ -9,7 +9,7 @@ spec:
     name: prometheus-kube-prometheus-stack-prometheus
   resourcePolicy:
     containerPolicies:
-    - containerName: "*"
+    - containerName: "prometheus"
       maxAllowed:
         cpu: 800m
         memory: 2Gi

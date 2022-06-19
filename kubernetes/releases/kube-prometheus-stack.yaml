@@ -118,8 +118,12 @@ prometheus:
 prometheusOperator:
   prometheusConfigReloader:
     resources:
+      requests:
+        cpu: 5m
+        memory: 40Mi
       limits:
-        cpu: null
+        cpu: "0"
+        memory: 40Mi
 kubeScheduler:
   enabled: false
 kubeControllerManager:
