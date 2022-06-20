@@ -6,7 +6,6 @@ resource "azurerm_kubernetes_cluster" "abyss" {
   kubernetes_version  = var.kubernetes_version
 
   lifecycle {
-    prevent_destroy = true
     ignore_changes = [
       default_node_pool[0].node_count
     ]
@@ -24,13 +23,18 @@ resource "azurerm_kubernetes_cluster" "abyss" {
     }
   }
 
+  auto_scaler_profile {
+    scale_down_utilization_threshold = "0.2"
+  }
+
   default_node_pool {
     name                 = "agentpool"
     enable_auto_scaling  = true
     node_count           = 1
     min_count            = 1
     max_count            = 5
-    vm_size              = "Standard_B2s" # This is actually Standard_D2as_v5 (VMSS manually changed)
+    max_pods             = 50
+    vm_size              = "Standard_D2as_v5"
     vnet_subnet_id       = azurerm_subnet.abyss_aks.id
     orchestrator_version = var.kubernetes_version
   }
