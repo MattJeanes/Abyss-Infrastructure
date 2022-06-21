@@ -516,7 +516,7 @@ jobs:
           }
 
           $null = New-Item -Path $dashboardsPath -ItemType Directory -Force
-          Copy-Item -Path (Join-Path "teslamate" "grafana" "dashboards" "*") -Destination $dashboardsPath -Recurse
+          Copy-Item -Path (Join-Path $teslamatePath "grafana" "dashboards" "*") -Destination $dashboardsPath -Recurse
 
           Get-ChildItem -File -Recurse $dashboardsPath | ForEach-Object {
               Move-Item -Path $_.FullName -Destination (Join-Path $_.DirectoryName ("teslamate-" + $_.Name))
