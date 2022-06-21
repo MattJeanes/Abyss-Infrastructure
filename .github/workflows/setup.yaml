@@ -227,7 +227,8 @@ jobs:
         run: |
           helm upgrade --install --wait --atomic --debug \
             grafana-plugins-persistentvolume ./azure-persistentvolume \
-            --namespace default \
+            --namespace monitoring \
+            --create-namespace \
             --set name=grafana-plugins \
             --set disk.capacity=1Gi \
             --set useFileShare=true \
