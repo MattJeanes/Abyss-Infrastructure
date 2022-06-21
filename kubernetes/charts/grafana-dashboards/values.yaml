@@ -1,5 +1,6 @@
 teslamate:
   database:
     host: postgresql
+    port: 5432
     name: teslamate
     user: teslamate

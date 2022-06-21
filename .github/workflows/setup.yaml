@@ -263,38 +263,27 @@ jobs:
           ./WaitKubeCertificate.ps1 -Name "grafana-tls" -Namespace "monitoring"
         shell: pwsh
         working-directory: scripts
+
+      - name: Install dashboard-service-account
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            dashboard-service-account ./dashboard-service-account \
+            --namespace dashboard \
+            --create-namespace
+        working-directory: kubernetes/charts
       
       - name: Create dashboard account
         run: |
-          Write-Host "Creating namespace"
-          kubectl create namespace dashboard --dry-run=client -o yaml | kubectl apply -f -
-          if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to create namespace"
-          }
-
-          Write-Host "Creating service account"
-          kubectl apply -f dashboard-service-account.yaml
-          if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to create service account"
-          }
-
-          Write-Host "Creating cluster role binding"
-          kubectl apply -f dashboard-cluster-role-binding.yaml
-          if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to create cluster role binding"
-          }
-
           Write-Host "Retrieving dashboard token"
-          $dashboardSecrets = (kubectl get secret -n dashboard -o json | ConvertFrom-Json).items
+          $adminUserToken = kubectl get secret -n dashboard admin-user-token -o json | ConvertFrom-Json
+          $tokenBase64 = $adminUserToken.data.token
           if ($LASTEXITCODE -ne 0) {
               Write-Error "Failed to get dashboard token"
           }
-          $tokenBase64 = ($dashboardSecrets | Where-Object { $_.metadata.name.StartsWith("admin-user-token") }).data.token
           $token = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($tokenBase64))
           Write-Host "::add-mask::$token"
           "dashboard_token=$token" >> $env:GITHUB_ENV
         shell: pwsh
-        working-directory: kubernetes/manifests
 
       # https://artifacthub.io/packages/helm/k8s-dashboard/kubernetes-dashboard
       - name: Install kubernetes-dashboard
