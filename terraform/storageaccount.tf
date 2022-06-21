@@ -31,6 +31,16 @@ resource "azurerm_storage_share" "abyss_gpt" {
   }
 }
 
+resource "azurerm_storage_share" "abyss_grafana_plugins" {
+  name                 = "grafana-plugins"
+  storage_account_name = azurerm_storage_account.abyss.name
+  quota                = "1"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 output "storage_account_name" {
   value     = azurerm_storage_account.abyss.name
   sensitive = true

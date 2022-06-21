@@ -86,6 +86,11 @@ grafana:
       cert-manager.io/cluster-issuer: letsencrypt-prod
     tls:
     - secretName: grafana-tls
+  extraVolumeMounts:
+  - name: plugins
+    mountPath: /var/lib/grafana/plugins
+    existingClaim: grafana-plugins
+    readOnly: false
 prometheus:
   prometheusSpec:
     resources:

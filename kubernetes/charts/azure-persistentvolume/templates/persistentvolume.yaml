@@ -8,9 +8,16 @@ spec:
   capacity:
     storage: {{ required "disk.capacity is required" .Values.disk.capacity }}
   csi:
+    {{- if .Values.useFileShare }}
+    driver: file.csi.azure.com
+    volumeAttributes:
+      secretName: {{ required "name is required" .Values.name }}-volume-secret
+      shareName: {{ required "fileShare.name is required" .Values.fileShare.name }}
+    {{- else }}
     driver: disk.csi.azure.com
     volumeAttributes:
       fsType: ext4
     volumeHandle: {{ required "disk.id is required" .Values.disk.id }}
+    {{- end }}
   persistentVolumeReclaimPolicy: Retain
   storageClassName: managed-csi

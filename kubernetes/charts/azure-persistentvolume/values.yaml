@@ -1,3 +1,5 @@
 persistentVolumeClaim:
   enabled: true
 disk: {}
+useFileShare: false
+fileShare: {}
