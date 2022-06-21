@@ -491,6 +491,8 @@ jobs:
             -f teslamate.yaml \
             --set ingress.main.hosts[0].host="${{ env.teslamate_host }}" \
             --set ingress.main.tls[0].hosts[0]="${{ env.teslamate_host }}" \
+            --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
+            --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}" \
             --set env.DATABASE_PASS="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}"
         working-directory: kubernetes/releases
 
