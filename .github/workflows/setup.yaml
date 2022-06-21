@@ -454,3 +454,26 @@ jobs:
             --set auth.rootPassword="${{ secrets.MONGODB_ROOT_PASSWORD }}" \
             --set service.loadBalancerIP="${{ env.public_ip_address }}"
         working-directory: kubernetes/releases
+
+      - name: Install persistent volume for postgresql
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            postgresql-persistentvolume ./azure-persistentvolume \
+            --namespace default \
+            --set name=postgresql \
+            --set disk.capacity=4Gi \
+            --set disk.id="${{ env.postgresql_disk_id }}"
+        working-directory: kubernetes/charts
+
+      # https://artifacthub.io/packages/helm/bitnami/postgresql
+      - name: Install postgresql
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            postgresql postgresql \
+            --repo https://charts.bitnami.com/bitnami \
+            --namespace default \
+            --version 11.6.7 \
+            -f postgresql.yaml \
+            --set auth.postgresPassword="${{ secrets.POSTGRESQL_POSTGRES_PASSWORD }}" \
+            --set primary.service.loadBalancerIP="${{ env.public_ip_address }}"
+        working-directory: kubernetes/releases
