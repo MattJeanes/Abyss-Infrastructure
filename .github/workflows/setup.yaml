@@ -502,6 +502,7 @@ jobs:
             --namespace default \
             --version 6.7.2 \
             -f teslamate.yaml \
+            --set image.tag=1.26.1 \
             --set ingress.main.hosts[0].host="${{ env.teslamate_host }}" \
             --set ingress.main.tls[0].hosts[0]="${{ env.teslamate_host }}" \
             --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
