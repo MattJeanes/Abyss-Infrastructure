@@ -86,6 +86,8 @@ grafana:
       cert-manager.io/cluster-issuer: letsencrypt-prod
     tls:
     - secretName: grafana-tls
+  env:
+    GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: panodata-map-panel
   extraVolumeMounts:
   - name: plugins
     mountPath: /var/lib/grafana/plugins
