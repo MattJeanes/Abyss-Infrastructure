@@ -43,7 +43,7 @@ function Test-KubeCertificate {
 
     $certificate = Invoke-Kubectl "get", "certificate", $Name, "--namespace", $Namespace
     $readyStatus = $certificate.status.conditions | Where-Object { $_.type -eq "Ready" }
-    return $readyStatus.status
+    return $readyStatus.status -eq "True"
 }
 
 function Wait-KubeCertificate {

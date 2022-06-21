@@ -497,3 +497,10 @@ jobs:
         run: ./WaitKubeCertificate.ps1 -Name "teslamate-tls"
         shell: pwsh
         working-directory: scripts
+
+      - name: Install grafana-dashboards
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            grafana-dashboards ./grafana-dashboards \
+            --namespace default
+        working-directory: kubernetes/charts

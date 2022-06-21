@@ -9,7 +9,8 @@ locals {
     "prometheus",
     "auth",
     "ts",
-    "musicbot"
+    "musicbot",
+    "teslamate"
   ]
   proxied_records = {
     "hello-world" = true,
