@@ -5,7 +5,7 @@ locals {
     "abyss",
     "gpt",
     "alertmanager",
-    "newgrafana",
+    "grafana",
     "prometheus",
     "auth",
     "ts",

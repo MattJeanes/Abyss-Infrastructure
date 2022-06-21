@@ -90,7 +90,7 @@ jobs:
             hello_world_host = "hello-world.${{ secrets.HOST }}"
             dashboard_host = "kubedashboard.${{ secrets.HOST }}"
             alertmanager_host = "alertmanager.${{ secrets.HOST }}"
-            grafana_host = "newgrafana.${{ secrets.HOST }}"
+            grafana_host = "grafana.${{ secrets.HOST }}"
             prometheus_host = "prometheus.${{ secrets.HOST }}"
             sinusbot_host = "musicbot.${{ secrets.HOST }}"
             teamspeak_host = "ts.${{ secrets.HOST }}"
