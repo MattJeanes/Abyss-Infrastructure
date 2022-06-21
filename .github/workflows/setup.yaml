@@ -275,8 +275,8 @@ jobs:
       - name: Create dashboard account
         run: |
           Write-Host "Retrieving dashboard token"
-          $adminUserToken = kubectl get secret -n dashboard admin-user-token -o json | ConvertFrom-Json
-          $tokenBase64 = $adminUserToken.data.token
+          $dashboardAdminUserToken = kubectl get secret -n dashboard dashboard-admin-user-token -o json | ConvertFrom-Json
+          $tokenBase64 = $dashboardAdminUserToken.data.token
           if ($LASTEXITCODE -ne 0) {
               Write-Error "Failed to get dashboard token"
           }
