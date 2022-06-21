@@ -1,0 +1,5 @@
+teslamate:
+  database:
+    host: postgresql
+    name: teslamate
+    user: teslamate

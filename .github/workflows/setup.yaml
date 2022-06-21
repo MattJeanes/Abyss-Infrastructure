@@ -498,9 +498,38 @@ jobs:
         shell: pwsh
         working-directory: scripts
 
+      - name: Prepare teslamate grafana dashboards
+        run: |
+          $tempDirectory = $env:RUNNER_TEMP
+          $teslamateVersion = $env:TESLAMATE_VERSION
+
+          $teslamatePath = Join-Path $tempDirectory "teslamate"
+          $dashboardsPath = Join-Path "dashboards" "teslamate"
+
+          git clone https://github.com/adriankumpf/teslamate.git $teslamatePath
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "git exited with code $LASTEXITCODE"
+          }
+          git -C $teslamatePath checkout $teslamateVersion
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "git exited with code $LASTEXITCODE"
+          }
+
+          $null = New-Item -Path $dashboardsPath -ItemType Directory -Force
+          Copy-Item -Path (Join-Path "teslamate" "grafana" "dashboards" "*") -Destination $dashboardsPath -Recurse
+
+          Get-ChildItem -File -Recurse $dashboardsPath | ForEach-Object {
+              Move-Item -Path $_.FullName -Destination (Join-Path $_.DirectoryName ("teslamate-" + $_.Name))
+          }
+        shell: pwsh
+        working-directory: kubernetes/charts/grafana-dashboards
+        env:
+          TESLAMATE_VERSION: v1.26.1
+
       - name: Install grafana-dashboards
         run: |
           helm upgrade --install --wait --atomic --debug \
             grafana-dashboards ./grafana-dashboards \
-            --namespace default
+            --namespace default \
+            --set teslamate.database.pass="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}"
         working-directory: kubernetes/charts
