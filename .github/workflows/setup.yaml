@@ -231,9 +231,7 @@ jobs:
             --set name=grafana-plugins \
             --set disk.capacity=1Gi \
             --set useFileShare=true \
-            --set fileShare.name=grafana-plugins \
-            --set fileShare.storageAccountName="${{ env.storage_account_name }}" \
-            --set fileShare.storageAccountKey="${{ env.storage_account_key }}"
+            --set fileShare.name=grafana-plugins
         working-directory: kubernetes/charts
 
       # https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy

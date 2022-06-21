@@ -5,10 +5,10 @@ metadata:
   name: {{ required "name is required" .Values.name }}
 spec:
   accessModes:
-  - ReadWriteOnce
+  - {{ ternary "ReadWriteMany" "ReadWriteOnce" .Values.useFileShare }}
   resources:
     requests:
       storage: {{ required "disk.capacity is required" .Values.disk.capacity }}
-  storageClassName: managed-csi
+  storageClassName: {{ ternary "azurefile-csi" "managed-csi" .Values.useFileShare }}
   volumeName: {{ required "name is required" .Values.name }}
 {{- end }}

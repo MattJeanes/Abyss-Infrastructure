@@ -4,20 +4,35 @@ metadata:
   name: {{ required "name is required" .Values.name }}
 spec:
   accessModes:
-  - ReadWriteOnce
+  - {{ ternary "ReadWriteMany" "ReadWriteOnce" .Values.useFileShare }}
   capacity:
     storage: {{ required "disk.capacity is required" .Values.disk.capacity }}
+  {{- if .Values.useFileShare }}
+  mountOptions:
+  - dir_mode=0777
+  - file_mode=0777
+  - uid=0
+  - gid=0
+  - mfsymlinks
+  - cache=strict  # https://linux.die.net/man/8/mount.cifs
+  - nosharesock
+  {{- end }}
   csi:
     {{- if .Values.useFileShare }}
     driver: file.csi.azure.com
     volumeAttributes:
-      secretName: {{ required "name is required" .Values.name }}-volume-secret
+      resourceGroup: abyss
       shareName: {{ required "fileShare.name is required" .Values.fileShare.name }}
+    volumeHandle: {{ .Values.name }}-{{ .Values.fileShare.name }}
+    nodeStageSecretRef:
+      name: azure-storage-account
+      namespace: default
     {{- else }}
     driver: disk.csi.azure.com
     volumeAttributes:
       fsType: ext4
     volumeHandle: {{ required "disk.id is required" .Values.disk.id }}
     {{- end }}
+    readOnly: false
   persistentVolumeReclaimPolicy: Retain
-  storageClassName: managed-csi
+  storageClassName: {{ ternary "azurefile-csi" "managed-csi" .Values.useFileShare }}
