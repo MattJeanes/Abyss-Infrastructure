@@ -32,7 +32,6 @@ spec:
             cpu: 10m
           limits:
             memory: "10Mi"
-            cpu: 10m
         livenessProbe:
           httpGet:
             scheme: HTTP
