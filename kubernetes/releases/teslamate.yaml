@@ -16,10 +16,9 @@ env:
   TZ: Europe/London
   DISABLE_MQTT: "true"
   LOCALE: en
-# TODO RESOURCES
-# resources:
-#   requests:
-#     cpu: 15m
-#     memory: 200Mi
-#   limits:
-#     memory: 200Mi
+resources:
+  requests:
+    cpu: 30m
+    memory: 200Mi
+  limits:
+    memory: 200Mi

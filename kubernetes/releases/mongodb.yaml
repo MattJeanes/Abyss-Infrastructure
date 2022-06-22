@@ -9,3 +9,9 @@ service:
   type: LoadBalancer
   annotations:
     service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
+resources:
+  requests:
+    cpu: 400m
+    memory: 750Mi
+  limits:
+    memory: 750Mi
