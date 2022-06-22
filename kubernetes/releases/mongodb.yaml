@@ -1,3 +1,4 @@
+useStatefulSet: true
 metrics:
   enabled: true
   serviceMonitor:
