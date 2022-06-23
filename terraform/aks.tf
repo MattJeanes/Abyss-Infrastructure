@@ -35,6 +35,7 @@ resource "azurerm_kubernetes_cluster" "abyss" {
     max_count            = 5
     max_pods             = 50
     vm_size              = "Standard_D2as_v5"
+    os_disk_size_gb      = 64
     vnet_subnet_id       = azurerm_subnet.abyss_aks.id
     orchestrator_version = var.kubernetes_version
   }
