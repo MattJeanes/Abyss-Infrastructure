@@ -29,10 +29,8 @@ resource "azurerm_kubernetes_cluster" "abyss" {
 
   default_node_pool {
     name                 = "agentpool"
-    enable_auto_scaling  = true
-    node_count           = 1
-    min_count            = 1
-    max_count            = 5
+    enable_auto_scaling  = false
+    node_count           = 2
     max_pods             = 50
     vm_size              = "Standard_D2as_v5"
     os_disk_size_gb      = 64
