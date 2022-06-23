@@ -115,6 +115,15 @@ jobs:
             --set storageAccountName="${{ env.storage_account_name }}" \
             --set storageAccountKey="${{ env.storage_account_key }}"
         working-directory: kubernetes/charts
+
+      - name: Add github-registry secret
+        run: |
+          kubectl -n default create secret docker-registry github-registry \
+            --docker-server=ghcr.io \
+            --docker-username="${{ github.actor }}" \
+            --docker-password="${{ secrets.ABYSS_GITHUB_REGISTRY_PAT }}" \
+            --docker-email="${{ secrets.EMAIL }}" \
+            --dry-run=client -o yaml --save-config | kubectl apply -f -
       
       # https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx
       - name: Install ingress-nginx
