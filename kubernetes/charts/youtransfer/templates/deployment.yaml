@@ -34,7 +34,7 @@ spec:
           subPath: assets
         - name: youtransfer
           mountPath: /opt/youtransfer/src/css
-          subPath: assets
+          subPath: css
         - name: youtransfer
           mountPath: /opt/youtransfer/config
           subPath: config
