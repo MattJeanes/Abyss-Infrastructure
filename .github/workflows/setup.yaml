@@ -572,7 +572,9 @@ jobs:
           helm upgrade --install --wait --atomic --debug \
             youtransfer ./youtransfer \
             --namespace default \
-            --set ingress.host="${{ env.send_host }}"
+            --set ingress.host="${{ env.send_host }}" \
+            --set auth.username="${{ secrets.YOUTRANSFER_USERNAME }}" \
+            --set auth.password="${{ secrets.YOUTRANSFER_PASSWORD }}"
         working-directory: kubernetes/charts
 
       - name: Wait for youtransfer certificate to be ready
