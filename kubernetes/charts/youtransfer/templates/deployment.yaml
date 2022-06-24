@@ -1,0 +1,56 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: youtransfer
+  name: youtransfer
+spec: 
+  strategy: 
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: {{ ternary 1 0 (gt (int .Values.replicaCount) 1) }}
+      maxSurge: 1
+  replicas: {{ .Values.replicaCount }}
+  revisionHistoryLimit: 3
+  selector: 
+    matchLabels: 
+      app: youtransfer
+  template: 
+    metadata: 
+      labels: 
+        app: youtransfer
+        {{- if eq .Values.image.tag "latest" }}
+        date: "{{ now | unixEpoch }}"
+        {{- end }}
+    spec: 
+      containers: 
+      - image: {{ .Values.image.repository }}:{{ required "image.tag is required" .Values.image.tag }}
+        name: youtransfer
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        resources: {{ toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        - name: youtransfer
+          mountPath: /opt/youtransfer/src/assets
+          subPath: assets
+        - name: youtransfer
+          mountPath: /opt/youtransfer/src/css
+          subPath: assets
+        - name: youtransfer
+          mountPath: /opt/youtransfer/config
+          subPath: config
+        ports:
+        - containerPort: 80
+        startupProbe:
+          httpGet:
+            scheme: HTTP
+            port: 80
+            path: /
+          periodSeconds: 5
+          failureThreshold: 6
+      volumes:
+      - name: youtransfer
+        csi:
+          driver: file.csi.azure.com
+          volumeAttributes:
+            secretName: azure-storage-account
+            shareName: youtransfer

@@ -1,0 +1,12 @@
+replicaCount: 1
+image:
+  repository: remie/youtransfer
+  tag: stable
+  pullPolicy: Always
+ingress: {}
+resources:
+  requests:
+    memory: 150Mi
+    cpu: 10m
+  limits:
+    memory: 150Mi

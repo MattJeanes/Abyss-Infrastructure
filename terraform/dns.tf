@@ -10,7 +10,9 @@ locals {
     "auth",
     "ts",
     "musicbot",
-    "teslamate"
+    "teslamate",
+    "youtubedl",
+    "send"
   ]
   proxied_records = {
     "hello-world" = true,
