@@ -4,7 +4,7 @@ metadata:
   name: youtransfer
 spec:
   ports:
-  - port: 80
+  - port: 5000
     protocol: TCP
   selector:
     app: youtransfer
