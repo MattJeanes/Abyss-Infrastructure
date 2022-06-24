@@ -10,5 +10,5 @@ resources:
     cpu: 10m
   limits:
     memory: 250Mi
-maxSize: 500Mi
+maxSize: 500m
 auth: {}
