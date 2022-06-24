@@ -6,9 +6,7 @@ image:
 ingress: {}
 resources:
   requests:
-    memory: 250Mi
+    memory: 150Mi
     cpu: 10m
-  limits:
-    memory: 250Mi
 maxSize: 500m
 auth: {}
