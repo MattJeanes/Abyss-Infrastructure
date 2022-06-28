@@ -20,40 +20,29 @@ spec:
         app: {{ .Release.Name }}
     spec:
       containers:
-      - name: static-file-server
-        image: halverneus/static-file-server
-        env:
-        - name: PORT
-          value: "8080"
-        - name: SHOW_LISTING
-          value: {{ .Values.allowBrowse | quote }}
-        - name: FOLDER
-          value: /site
+      - name: app
+        image: httpd
         ports:
-        - containerPort: 8080
+        - containerPort: 80
           protocol: TCP
         imagePullPolicy: Always
         resources: {{ toYaml .Values.resources | nindent 10 }}
         volumeMounts:
         - name: site
-          mountPath: /site
+          mountPath: /usr/local/apache2/htdocs
           {{- if .Values.mount.subPath }}
           subPath: {{ .Values.mount.subPath }}
           {{- end }}
         livenessProbe:
-          httpGet:
-            scheme: HTTP
-            port: 8080
-            path: /
+          tcpSocket:
+            port: 80
           initialDelaySeconds: 5
           periodSeconds: 10
           timeoutSeconds: 4
           failureThreshold: 5
         readinessProbe:
-          httpGet:
-            scheme: HTTP
-            port: 8080
-            path: /
+          tcpSocket:
+            port: 80
           initialDelaySeconds: 4
           periodSeconds: 5
           timeoutSeconds: 2
