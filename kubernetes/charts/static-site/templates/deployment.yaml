@@ -21,7 +21,7 @@ spec:
     spec:
       containers:
       - name: app
-        image: httpd
+        image: php:7.2-apache
         ports:
         - containerPort: 80
           protocol: TCP
@@ -29,7 +29,7 @@ spec:
         resources: {{ toYaml .Values.resources | nindent 10 }}
         volumeMounts:
         - name: site
-          mountPath: /usr/local/apache2/htdocs
+          mountPath: /var/www/html
           {{- if .Values.mount.subPath }}
           subPath: {{ .Values.mount.subPath }}
           {{- end }}
