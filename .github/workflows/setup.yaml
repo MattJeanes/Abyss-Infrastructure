@@ -583,31 +583,3 @@ jobs:
         run: ./WaitKubeCertificate.ps1 -Name "youtransfer-tls"
         shell: pwsh
         working-directory: scripts
-
-      - name: Install main site
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            main-site ./static-site \
-            --namespace default \
-            --set host="${{ env.main_host }}" \
-            --set mount.shareName=site
-        working-directory: kubernetes/charts
-
-      - name: Wait for main site certificate to be ready
-        run: ./WaitKubeCertificate.ps1 -Name "main-site-tls"
-        shell: pwsh
-        working-directory: scripts
-
-      - name: Install cdn site
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            cdn-site ./static-site \
-            --namespace default \
-            --set host="${{ env.cdn_host }}" \
-            --set mount.shareName=cdn
-        working-directory: kubernetes/charts
-
-      - name: Wait for cdn site certificate to be ready
-        run: ./WaitKubeCertificate.ps1 -Name "cdn-site-tls"
-        shell: pwsh
-        working-directory: scripts

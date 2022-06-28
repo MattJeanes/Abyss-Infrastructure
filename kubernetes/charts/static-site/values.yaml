@@ -1,9 +1,0 @@
-allowBrowse: false
-mount:
-  secretName: azure-storage-account
-resources:
-  requests:
-    memory: 50Mi
-    cpu: 10m
-  limits:
-    memory: 50Mi
