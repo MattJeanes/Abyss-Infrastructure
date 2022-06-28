@@ -3,7 +3,7 @@ mount:
   secretName: azure-storage-account
 resources:
   requests:
-    memory: 10Mi
+    memory: 50Mi
     cpu: 10m
   limits:
-    memory: 10Mi
+    memory: 50Mi

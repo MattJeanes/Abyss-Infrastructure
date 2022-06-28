@@ -24,13 +24,13 @@ spec:
         image: halverneus/static-file-server
         env:
         - name: PORT
-          value: "80"
+          value: "8080"
         - name: SHOW_LISTING
           value: {{ .Values.allowBrowse | quote }}
         - name: FOLDER
           value: /site
         ports:
-        - containerPort: 80
+        - containerPort: 8080
           protocol: TCP
         imagePullPolicy: Always
         resources: {{ toYaml .Values.resources | nindent 10 }}
@@ -43,7 +43,7 @@ spec:
         livenessProbe:
           httpGet:
             scheme: HTTP
-            port: 80
+            port: 8080
             path: /
           initialDelaySeconds: 5
           periodSeconds: 10
@@ -52,7 +52,7 @@ spec:
         readinessProbe:
           httpGet:
             scheme: HTTP
-            port: 80
+            port: 8080
             path: /
           initialDelaySeconds: 4
           periodSeconds: 5
