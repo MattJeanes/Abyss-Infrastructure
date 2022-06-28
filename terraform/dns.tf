@@ -12,11 +12,15 @@ locals {
     "musicbot",
     "teslamate",
     "youtubedl",
-    "send"
+    "send",
+    "cdn",
+    "@"
   ]
   proxied_records = {
     "hello-world" = true,
-    "musicbot" = true
+    "musicbot"    = true,
+    "cdn"         = true,
+    "@"           = true
   }
 }
 

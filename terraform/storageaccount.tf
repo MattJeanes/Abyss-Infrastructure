@@ -51,6 +51,26 @@ resource "azurerm_storage_share" "abyss_youtransfer" {
   }
 }
 
+resource "azurerm_storage_share" "abyss_site" {
+  name                 = "site"
+  storage_account_name = azurerm_storage_account.abyss.name
+  quota                = "1"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
+resource "azurerm_storage_share" "abyss_cdn" {
+  name                 = "cdn"
+  storage_account_name = azurerm_storage_account.abyss.name
+  quota                = "1"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
+
 output "storage_account_name" {
   value     = azurerm_storage_account.abyss.name
   sensitive = true

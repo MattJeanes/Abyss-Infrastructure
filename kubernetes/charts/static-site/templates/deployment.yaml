@@ -1,0 +1,68 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}
+  labels:
+    app: {{ .Release.Name }}
+spec:
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 0
+      maxSurge: 1
+  replicas: 1
+  selector:
+    matchLabels:
+      app: {{ .Release.Name }}
+  template:
+    metadata:
+      labels:
+        app: {{ .Release.Name }}
+    spec:
+      containers:
+      - name: static-file-server
+        image: halverneus/static-file-server
+        env:
+        - name: PORT
+          value: "80"
+        - name: SHOW_LISTING
+          value: {{ .Values.allowBrowse | quote }}
+        - name: FOLDER
+          value: /site
+        ports:
+        - containerPort: 80
+          protocol: TCP
+        imagePullPolicy: Always
+        resources: {{ toYaml .Values.resources | nindent 10 }}
+        volumeMounts:
+        - name: site
+          mountPath: /site
+          {{- if .Values.mount.subPath }}
+          subPath: {{ .Values.mount.subPath }}
+          {{- end }}
+        livenessProbe:
+          httpGet:
+            scheme: HTTP
+            port: 80
+            path: /
+          initialDelaySeconds: 5
+          periodSeconds: 10
+          timeoutSeconds: 4
+          failureThreshold: 5
+        readinessProbe:
+          httpGet:
+            scheme: HTTP
+            port: 80
+            path: /
+          initialDelaySeconds: 4
+          periodSeconds: 5
+          timeoutSeconds: 2
+          successThreshold: 1
+          failureThreshold: 2
+      volumes:
+      - name: site
+        csi:
+          driver: file.csi.azure.com
+          volumeAttributes:
+            secretName: {{ .Values.mount.secretName }}
+            shareName: {{ required "mount.shareName is required" .Values.mount.shareName }}
