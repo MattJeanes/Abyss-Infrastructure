@@ -604,7 +604,8 @@ jobs:
             cdn-site ./static-site \
             --namespace default \
             --set host="${{ env.cdn_host }}" \
-            --set mount.shareName=cdn
+            --set mount.shareName=cdn \
+            --set allowBrowse=true
         working-directory: kubernetes/charts
 
       - name: Wait for cdn site certificate to be ready
