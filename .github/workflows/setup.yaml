@@ -512,14 +512,15 @@ jobs:
             teslamate teslamate \
             --repo https://k8s-at-home.com/charts \
             --namespace default \
-            --version 6.7.2 \
+            --version 7.0.1 \
             -f teslamate.yaml \
-            --set image.tag=1.26.1 \
+            --set image.tag=1.27.0 \
             --set ingress.main.hosts[0].host="${{ env.teslamate_host }}" \
             --set ingress.main.tls[0].hosts[0]="${{ env.teslamate_host }}" \
             --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
             --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}" \
-            --set env.DATABASE_PASS="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}"
+            --set env.DATABASE_PASS="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
+            --set env.ENCRYPTION_KEY="${{ secrets.TESLAMATE_ENCRYPTION_KEY }}"
         working-directory: kubernetes/releases
 
       - name: Wait for teslamate certificate to be ready
@@ -559,7 +560,7 @@ jobs:
         shell: pwsh
         working-directory: kubernetes/charts/grafana-dashboards
         env:
-          TESLAMATE_VERSION: v1.26.1
+          TESLAMATE_VERSION: v1.27.0
 
       - name: Install grafana-dashboards
         run: |
