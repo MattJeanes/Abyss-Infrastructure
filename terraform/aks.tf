@@ -92,3 +92,13 @@ resource "azurerm_role_assignment" "aks_abyss_aci_network_contributor_subnet" {
   role_definition_name = "Network Contributor"
   principal_id         = data.azurerm_user_assigned_identity.aks_abyss_aci.principal_id
 }
+
+resource "azurerm_subnet_network_security_group_association" "aks_abyss" {
+  subnet_id                 = azurerm_subnet.abyss_aks.id
+  network_security_group_id = azurerm_network_security_group.abyss.id
+}
+
+resource "azurerm_subnet_network_security_group_association" "aks_abyss_aci" {
+  subnet_id                 = azurerm_subnet.abyss_aci.id
+  network_security_group_id = azurerm_network_security_group.abyss.id
+}
