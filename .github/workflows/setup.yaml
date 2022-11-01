@@ -384,7 +384,7 @@ jobs:
             teamspeak teamspeak \
             --repo https://k8s-at-home.com/charts \
             --namespace default \
-            --version 0.6.0 \
+            --version 0.7.2 \
             -f teamspeak.yaml \
             --set service.main.loadBalancerIP="${{ env.public_ip_address }}" \
             --set service.udp.loadBalancerIP="${{ env.public_ip_address }}" \
