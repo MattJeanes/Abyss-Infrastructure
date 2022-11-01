@@ -1,3 +1,5 @@
+image:
+  tag: 3.13.7
 metrics:
   enabled: true
   prometheusRule:
