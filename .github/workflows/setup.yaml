@@ -361,7 +361,7 @@ jobs:
             mariadb mariadb \
             --repo https://charts.bitnami.com/bitnami \
             --namespace default \
-            --version 11.0.3 \
+            --version 11.4.2 \
             -f mariadb.yaml \
             --set auth.rootPassword="${{ secrets.MARIADB_ROOT_PASSWORD }}" \
             --set primary.service.loadBalancerIP="${{ env.public_ip_address }}"
