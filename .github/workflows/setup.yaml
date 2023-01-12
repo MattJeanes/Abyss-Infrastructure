@@ -28,10 +28,10 @@ jobs:
       - name: Set Terraform variables
         run: |
           tee terraform.tfvars <<EOF
-          kubernetes_version = "${{ secrets.KUBERNETES_VERSION }}"
+          kubernetes_version = "${{ vars.KUBERNETES_VERSION }}"
           ssh_public_key = "${{ secrets.SSH_PUBLIC_KEY }}"
           cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
-          cloudflare_zone_id = "${{ secrets.CLOUDFLARE_ZONE_ID }}"
+          cloudflare_zone_id = "${{ vars.CLOUDFLARE_ZONE_ID }}"
           home_ip = "${{ secrets.HOME_IP }}"
           EOF
         working-directory: terraform
@@ -40,19 +40,19 @@ jobs:
         run: terraform plan -out tfplan
         working-directory: terraform
         env:
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
 
       - name: Terraform Validate and Apply
         run: terraform apply tfplan
         working-directory: terraform
         env:
-          ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+          ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
-          ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
-          ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+          ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
         if: github.event.inputs.planOnly == 'false'
 
       - name: Retrieve terraform outputs
@@ -87,20 +87,20 @@ jobs:
       - name: Set common variables
         run: |
           $variables = @{
-            hello_world_host = "hello-world.${{ secrets.HOST }}"
-            dashboard_host = "kubedashboard.${{ secrets.HOST }}"
-            alertmanager_host = "alertmanager.${{ secrets.HOST }}"
-            grafana_host = "grafana.${{ secrets.HOST }}"
-            prometheus_host = "prometheus.${{ secrets.HOST }}"
-            sinusbot_host = "musicbot.${{ secrets.HOST }}"
-            teamspeak_host = "ts.${{ secrets.HOST }}"
-            teslamate_host = "teslamate.${{ secrets.HOST }}"
-            send_host = "send.${{ secrets.HOST }}"
-            main_host = "${{ secrets.HOST }}"
-            cdn_host = "cdn.${{ secrets.HOST }}"
-            auth_host = "auth.${{ secrets.HOST }}"
+            hello_world_host = "hello-world.${{ vars.HOST }}"
+            dashboard_host = "kubedashboard.${{ vars.HOST }}"
+            alertmanager_host = "alertmanager.${{ vars.HOST }}"
+            grafana_host = "grafana.${{ vars.HOST }}"
+            prometheus_host = "prometheus.${{ vars.HOST }}"
+            sinusbot_host = "musicbot.${{ vars.HOST }}"
+            teamspeak_host = "ts.${{ vars.HOST }}"
+            teslamate_host = "teslamate.${{ vars.HOST }}"
+            send_host = "send.${{ vars.HOST }}"
+            main_host = "${{ vars.HOST }}"
+            cdn_host = "cdn.${{ vars.HOST }}"
+            auth_host = "auth.${{ vars.HOST }}"
             auth_url = "http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth"
-            auth_signin = "https://auth.${{ secrets.HOST }}/oauth2/start?rd=\`$scheme://\`$host\`$request_uri"
+            auth_signin = "https://auth.${{ vars.HOST }}/oauth2/start?rd=\`$scheme://\`$host\`$request_uri"
           }
           $variables.Keys | ForEach-Object {
               $key = $_
@@ -125,7 +125,7 @@ jobs:
             --docker-server=ghcr.io \
             --docker-username="${{ github.actor }}" \
             --docker-password="${{ secrets.ABYSS_GITHUB_REGISTRY_PAT }}" \
-            --docker-email="${{ secrets.EMAIL }}" \
+            --docker-email="${{ vars.EMAIL }}" \
             --dry-run=client -o yaml --save-config | kubectl apply -f -
 
       # https://artifacthub.io/packages/helm/ingress-nginx/ingress-nginx
@@ -158,7 +158,7 @@ jobs:
           helm upgrade --install --wait --atomic --debug \
             certificate-issuers ./certificate-issuers \
             --namespace cert-manager \
-            --set letsEncrypt.email="${{ secrets.EMAIL }}"
+            --set letsEncrypt.email="${{ vars.EMAIL }}"
         working-directory: kubernetes/charts
 
       - name: Install Hello World
@@ -184,14 +184,14 @@ jobs:
             --create-namespace \
             --version 6.2.1 \
             -f oauth2-proxy.yaml \
-            --set config.clientID="${{ secrets.OAUTH2_CLIENT_ID }}" \
+            --set config.clientID="${{ vars.OAUTH2_CLIENT_ID }}" \
             --set config.clientSecret="${{ secrets.OAUTH2_CLIENT_SECRET }}" \
             --set config.cookieSecret="${{ secrets.OAUTH2_COOKIE_SECRET }}" \
-            --set authenticatedEmailsFile.restricted_access="${{ secrets.EMAIL }}" \
+            --set authenticatedEmailsFile.restricted_access="${{ vars.EMAIL }}" \
             --set ingress.hosts[0]="${{ env.auth_host }}" \
             --set ingress.tls[0].hosts[0]="${{ env.auth_host }}" \
-            --set extraArgs.whitelist-domain=".${{ secrets.HOST }}" \
-            --set extraArgs.cookie-domain=".${{ secrets.HOST }}"
+            --set extraArgs.whitelist-domain=".${{ vars.HOST }}" \
+            --set extraArgs.cookie-domain=".${{ vars.HOST }}"
         working-directory: kubernetes/releases
 
       - name: Wait for oauth2-proxy certificate to be ready
@@ -261,7 +261,7 @@ jobs:
             --set alertmanager.ingress.tls[0].hosts[0]="${{ env.alertmanager_host }}" \
             --set alertmanager.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
             --set alertmanager.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}" \
-            --set alertmanager.config.global.pagerduty_url="${{ secrets.PAGERDUTY_URL }}" \
+            --set alertmanager.config.global.pagerduty_url="${{ vars.PAGERDUTY_URL }}" \
             --set alertmanager.config.receivers[0].pagerduty_configs[0].routing_key="${{ secrets.PAGERDUTY_INTEGRATION_KEY }}" \
             --set alertmanager.config.receivers[1].webhook_configs[0].url="${{ secrets.DEAD_MANS_SNITCH_WEBHOOK_URL }}" \
             --set grafana.ingress.hosts[0]="${{ env.grafana_host }}" \
@@ -576,7 +576,7 @@ jobs:
             youtransfer ./youtransfer \
             --namespace default \
             --set ingress.host="${{ env.send_host }}" \
-            --set auth.username="${{ secrets.YOUTRANSFER_USERNAME }}" \
+            --set auth.username="${{ vars.YOUTRANSFER_USERNAME }}" \
             --set auth.password="${{ secrets.YOUTRANSFER_PASSWORD }}"
         working-directory: kubernetes/charts
 
