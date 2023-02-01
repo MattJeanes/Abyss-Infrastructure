@@ -14,6 +14,7 @@ spec:
   - uid={{ .Values.fileShare.uid | default 0 }}
   - gid={{ .Values.fileShare.gid | default 0 }}
   - mfsymlinks
+  - nobrl
   - cache=strict  # https://linux.die.net/man/8/mount.cifs
   - nosharesock
   {{- end }}
