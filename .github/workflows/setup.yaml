@@ -584,3 +584,26 @@ jobs:
         run: ./WaitKubeCertificate.ps1 -Name "youtransfer-tls"
         shell: pwsh
         working-directory: scripts
+
+      - name: Install persistent volume for influxdb
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            influxdb-persistentvolume ./azure-persistentvolume \
+            --namespace default \
+            --set name=influxdb \
+            --set disk.capacity=4Gi \
+            --set disk.id="${{ env.influxdb_disk_id }}"
+        working-directory: kubernetes/charts
+
+      # https://artifacthub.io/packages/helm/bitnami/influxdb
+      - name: Install influxdb
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            influxdb influxdb \
+            --repo https://charts.bitnami.com/bitnami \
+            --namespace default \
+            --version 5.4.15 \
+            -f influxdb.yaml \
+            --set auth.admin.password="${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" \
+            --set service.loadBalancerIP="${{ env.public_ip_address }}"
+        working-directory: kubernetes/releases
