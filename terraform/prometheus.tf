@@ -33,3 +33,13 @@ output "alertmanager_disk_id" {
   value     = azurerm_managed_disk.alertmanager.id
   sensitive = true
 }
+
+resource "azurerm_storage_share" "abyss_grafana_plugins" {
+  name                 = "grafana-plugins"
+  storage_account_name = azurerm_storage_account.abyss.name
+  quota                = "1"
+
+  lifecycle {
+    prevent_destroy = true
+  }
+}
