@@ -610,5 +610,6 @@ jobs:
             --version 5.4.15 \
             -f influxdb.yaml \
             --set auth.admin.password="${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" \
+            --set auth.admin.token="${{ secrets.INFLUXDB_ADMIN_TOKEN }}" \
             --set influx.service.loadBalancerIP="${{ env.public_ip_address }}"
         working-directory: kubernetes/releases
