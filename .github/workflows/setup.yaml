@@ -373,8 +373,9 @@ jobs:
             teamspeak-persistentvolume ./azure-persistentvolume \
             --namespace default \
             --set name=teamspeak \
-            --set disk.capacity=4Gi \
-            --set disk.id="${{ env.teamspeak_disk_id }}"
+            --set disk.capacity=10Gi \
+            --set useFileShare=true \
+            --set fileShare.name=teamspeak
         working-directory: kubernetes/charts
 
       # https://artifacthub.io/packages/helm/k8s-at-home/teamspeak
@@ -412,8 +413,9 @@ jobs:
             teamspeak-alt-persistentvolume ./azure-persistentvolume \
             --namespace default \
             --set name=teamspeak-alt \
-            --set disk.capacity=4Gi \
-            --set disk.id="${{ env.teamspeak_alt_disk_id }}"
+            --set disk.capacity=10Gi \
+            --set useFileShare=true \
+            --set fileShare.name=teamspeak-alt
         working-directory: kubernetes/charts
 
       # https://artifacthub.io/packages/helm/k8s-at-home/teamspeak
@@ -437,8 +439,9 @@ jobs:
             sinusbot-persistentvolume ./azure-persistentvolume \
             --namespace default \
             --set name=sinusbot \
-            --set disk.capacity=4Gi \
-            --set disk.id="${{ env.sinusbot_disk_id }}"
+            --set disk.capacity=10Gi \
+            --set useFileShare=true \
+            --set fileShare.name=sinusbot
         working-directory: kubernetes/charts
 
       # https://artifacthub.io/packages/helm/k8s-at-home/sinusbot
