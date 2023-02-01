@@ -441,7 +441,9 @@ jobs:
             --set name=sinusbot \
             --set disk.capacity=10Gi \
             --set useFileShare=true \
-            --set fileShare.name=sinusbot
+            --set fileShare.name=sinusbot \
+            --set fileShare.uid=1001 \
+            --set fileShare.gid=1001
         working-directory: kubernetes/charts
 
       # https://artifacthub.io/packages/helm/k8s-at-home/sinusbot
