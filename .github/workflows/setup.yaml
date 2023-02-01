@@ -572,7 +572,8 @@ jobs:
           helm upgrade --install --wait --atomic --debug \
             grafana-dashboards ./grafana-dashboards \
             --namespace default \
-            --set teslamate.database.pass="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}"
+            --set teslamate.database.pass="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
+            --set influxdb.token="${{ secrets.INFLUXDB_GRAFANA_API_TOKEN }}"
         working-directory: kubernetes/charts
 
       - name: Install youtransfer

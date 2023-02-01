@@ -4,7 +4,12 @@ metrics:
     enabled: true
     namespace: monitoring
 influxdb:
-  resources: {} # TODO
+  resources:
+    requests:
+      cpu: 10m
+      memory: 150Mi
+    limits:
+      memory: 150Mi
   service:
     type: LoadBalancer
     annotations:
