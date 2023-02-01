@@ -5,9 +5,9 @@ metrics:
     namespace: monitoring
 influxdb:
   resources: {} # TODO
-service:
-  type: LoadBalancer
-  annotations:
-    service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
+  service:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
 persistence:
   existingClaim: influxdb
