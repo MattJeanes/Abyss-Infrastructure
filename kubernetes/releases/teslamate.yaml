@@ -14,7 +14,7 @@ env:
   DATABASE_USER: teslamate
   DATABASE_NAME: teslamate
   TZ: Europe/London
-  DISABLE_MQTT: "true"
+  MQTT_TLS: "true"
   LOCALE: en
 resources:
   requests:

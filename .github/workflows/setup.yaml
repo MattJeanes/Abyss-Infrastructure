@@ -95,6 +95,7 @@ jobs:
             sinusbot_host = "musicbot.${{ vars.HOST }}"
             teamspeak_host = "ts.${{ vars.HOST }}"
             teslamate_host = "teslamate.${{ vars.HOST }}"
+            mqtt_host = "mqtt.${{ vars.HOST }}"
             send_host = "send.${{ vars.HOST }}"
             main_host = "${{ vars.HOST }}"
             cdn_host = "cdn.${{ vars.HOST }}"
@@ -525,7 +526,10 @@ jobs:
             --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
             --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}" \
             --set env.DATABASE_PASS="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
-            --set env.ENCRYPTION_KEY="${{ secrets.TESLAMATE_ENCRYPTION_KEY }}"
+            --set env.ENCRYPTION_KEY="${{ secrets.TESLAMATE_ENCRYPTION_KEY }}" \
+            --set env.MQTT_HOST="${{ env.mqtt_host }}" \
+            --set env.MQTT_USERNAME="${{ vars.MQTT_USERNAME }}" \
+            --set env.MQTT_PASSWORD="${{ secrets.MQTT_PASSWORD }}"
         working-directory: kubernetes/releases
 
       - name: Wait for teslamate certificate to be ready
