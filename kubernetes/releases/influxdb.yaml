@@ -10,9 +10,12 @@ influxdb:
       memory: 150Mi
     limits:
       memory: 150Mi
-  service:
-    type: LoadBalancer
-    annotations:
-      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
+ingress:
+  enabled: true
+  annotations:
+    kubernetes.io/ingress.class: nginx
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+  tls:
+  - secretName: influxdb-tls
 persistence:
   existingClaim: influxdb

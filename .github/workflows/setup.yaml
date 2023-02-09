@@ -95,6 +95,7 @@ jobs:
             sinusbot_host = "musicbot.${{ vars.HOST }}"
             teamspeak_host = "ts.${{ vars.HOST }}"
             teslamate_host = "teslamate.${{ vars.HOST }}"
+            influxdb_host = "influxdb.${{ vars.HOST }}"
             mqtt_host = "mqtt.${{ vars.HOST }}"
             send_host = "send.${{ vars.HOST }}"
             main_host = "${{ vars.HOST }}"
@@ -616,5 +617,6 @@ jobs:
             -f influxdb.yaml \
             --set auth.admin.password="${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" \
             --set auth.admin.token="${{ secrets.INFLUXDB_ADMIN_TOKEN }}" \
-            --set influx.service.loadBalancerIP="${{ env.public_ip_address }}"
+            --set ingress.hosts[0]="${{ env.influxdb_host }}" \
+            --set ingress.tls[0].hosts[0]="${{ env.influxdb_host }}"
         working-directory: kubernetes/releases
