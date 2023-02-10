@@ -11,6 +11,7 @@ locals {
     "ts",
     "musicbot",
     "teslamate",
+    "influxdb",
     "youtubedl",
     "send",
     "cdn",
