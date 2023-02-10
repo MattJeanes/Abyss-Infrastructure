@@ -617,6 +617,5 @@ jobs:
             -f influxdb.yaml \
             --set auth.admin.password="${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" \
             --set auth.admin.token="${{ secrets.INFLUXDB_ADMIN_TOKEN }}" \
-            --set ingress.hosts[0]="${{ env.influxdb_host }}" \
-            --set ingress.tls[0].hosts[0]="${{ env.influxdb_host }}"
+            --set ingress.hostname="${{ env.influxdb_host }}"
         working-directory: kubernetes/releases
