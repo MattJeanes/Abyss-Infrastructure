@@ -226,7 +226,7 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "list",
+          "displayMode": "hidden",
           "placement": "bottom"
         },
         "tooltip": {
@@ -351,7 +351,7 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "list",
+          "displayMode": "hidden",
           "placement": "bottom"
         },
         "tooltip": {
@@ -471,7 +471,7 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "list",
+          "displayMode": "hidden",
           "placement": "bottom"
         },
         "tooltip": {
@@ -492,7 +492,7 @@
               "type": "time"
             },
             {
-              "params": ["0"],
+              "params": ["none"],
               "type": "fill"
             }
           ],
@@ -555,7 +555,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": 120000,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -592,7 +592,7 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "list",
+          "displayMode": "hidden",
           "placement": "bottom"
         },
         "tooltip": {
@@ -612,7 +612,7 @@
               "type": "time"
             },
             {
-              "params": ["0"],
+              "params": ["null"],
               "type": "fill"
             }
           ],
@@ -715,7 +715,7 @@
       "options": {
         "legend": {
           "calcs": [],
-          "displayMode": "list",
+          "displayMode": "hidden",
           "placement": "bottom"
         },
         "tooltip": {
