@@ -1,4 +1,4 @@
-name: Setup
+name: Dashboards
 
 on:
   workflow_dispatch:
