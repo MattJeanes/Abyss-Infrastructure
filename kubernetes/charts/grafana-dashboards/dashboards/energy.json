@@ -70,6 +70,7 @@
               "mode": "off"
             }
           },
+          "displayName": "SoC",
           "mappings": [],
           "max": 100,
           "min": 0,
@@ -167,7 +168,8 @@
       "fieldConfig": {
         "defaults": {
           "color": {
-            "mode": "palette-classic"
+            "fixedColor": "yellow",
+            "mode": "fixed"
           },
           "custom": {
             "axisLabel": "",
@@ -197,6 +199,7 @@
               "mode": "off"
             }
           },
+          "displayName": "Solar energy",
           "mappings": [],
           "max": 5,
           "min": 0,
@@ -213,7 +216,7 @@
               }
             ]
           },
-          "unit": "kwatt"
+          "unit": "kwatth"
         },
         "overrides": []
       },
@@ -255,7 +258,7 @@
           "measurement": "kW",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_input_kilowatt_actual\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> aggregateWindow(every: 30m, fn: mean, createEmpty: true)\r\n  |> fill(usePrevious: true)\r\n  |> yield(name: \"mean\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_generated_solar_energy_total\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference()\r\n  |> timeShift(duration: -1h)\r\n  |> yield(name: \"last\")",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -279,7 +282,7 @@
           ]
         }
       ],
-      "title": "Solar Energy",
+      "title": "Solar energy",
       "type": "timeseries"
     },
     {
@@ -324,6 +327,7 @@
               "mode": "off"
             }
           },
+          "displayName": "Power output",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -380,7 +384,7 @@
           "measurement": "kW",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: \"homeassistant\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_output_kilowatt_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(value: 0.0)\r\n  |> yield(name: \"mean\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_output_kilowatt_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(value: 0.0)\r\n  |> yield(name: \"mean\")",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -445,6 +449,7 @@
               "mode": "off"
             }
           },
+          "displayName": "Import from grid",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -501,7 +506,7 @@
           "measurement": "kW",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: \"homeassistant\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_import_from_grid_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(usePrevious: true)\r\n  |> yield(name: \"mean\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_import_from_grid_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(usePrevious: true)\r\n  |> yield(name: \"mean\")",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -567,6 +572,7 @@
               "mode": "off"
             }
           },
+          "displayName": "Load",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -622,7 +628,7 @@
           "measurement": "kW",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: \"homeassistant\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_local_load_consumption_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(usePrevious: true)\r\n  |> yield(name: \"mean\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_local_load_consumption_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(usePrevious: true)\r\n  |> yield(name: \"mean\")",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -664,7 +670,7 @@
             "axisLabel": "",
             "axisPlacement": "left",
             "barAlignment": 0,
-            "drawStyle": "line",
+            "drawStyle": "bars",
             "fillOpacity": 50,
             "gradientMode": "none",
             "hideFrom": {
@@ -672,11 +678,11 @@
               "tooltip": false,
               "viz": false
             },
-            "lineInterpolation": "linear",
+            "lineInterpolation": "smooth",
             "lineStyle": {
               "fill": "solid"
             },
-            "lineWidth": 1,
+            "lineWidth": 2,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
@@ -691,7 +697,9 @@
               "mode": "off"
             }
           },
+          "displayName": "Energy use",
           "mappings": [],
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -747,7 +755,7 @@
           "measurement": "kWh",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: \"homeassistant\")\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_local_load_consumption_today\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(usePrevious: true)\r\n  |> yield(name: \"mean\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_import_from_grid_total\")\r\n  |> aggregateWindow(every: 30m, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> yield(name: \"last\")",
           "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
@@ -772,7 +780,7 @@
           ]
         }
       ],
-      "title": "Energy use per day",
+      "title": "Energy use",
       "type": "timeseries"
     }
   ],
@@ -791,6 +799,6 @@
   "timezone": "",
   "title": "Energy",
   "uid": "vdT4UkJ4k",
-  "version": 4,
+  "version": 5,
   "weekStart": ""
 }
