@@ -578,6 +578,7 @@ jobs:
             grafana-dashboards ./grafana-dashboards \
             --namespace default \
             --set teslamate.database.pass="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
+            --set influxdb.organization="${{ vars.INFLUXDB_ORGANIZATION }}" \
             --set influxdb.token="${{ secrets.INFLUXDB_GRAFANA_API_TOKEN }}"
         working-directory: kubernetes/charts
 
