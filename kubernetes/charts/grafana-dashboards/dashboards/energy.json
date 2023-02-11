@@ -24,6 +24,7 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
+  "iteration": 1676157231792,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -201,7 +202,6 @@
           },
           "displayName": "Solar energy",
           "mappings": [],
-          "max": 5,
           "min": 0,
           "thresholds": {
             "mode": "absolute",
@@ -258,7 +258,7 @@
           "measurement": "kW",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_generated_solar_energy_total\")\r\n  |> aggregateWindow(every: 1h, fn: last, createEmpty: false)\r\n  |> difference()\r\n  |> timeShift(duration: -1h)\r\n  |> yield(name: \"last\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_generated_solar_energy_total\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> difference()\r\n  |> timeShift(duration: -${aggregation})\r\n  |> yield(name: \"last\")",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -290,7 +290,7 @@
         "type": "influxdb",
         "uid": "PBB7EDB19FB19A0A4"
       },
-      "description": "Includes both solar and battery output",
+      "description": "",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -298,10 +298,10 @@
           },
           "custom": {
             "axisLabel": "",
-            "axisPlacement": "auto",
+            "axisPlacement": "left",
             "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
+            "drawStyle": "bars",
+            "fillOpacity": 50,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -318,7 +318,7 @@
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": false,
+            "spanNulls": true,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -327,8 +327,9 @@
               "mode": "off"
             }
           },
-          "displayName": "Power output",
+          "displayName": "Energy use",
           "mappings": [],
+          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -342,7 +343,7 @@
               }
             ]
           },
-          "unit": "kwatt"
+          "unit": "kwatth"
         },
         "overrides": []
       },
@@ -352,7 +353,7 @@
         "x": 16,
         "y": 0
       },
-      "id": 6,
+      "id": 12,
       "options": {
         "legend": {
           "calcs": [],
@@ -366,25 +367,26 @@
       },
       "targets": [
         {
-          "alias": "Power output",
+          "alias": "Energy use",
           "datasource": {
             "type": "influxdb",
             "uid": "PBB7EDB19FB19A0A4"
           },
           "groupBy": [
             {
-              "params": ["5m"],
+              "params": ["$__interval"],
               "type": "time"
             },
             {
-              "params": ["0"],
+              "params": ["null"],
               "type": "fill"
             }
           ],
-          "measurement": "kW",
+          "measurement": "kWh",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_output_kilowatt_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(value: 0.0)\r\n  |> yield(name: \"mean\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_import_from_grid_total\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> yield(name: \"last\")",
+          "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -403,12 +405,12 @@
             {
               "key": "entity_id",
               "operator": "=",
-              "value": "growatt_output_kilowatt_actual"
+              "value": "growatt_local_load_consumption_today"
             }
           ]
         }
       ],
-      "title": "Power output",
+      "title": "Energy use",
       "type": "timeseries"
     },
     {
@@ -660,7 +662,7 @@
         "type": "influxdb",
         "uid": "PBB7EDB19FB19A0A4"
       },
-      "description": "",
+      "description": "Includes both solar and battery output",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -668,10 +670,10 @@
           },
           "custom": {
             "axisLabel": "",
-            "axisPlacement": "left",
+            "axisPlacement": "auto",
             "barAlignment": 0,
-            "drawStyle": "bars",
-            "fillOpacity": 50,
+            "drawStyle": "line",
+            "fillOpacity": 0,
             "gradientMode": "none",
             "hideFrom": {
               "legend": false,
@@ -682,13 +684,13 @@
             "lineStyle": {
               "fill": "solid"
             },
-            "lineWidth": 2,
+            "lineWidth": 1,
             "pointSize": 5,
             "scaleDistribution": {
               "type": "linear"
             },
             "showPoints": "auto",
-            "spanNulls": true,
+            "spanNulls": false,
             "stacking": {
               "group": "A",
               "mode": "none"
@@ -697,9 +699,8 @@
               "mode": "off"
             }
           },
-          "displayName": "Energy use",
+          "displayName": "Power output",
           "mappings": [],
-          "min": 0,
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -713,7 +714,7 @@
               }
             ]
           },
-          "unit": "kwatth"
+          "unit": "kwatt"
         },
         "overrides": []
       },
@@ -723,7 +724,7 @@
         "x": 16,
         "y": 9
       },
-      "id": 12,
+      "id": 6,
       "options": {
         "legend": {
           "calcs": [],
@@ -737,26 +738,25 @@
       },
       "targets": [
         {
-          "alias": "Energy use",
+          "alias": "Power output",
           "datasource": {
             "type": "influxdb",
             "uid": "PBB7EDB19FB19A0A4"
           },
           "groupBy": [
             {
-              "params": ["$__interval"],
+              "params": ["5m"],
               "type": "time"
             },
             {
-              "params": ["null"],
+              "params": ["0"],
               "type": "fill"
             }
           ],
-          "measurement": "kWh",
+          "measurement": "kW",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_import_from_grid_total\")\r\n  |> aggregateWindow(every: 30m, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> yield(name: \"last\")",
-          "rawQuery": false,
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_output_kilowatt_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(value: 0.0)\r\n  |> yield(name: \"mean\")",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -775,12 +775,12 @@
             {
               "key": "entity_id",
               "operator": "=",
-              "value": "growatt_local_load_consumption_today"
+              "value": "growatt_output_kilowatt_actual"
             }
           ]
         }
       ],
-      "title": "Energy use",
+      "title": "Power output",
       "type": "timeseries"
     }
   ],
@@ -789,7 +789,83 @@
   "style": "dark",
   "tags": [],
   "templating": {
-    "list": []
+    "list": [
+      {
+        "auto": true,
+        "auto_count": 30,
+        "auto_min": "10s",
+        "current": {
+          "selected": true,
+          "text": "auto",
+          "value": "$__auto_interval_aggregation"
+        },
+        "hide": 0,
+        "label": "Bar chart aggregation",
+        "name": "aggregation",
+        "options": [
+          {
+            "selected": true,
+            "text": "auto",
+            "value": "$__auto_interval_aggregation"
+          },
+          {
+            "selected": false,
+            "text": "1m",
+            "value": "1m"
+          },
+          {
+            "selected": false,
+            "text": "10m",
+            "value": "10m"
+          },
+          {
+            "selected": false,
+            "text": "30m",
+            "value": "30m"
+          },
+          {
+            "selected": false,
+            "text": "1h",
+            "value": "1h"
+          },
+          {
+            "selected": false,
+            "text": "6h",
+            "value": "6h"
+          },
+          {
+            "selected": false,
+            "text": "12h",
+            "value": "12h"
+          },
+          {
+            "selected": false,
+            "text": "1d",
+            "value": "1d"
+          },
+          {
+            "selected": false,
+            "text": "7d",
+            "value": "7d"
+          },
+          {
+            "selected": false,
+            "text": "14d",
+            "value": "14d"
+          },
+          {
+            "selected": false,
+            "text": "30d",
+            "value": "30d"
+          }
+        ],
+        "query": "1m,10m,30m,1h,6h,12h,1d,7d,14d,30d",
+        "queryValue": "",
+        "refresh": 2,
+        "skipUrlSync": false,
+        "type": "interval"
+      }
+    ]
   },
   "time": {
     "from": "now-2d",
@@ -799,6 +875,6 @@
   "timezone": "",
   "title": "Energy",
   "uid": "vdT4UkJ4k",
-  "version": 5,
+  "version": 6,
   "weekStart": ""
 }
