@@ -1,0 +1,61 @@
+name: Setup
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dashboards:
+    name: Dashboards
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Azure Login
+        uses: Azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      - name: Login to Kubernetes
+        uses: Azure/aks-set-context@v3
+        with:
+          resource-group: abyss
+          cluster-name: abyss
+
+      - name: Prepare teslamate grafana dashboards
+        run: |
+          $tempDirectory = $env:RUNNER_TEMP
+          $teslamateVersion = $env:TESLAMATE_VERSION
+
+          $teslamatePath = Join-Path $tempDirectory "teslamate"
+          $dashboardsPath = Join-Path "dashboards" "teslamate"
+
+          git clone https://github.com/adriankumpf/teslamate.git $teslamatePath
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "git exited with code $LASTEXITCODE"
+          }
+          git -C $teslamatePath checkout $teslamateVersion
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "git exited with code $LASTEXITCODE"
+          }
+
+          $null = New-Item -Path $dashboardsPath -ItemType Directory -Force
+          Copy-Item -Path (Join-Path $teslamatePath "grafana" "dashboards" "*") -Destination $dashboardsPath -Recurse
+
+          Get-ChildItem -File -Recurse $dashboardsPath | ForEach-Object {
+              Move-Item -Path $_.FullName -Destination (Join-Path $_.DirectoryName ("teslamate-" + $_.Name))
+          }
+        shell: pwsh
+        working-directory: kubernetes/charts/grafana-dashboards
+        env:
+          TESLAMATE_VERSION: v${{ vars.TESLAMATE_VERSION }}
+
+      - name: Install grafana-dashboards
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            grafana-dashboards ./grafana-dashboards \
+            --namespace default \
+            --set teslamate.database.pass="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
+            --set influxdb.organization="${{ vars.INFLUXDB_ORGANIZATION }}" \
+            --set influxdb.token="${{ secrets.INFLUXDB_GRAFANA_API_TOKEN }}"
+        working-directory: kubernetes/charts

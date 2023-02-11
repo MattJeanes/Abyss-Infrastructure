@@ -521,7 +521,7 @@ jobs:
             --namespace default \
             --version 7.0.1 \
             -f teslamate.yaml \
-            --set image.tag=1.27.0 \
+            --set image.tag="${{ vars.TESLAMATE_VERSION }}" \
             --set ingress.main.hosts[0].host="${{ env.teslamate_host }}" \
             --set ingress.main.tls[0].hosts[0]="${{ env.teslamate_host }}" \
             --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
@@ -570,7 +570,7 @@ jobs:
         shell: pwsh
         working-directory: kubernetes/charts/grafana-dashboards
         env:
-          TESLAMATE_VERSION: v1.27.0
+          TESLAMATE_VERSION: v${{ vars.TESLAMATE_VERSION }}
 
       - name: Install grafana-dashboards
         run: |
