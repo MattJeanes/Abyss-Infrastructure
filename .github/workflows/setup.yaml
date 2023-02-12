@@ -500,14 +500,13 @@ jobs:
         working-directory: kubernetes/charts
 
       # https://artifacthub.io/packages/helm/bitnami/postgresql
-      # TODO: UPGRADE
       - name: Install postgresql
         run: |
           helm upgrade --install --wait --atomic --debug \
             postgresql postgresql \
             --repo https://charts.bitnami.com/bitnami \
             --namespace default \
-            --version 11.6.7 \
+            --version 12.1.15 \
             -f postgresql.yaml \
             --set auth.postgresPassword="${{ secrets.POSTGRESQL_POSTGRES_PASSWORD }}" \
             --set primary.service.loadBalancerIP="${{ env.public_ip_address }}"
