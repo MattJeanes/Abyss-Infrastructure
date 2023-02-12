@@ -1,6 +1,11 @@
 name: Dashboards
 
 on:
+  push:
+    branches:
+    - main
+    paths:
+    - kubernetes/charts/grafana-dashboards/dashboards/*.json
   workflow_dispatch:
 
 jobs:
