@@ -138,7 +138,7 @@ jobs:
             --repo https://kubernetes.github.io/ingress-nginx \
             --namespace ingress-nginx \
             --create-namespace \
-            --version 4.1.4 \
+            --version 4.4.2 \
             -f ingress-nginx.yaml \
             --set controller.service.loadBalancerIP="${{ env.public_ip_address }}"
         working-directory: kubernetes/releases
@@ -151,7 +151,7 @@ jobs:
             --repo https://charts.jetstack.io \
             --namespace cert-manager \
             --create-namespace \
-            --version 1.8.0 \
+            --version 1.11.0 \
             -f cert-manager.yaml
         working-directory: kubernetes/releases
 
@@ -184,7 +184,7 @@ jobs:
             --repo https://oauth2-proxy.github.io/manifests \
             --namespace oauth2-proxy \
             --create-namespace \
-            --version 6.2.1 \
+            --version 6.8.0 \
             -f oauth2-proxy.yaml \
             --set config.clientID="${{ vars.OAUTH2_CLIENT_ID }}" \
             --set config.clientSecret="${{ secrets.OAUTH2_CLIENT_SECRET }}" \
@@ -209,7 +209,7 @@ jobs:
             --repo https://charts.fairwinds.com/stable \
             --namespace vpa \
             --create-namespace \
-            --version 1.4.0 \
+            --version 1.6.1 \
             -f vpa.yaml
         working-directory: kubernetes/releases
 
@@ -249,7 +249,7 @@ jobs:
             --set fileShare.name=grafana-plugins
         working-directory: kubernetes/charts
 
-      # https://artifacthub.io/packages/helm/oauth2-proxy/oauth2-proxy
+      # https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
       - name: Install prometheus
         run: |
           helm upgrade --install --wait --atomic --debug \
@@ -257,7 +257,7 @@ jobs:
             --repo https://prometheus-community.github.io/helm-charts \
             --namespace monitoring \
             --create-namespace \
-            --version 36.0.1 \
+            --version 45.0.0 \
             -f kube-prometheus-stack.yaml \
             --set alertmanager.ingress.hosts[0]="${{ env.alertmanager_host }}" \
             --set alertmanager.ingress.tls[0].hosts[0]="${{ env.alertmanager_host }}" \
@@ -326,7 +326,7 @@ jobs:
             --repo https://kubernetes.github.io/dashboard \
             --namespace dashboard \
             --create-namespace \
-            --version 5.7.0 \
+            --version 6.0.0 \
             -f kubernetes-dashboard.yaml \
             --set ingress.hosts[0]="${{ env.dashboard_host }}" \
             --set ingress.tls[0].hosts[0]="${{ env.dashboard_host }}" \
@@ -363,7 +363,7 @@ jobs:
             mariadb mariadb \
             --repo https://charts.bitnami.com/bitnami \
             --namespace default \
-            --version 11.4.2 \
+            --version 11.4.6 \
             -f mariadb.yaml \
             --set auth.rootPassword="${{ secrets.MARIADB_ROOT_PASSWORD }}" \
             --set primary.service.loadBalancerIP="${{ env.public_ip_address }}"
@@ -483,7 +483,7 @@ jobs:
             mongodb mongodb \
             --repo https://charts.bitnami.com/bitnami \
             --namespace default \
-            --version 12.1.20 \
+            --version 13.6.7 \
             -f mongodb.yaml \
             --set auth.rootPassword="${{ secrets.MONGODB_ROOT_PASSWORD }}" \
             --set service.loadBalancerIP="${{ env.public_ip_address }}"
@@ -500,6 +500,7 @@ jobs:
         working-directory: kubernetes/charts
 
       # https://artifacthub.io/packages/helm/bitnami/postgresql
+      # TODO: UPGRADE
       - name: Install postgresql
         run: |
           helm upgrade --install --wait --atomic --debug \
@@ -519,7 +520,7 @@ jobs:
             teslamate teslamate \
             --repo https://k8s-at-home.com/charts \
             --namespace default \
-            --version 7.0.1 \
+            --version ${{ vars.TESLAMATE_VERSION }} \
             -f teslamate.yaml \
             --set image.tag="${{ vars.TESLAMATE_VERSION }}" \
             --set ingress.main.hosts[0].host="${{ env.teslamate_host }}" \
