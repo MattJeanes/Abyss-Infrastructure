@@ -520,7 +520,7 @@ jobs:
             teslamate teslamate \
             --repo https://k8s-at-home.com/charts \
             --namespace default \
-            --version ${{ vars.TESLAMATE_VERSION }} \
+            --version 7.0.1 \
             -f teslamate.yaml \
             --set image.tag="${{ vars.TESLAMATE_VERSION }}" \
             --set ingress.main.hosts[0].host="${{ env.teslamate_host }}" \
