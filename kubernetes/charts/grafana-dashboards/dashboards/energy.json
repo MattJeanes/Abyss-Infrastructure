@@ -523,8 +523,8 @@
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT time, SUM(value) AS \"Matt's Tesla\" FROM (\r\n  SELECT\r\n    $__timeGroup(c.date,${aggregation}) AS \"time\",\r\n    -\t(\r\n        SELECT MIN(ci.charge_energy_added)\r\n        FROM charges ci\r\n        WHERE ci.charging_process_id = c.charging_process_id\r\n        GROUP BY ci.charging_process_id\r\n    )\r\n      + MAX(c.charge_energy_added)\r\n    - COALESCE(LAG(MAX(c.charge_energy_added)) OVER client_window, 0)\r\n    AS value\r\n  FROM charging_processes cp\r\n  INNER JOIN charges c ON cp.id = c.charging_process_id\r\n  WHERE $__timeFilter(c.date)\r\n  AND cp.geofence_id = 1\r\n  GROUP BY $__timeGroup(c.date,${aggregation}), c.charging_process_id\r\n  WINDOW client_window as (partition by c.charging_process_id order by $__timeGroup(c.date,${aggregation}))\r\n  ORDER BY $__timeGroup(c.date,${aggregation})\r\n) t\r\nGROUP BY t.time",
-          "refId": "D",
+          "rawSql": "SELECT time, SUM(total_energy_used) AS \"Matt's Tesla\"\r\nFROM (\r\n\tSELECT \r\n\t\t$__timeGroup(date, ${aggregation}) AS time, \r\n\t\tcharging_process_id,\r\n\t\tSUM(energy_used) AS total_energy_used \r\n\tFROM (\r\n\t\tSELECT \r\n\t\t\tcharging_process_id,\r\n\t\t\tCASE\r\n\t\t\t\tWHEN charger_phases IS NULL THEN charger_power\r\n\t\t\t\tELSE charger_actual_current * charger_voltage * CAST(1 AS float) / 1000.0\r\n\t\t\tEND *\r\n\t\t\tEXTRACT(epoch FROM (date - LAG(date) OVER (PARTITION BY charging_process_id ORDER BY date))) / 3600 AS energy_used,\r\n\t\t\tdate\r\n\t\tFROM \r\n\t\t\tcharges\r\n\t\tWHERE \r\n\t\t\t$__timeFilter(date) \r\n\t) t\r\n\tGROUP BY time, charging_process_id\r\n\tORDER BY time, charging_process_id\r\n) t2\r\nGROUP BY time\r\n",
+          "refId": "E",
           "sql": {
             "columns": [
               {
@@ -1166,7 +1166,7 @@
         "auto_count": 30,
         "auto_min": "10s",
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "1h",
           "value": "1h"
         },
@@ -1246,6 +1246,6 @@
   "timezone": "",
   "title": "Energy",
   "uid": "vdT4UkJ4k",
-  "version": 3,
+  "version": 6,
   "weekStart": ""
 }
