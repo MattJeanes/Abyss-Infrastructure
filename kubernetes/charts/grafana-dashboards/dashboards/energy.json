@@ -72,7 +72,6 @@
               "mode": "off"
             }
           },
-          "displayName": "${__field.name}",
           "mappings": [],
           "max": 100,
           "min": 0,
@@ -95,7 +94,20 @@
           },
           "unit": "percent"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "SoC"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "SoC"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
@@ -140,8 +152,8 @@
           "measurement": "%",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"%\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_battery_state_of_charge\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> set(key: \"_field\", value: \"SoC\")",
-          "refId": "A",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"%\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_battery_state_of_charge\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> window(every: v.windowPeriod)\r\n  |> mean()\r\n  |> group()",
+          "refId": "SoC",
           "resultFormat": "time_series",
           "select": [
             [
@@ -209,7 +221,6 @@
               "mode": "off"
             }
           },
-          "displayName": "${__field.labels.name}",
           "mappings": [],
           "min": 0,
           "thresholds": {
@@ -358,7 +369,6 @@
               "mode": "off"
             }
           },
-          "displayName": "${__field.name}",
           "mappings": [],
           "min": 0,
           "thresholds": {
@@ -727,7 +737,6 @@
               "mode": "off"
             }
           },
-          "displayName": "${__field.name}",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -872,7 +881,6 @@
               "mode": "off"
             }
           },
-          "displayName": "${__field.name}",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1019,7 +1027,6 @@
               "mode": "off"
             }
           },
-          "displayName": "${__field.name}",
           "mappings": [],
           "thresholds": {
             "mode": "absolute",
@@ -1167,7 +1174,6 @@
               "mode": "off"
             }
           },
-          "displayName": "${__field.name}",
           "mappings": [],
           "min": 0,
           "thresholds": {
