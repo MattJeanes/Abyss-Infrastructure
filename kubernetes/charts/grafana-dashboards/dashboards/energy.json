@@ -183,7 +183,6 @@
           "custom": {
             "axisCenteredZero": false,
             "axisColorMode": "text",
-            "axisLabel": "",
             "axisPlacement": "auto",
             "barAlignment": 0,
             "drawStyle": "bars",
@@ -210,7 +209,7 @@
               "mode": "off"
             }
           },
-          "displayName": "${__field.name}",
+          "displayName": "${__field.labels.name}",
           "mappings": [],
           "min": 0,
           "thresholds": {
@@ -228,7 +227,20 @@
           },
           "unit": "kwatth"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "A"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Solar energy"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
@@ -273,7 +285,7 @@
           "measurement": "kW",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_generated_solar_energy_total\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> difference()\r\n  |> timeShift(duration: -${aggregation})\r\n  |> set(key: \"_field\", value: \"Solar energy\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_generated_solar_energy_total\")\r\n  |> window(every: ${aggregation})\r\n  |> last()\r\n  |> group()\r\n  |> difference()",
           "refId": "A",
           "resultFormat": "time_series",
           "select": [
@@ -367,32 +379,66 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
+              "id": "byFrameRefID",
               "options": "Load"
             },
             "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "green",
-                  "mode": "fixed"
-                }
-              },
               {
                 "id": "custom.stacking",
                 "value": {
                   "group": "Total",
                   "mode": "normal"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Load"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
               }
             ]
           },
           {
             "matcher": {
-              "id": "byName",
+              "id": "byFrameRefID",
+              "options": "Battery"
+            },
+            "properties": [
+              {
+                "id": "custom.stacking",
+                "value": {
+                  "group": "Total",
+                  "mode": "normal"
+                }
+              },
+              {
+                "id": "displayName",
+                "value": "Battery"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
               "options": "Stephen's room"
             },
             "properties": [
+              {
+                "id": "displayName",
+                "value": "Stephen's room"
+              },
               {
                 "id": "color",
                 "value": {
@@ -404,10 +450,14 @@
           },
           {
             "matcher": {
-              "id": "byName",
+              "id": "byFrameRefID",
               "options": "Matt's computer"
             },
             "properties": [
+              {
+                "id": "displayName",
+                "value": "Matt's computer"
+              },
               {
                 "id": "color",
                 "value": {
@@ -419,7 +469,7 @@
           },
           {
             "matcher": {
-              "id": "byName",
+              "id": "byFrameRefID",
               "options": "Matt's Tesla"
             },
             "properties": [
@@ -428,28 +478,6 @@
                 "value": {
                   "fixedColor": "red",
                   "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "matcher": {
-              "id": "byName",
-              "options": "Battery"
-            },
-            "properties": [
-              {
-                "id": "color",
-                "value": {
-                  "fixedColor": "dark-green",
-                  "mode": "fixed"
-                }
-              },
-              {
-                "id": "custom.stacking",
-                "value": {
-                  "group": "Total",
-                  "mode": "normal"
                 }
               }
             ]
@@ -499,7 +527,7 @@
           "measurement": "kWh",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_local_load_consumption_total\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> timeShift(duration: -${aggregation})\r\n  |> set(key: \"_field\", value: \"Load\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_local_load_consumption_total\")\r\n  |> window(every: ${aggregation})\r\n  |> last()\r\n  |> group()\r\n  |> increase()\r\n  |> difference()",
           "rawQuery": false,
           "refId": "Load",
           "resultFormat": "time_series",
@@ -549,7 +577,7 @@
           "measurement": "kWh",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_battery_ac_charged_total\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> timeShift(duration: -${aggregation})\r\n  |> set(key: \"_field\", value: \"Battery\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_battery_ac_charged_total\")\r\n  |> window(every: ${aggregation})\r\n  |> last()\r\n  |> group()\r\n  |> increase()\r\n  |> difference()",
           "rawQuery": false,
           "refId": "Battery",
           "resultFormat": "time_series",
@@ -581,7 +609,7 @@
             "uid": "PBB7EDB19FB19A0A4"
           },
           "hide": false,
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"stephen_s_room_breaker_energy_used\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> set(key: \"_field\", value: \"Stephen's room\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"stephen_s_room_breaker_energy_used\")\r\n  |> window(every: ${aggregation})\r\n  |> last()\r\n  |> group()\r\n  |> increase()\r\n  |> difference()",
           "refId": "Stephen's room"
         },
         {
@@ -590,7 +618,7 @@
             "uid": "PBB7EDB19FB19A0A4"
           },
           "hide": false,
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"matt_s_computer_today_energy\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> set(key: \"_field\", value: \"Matt's computer\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"matt_s_computer_today_energy\")\r\n  |> window(every: ${aggregation})\r\n  |> last()\r\n  |> group()\r\n  |> increase()\r\n  |> difference()",
           "refId": "Matt's computer"
         },
         {
@@ -716,7 +744,20 @@
           },
           "unit": "kwatt"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Import from grid"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Import from grid"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
@@ -761,8 +802,8 @@
           "measurement": "kW",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_import_from_grid_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(usePrevious: true)\r\n  |> set(key: \"_field\", value: \"Import from grid\")",
-          "refId": "A",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_import_from_grid_actual\")\r\n  |> window(every: v.windowPeriod)\r\n  |> mean()\r\n  |> group()\r\n  |> fill(usePrevious: true)",
+          "refId": "Import from grid",
           "resultFormat": "time_series",
           "select": [
             [
@@ -848,7 +889,20 @@
           },
           "unit": "kwatt"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Load"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Load"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
@@ -892,8 +946,8 @@
           "measurement": "kW",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_local_load_consumption_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(usePrevious: true)\r\n  |> set(key: \"_field\", value: \"Load\")",
-          "refId": "A",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_local_load_consumption_actual\")\r\n  |> window(every: v.windowPeriod)\r\n  |> mean()\r\n  |> group()\r\n  |> fill(usePrevious: true)",
+          "refId": "Load",
           "resultFormat": "time_series",
           "select": [
             [
@@ -982,7 +1036,20 @@
           },
           "unit": "kwatt"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Power output"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Power output"
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
@@ -1027,8 +1094,8 @@
           "measurement": "kW",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_output_kilowatt_actual\")\r\n  |> aggregateWindow(every: v.windowPeriod, fn: mean, createEmpty: true)\r\n  |> fill(value: 0.0)\r\n  |> set(key: \"_field\", value: \"Power output\")",
-          "refId": "A",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kW\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_output_kilowatt_actual\")\r\n  |> window(every: v.windowPeriod)\r\n  |> mean()\r\n  |> group()\r\n  |> fill(value: 0.0)",
+          "refId": "Power output",
           "resultFormat": "time_series",
           "select": [
             [
@@ -1121,10 +1188,14 @@
         "overrides": [
           {
             "matcher": {
-              "id": "byName",
+              "id": "byFrameRefID",
               "options": "Room"
             },
             "properties": [
+              {
+                "id": "displayName",
+                "value": "Room"
+              },
               {
                 "id": "color",
                 "value": {
@@ -1136,10 +1207,14 @@
           },
           {
             "matcher": {
-              "id": "byName",
+              "id": "byFrameRefID",
               "options": "Heater"
             },
             "properties": [
+              {
+                "id": "displayName",
+                "value": "Heater"
+              },
               {
                 "id": "color",
                 "value": {
@@ -1194,9 +1269,9 @@
           "measurement": "kWh",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"stephen_s_room_breaker_energy_used\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> timeShift(duration: -${aggregation})\r\n  |> set(key: \"_field\", value: \"Room\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"stephen_s_room_breaker_energy_used\")\r\n  |> window(every: ${aggregation})\r\n  |> last()\r\n  |> group()\r\n  |> increase()\r\n  |> difference()",
           "rawQuery": false,
-          "refId": "A",
+          "refId": "Room",
           "resultFormat": "time_series",
           "select": [
             [
@@ -1226,8 +1301,8 @@
             "uid": "PBB7EDB19FB19A0A4"
           },
           "hide": false,
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"stephen_s_heater_today_energy\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> timeShift(duration: -${aggregation})\r\n  |> set(key: \"_field\", value: \"Heater\")",
-          "refId": "C"
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"stephen_s_heater_today_energy\")\r\n  |> window(every: ${aggregation})\r\n  |> last()\r\n  |> group()\r\n  |> increase()\r\n  |> difference()",
+          "refId": "Heater"
         }
       ],
       "title": "Stephen's energy usage",
@@ -1318,13 +1393,13 @@
     ]
   },
   "time": {
-    "from": "now-2d",
+    "from": "now-24h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Energy",
   "uid": "vdT4UkJ4k",
-  "version": 9,
+  "version": 10,
   "weekStart": ""
 }
