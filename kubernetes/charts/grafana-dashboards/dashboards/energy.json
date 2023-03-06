@@ -874,7 +874,7 @@
             "spanNulls": true,
             "stacking": {
               "group": "A",
-              "mode": "normal"
+              "mode": "none"
             },
             "thresholdsStyle": {
               "mode": "off"
@@ -898,7 +898,38 @@
           },
           "unit": "kwatth"
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Room"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Heater"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "orange",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 10,
@@ -968,15 +999,6 @@
               "value": "growatt_local_load_consumption_today"
             }
           ]
-        },
-        {
-          "datasource": {
-            "type": "influxdb",
-            "uid": "PBB7EDB19FB19A0A4"
-          },
-          "hide": false,
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"stephen_s_boiler_today_energy\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> timeShift(duration: -${aggregation})\r\n  |> set(key: \"_field\", value: \"Boiler\")",
-          "refId": "B"
         },
         {
           "datasource": {
@@ -1357,6 +1379,6 @@
   "timezone": "",
   "title": "Energy",
   "uid": "vdT4UkJ4k",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }
