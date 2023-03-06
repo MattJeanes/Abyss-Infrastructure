@@ -304,8 +304,8 @@
     },
     {
       "datasource": {
-        "type": "influxdb",
-        "uid": "PBB7EDB19FB19A0A4"
+        "type": "datasource",
+        "uid": "-- Mixed --"
       },
       "description": "",
       "fieldConfig": {
@@ -409,6 +409,21 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Matt's Tesla"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "red",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
@@ -455,7 +470,7 @@
           "measurement": "kWh",
           "orderByTime": "ASC",
           "policy": "default",
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_import_from_grid_total\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> set(key: \"_field\", value: \"Total\")",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_import_from_grid_total\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> timeShift(duration: -${aggregation})\r\n  |> set(key: \"_field\", value: \"Total\")",
           "rawQuery": false,
           "refId": "A",
           "resultFormat": "time_series",
@@ -498,6 +513,68 @@
           "hide": false,
           "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"matt_s_computer_today_energy\")\r\n  |> aggregateWindow(every: ${aggregation}, fn: last, createEmpty: false)\r\n  |> increase()\r\n  |> difference()\r\n  |> set(key: \"_field\", value: \"Matt's computer\")",
           "refId": "C"
+        },
+        {
+          "datasource": {
+            "type": "postgres",
+            "uid": "PC98BA2F4D77E1A42"
+          },
+          "editorMode": "code",
+          "format": "time_series",
+          "hide": false,
+          "rawQuery": true,
+          "rawSql": "SELECT\r\n  $__timeGroup(c.date,${aggregation}) AS \"time\",\r\n  -MIN(c.charge_energy_added) + MAX(c.charge_energy_added) - COALESCE(LAG(MAX(c.charge_energy_added)) OVER client_window, 0) AS \"Matt's Tesla\"\r\nFROM charging_processes cp\r\nINNER JOIN charges c ON cp.id = c.charging_process_id\r\nWHERE $__timeFilter(c.date)\r\nAND cp.geofence_id = 1\r\nGROUP BY $__timeGroup(c.date,${aggregation}), c.charging_process_id\r\nWINDOW client_window as (partition by c.charging_process_id order by $__timeGroup(c.date,${aggregation}))\r\nORDER BY $__timeGroup(c.date,${aggregation})",
+          "refId": "D",
+          "sql": {
+            "columns": [
+              {
+                "alias": "\"value\"",
+                "name": "SUM",
+                "parameters": [
+                  {
+                    "name": "charge_energy_added",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              },
+              {
+                "alias": "\"time\"",
+                "parameters": [
+                  {
+                    "name": "date",
+                    "type": "functionParameter"
+                  }
+                ],
+                "type": "function"
+              }
+            ],
+            "groupBy": [
+              {
+                "property": {
+                  "name": "date",
+                  "type": "string"
+                },
+                "type": "groupBy"
+              }
+            ],
+            "limit": 50,
+            "orderBy": {
+              "property": {
+                "name": [
+                  "date"
+                ],
+                "type": "string"
+              },
+              "type": "property"
+            },
+            "whereJsonTree": {
+              "children1": [],
+              "id": "8bbb9bb8-89ab-4cde-b012-3186b45cd0d4",
+              "type": "group"
+            }
+          },
+          "table": "charges"
         }
       ],
       "title": "Energy use",
@@ -1078,7 +1155,7 @@
       "type": "timeseries"
     }
   ],
-  "refresh": "",
+  "refresh": false,
   "schemaVersion": 37,
   "style": "dark",
   "tags": [],
@@ -1089,7 +1166,7 @@
         "auto_count": 30,
         "auto_min": "10s",
         "current": {
-          "selected": true,
+          "selected": false,
           "text": "1h",
           "value": "1h"
         },
@@ -1162,7 +1239,7 @@
     ]
   },
   "time": {
-    "from": "now-24h",
+    "from": "now-2d",
     "to": "now"
   },
   "timepicker": {},
