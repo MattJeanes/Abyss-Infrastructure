@@ -639,7 +639,7 @@
             "uid": "PBB7EDB19FB19A0A4"
           },
           "hide": false,
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"stephen_s_room_breaker_energy_used\")\r\n  |> window(every: ${aggregation})\r\n  |> last()\r\n  |> group()\r\n  |> increase()\r\n  |> difference()",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"stephen_s_room_breaker_today_energy\")\r\n  |> window(every: ${aggregation})\r\n  |> last()\r\n  |> group()\r\n  |> increase()\r\n  |> difference()",
           "refId": "Stephen's room"
         },
         {
@@ -1435,6 +1435,6 @@
   "timezone": "",
   "title": "Energy",
   "uid": "vdT4UkJ4k",
-  "version": 13,
+  "version": 14,
   "weekStart": ""
 }
