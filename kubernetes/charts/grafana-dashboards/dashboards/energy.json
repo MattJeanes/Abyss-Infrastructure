@@ -492,6 +492,25 @@
                 }
               }
             ]
+          },
+          {
+            "matcher": {
+              "id": "byFrameRefID",
+              "options": "Matt's laptop"
+            },
+            "properties": [
+              {
+                "id": "displayName",
+                "value": "Matt's laptop"
+              },
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "dark-blue",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
@@ -693,6 +712,15 @@
             }
           },
           "table": "charges"
+        },
+        {
+          "datasource": {
+            "type": "influxdb",
+            "uid": "PBB7EDB19FB19A0A4"
+          },
+          "hide": false,
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: v.timeRangeStart, stop: v.timeRangeStop)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"matt_s_laptop_today_energy\")\r\n  |> window(every: ${aggregation})\r\n  |> last()\r\n  |> group()\r\n  |> increase()\r\n  |> difference()",
+          "refId": "Matt's laptop"
         }
       ],
       "title": "Energy use",
@@ -1407,6 +1435,6 @@
   "timezone": "",
   "title": "Energy",
   "uid": "vdT4UkJ4k",
-  "version": 12,
+  "version": 13,
   "weekStart": ""
 }
