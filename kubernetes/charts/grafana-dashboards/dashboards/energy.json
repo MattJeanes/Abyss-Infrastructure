@@ -660,7 +660,7 @@
           "format": "time_series",
           "hide": false,
           "rawQuery": true,
-          "rawSql": "SELECT time, SUM(total_energy_used) AS \"Matt's Tesla\"\r\nFROM (\r\n\tSELECT \r\n\t\t$__timeGroup(date, ${aggregation}) AS time, \r\n\t\tcharging_process_id,\r\n\t\tSUM(energy_used) AS total_energy_used \r\n\tFROM (\r\n\t\tSELECT \r\n\t\t\tcharging_process_id,\r\n\t\t\tCASE\r\n\t\t\t\tWHEN charger_phases IS NULL THEN charger_power\r\n\t\t\t\tELSE charger_actual_current * charger_voltage * CAST(1 AS float) / 1000.0\r\n\t\t\tEND *\r\n\t\t\tEXTRACT(epoch FROM (date - LAG(date) OVER (PARTITION BY charging_process_id ORDER BY date))) / 3600 AS energy_used,\r\n\t\t\tdate\r\n\t\tFROM \r\n\t\t\tcharges\r\n\t\tWHERE \r\n\t\t\t$__timeFilter(date)\r\n\t) t\r\n\tGROUP BY time, charging_process_id\r\n\tORDER BY time, charging_process_id\r\n) t2\r\nINNER JOIN charging_processes cp ON t2.charging_process_id = cp.id\r\nWHERE cp.geofence_id = 1\r\nGROUP BY time\r\n",
+          "rawSql": "SELECT time, SUM(total_energy_used) AS \"Matt's Tesla\"\r\nFROM (\r\n\tSELECT \r\n\t\t$__timeGroup(date, ${aggregation}) AS time,\r\n\t\tcharging_process_id,\r\n\t\tSUM(energy_used) AS total_energy_used \r\n\tFROM (\r\n\t\tSELECT \r\n\t\t\tcharging_process_id,\r\n\t\t\tCASE\r\n\t\t\t\tWHEN charger_phases IS NULL THEN charger_power\r\n\t\t\t\tELSE charger_actual_current * charger_voltage * CAST(1 AS float) / 1000.0\r\n\t\t\tEND *\r\n\t\t\tEXTRACT(epoch FROM (date - LAG(date) OVER (PARTITION BY charging_process_id ORDER BY date))) / 3600 AS energy_used,\r\n\t\t\tdate\r\n\t\tFROM \r\n\t\t\tcharges\r\n\t\tWHERE \r\n\t\t\t$__timeFilter(date)\r\n\t) t\r\n\tWHERE $__timeFilter(date)\r\n\tGROUP BY time, charging_process_id\r\n\tORDER BY time, charging_process_id\r\n) t2\r\nINNER JOIN charging_processes cp ON t2.charging_process_id = cp.id\r\nWHERE cp.geofence_id = 1\r\nGROUP BY time\r\n",
           "refId": "Matt's Tesla",
           "sql": {
             "columns": [
@@ -1435,6 +1435,6 @@
   "timezone": "",
   "title": "Energy",
   "uid": "vdT4UkJ4k",
-  "version": 14,
+  "version": 15,
   "weekStart": ""
 }
