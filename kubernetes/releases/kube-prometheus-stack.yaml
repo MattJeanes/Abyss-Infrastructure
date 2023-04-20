@@ -66,6 +66,10 @@ alertmanager:
       target_matchers:
       - severity = info
 grafana:
+  persistence:
+    enabled: true
+    type: pvc
+    existingClaim: grafana
   resources:
     requests:
       cpu: 15m
@@ -88,11 +92,6 @@ grafana:
     - secretName: grafana-tls
   env:
     GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: panodata-map-panel
-  extraVolumeMounts:
-  - name: plugins
-    mountPath: /var/lib/grafana/plugins
-    existingClaim: grafana-plugins
-    readOnly: false
 prometheus:
   prometheusSpec:
     resources:

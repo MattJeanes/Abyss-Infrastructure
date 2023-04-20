@@ -237,16 +237,16 @@ jobs:
             --set persistentVolumeClaim.enabled=false
         working-directory: kubernetes/charts
 
-      - name: Install persistent volume for grafana-plugins
+      - name: Install persistent volume for grafana
         run: |
           helm upgrade --install --wait --atomic --debug \
-            grafana-plugins-persistentvolume ./azure-persistentvolume \
+            grafana-persistentvolume ./azure-persistentvolume \
             --namespace monitoring \
             --create-namespace \
-            --set name=grafana-plugins \
+            --set name=grafana \
             --set disk.capacity=1Gi \
             --set useFileShare=true \
-            --set fileShare.name=grafana-plugins
+            --set fileShare.name=grafana
         working-directory: kubernetes/charts
 
       # https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
