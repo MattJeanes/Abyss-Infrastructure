@@ -62,6 +62,10 @@
                   "fixedColor": "yellow",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Solar energy total"
               }
             ]
           }
@@ -137,6 +141,10 @@
                   "fixedColor": "dark-blue",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Import from grid total"
               }
             ]
           }
@@ -212,6 +220,10 @@
                   "fixedColor": "light-blue",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Load total"
               }
             ]
           }
@@ -287,6 +299,10 @@
                   "fixedColor": "dark-purple",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Export to grid total"
               }
             ]
           }
@@ -363,6 +379,10 @@
                   "fixedColor": "semi-dark-red",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Battery charged (grid) total"
               }
             ]
           }
@@ -438,6 +458,10 @@
                   "fixedColor": "light-red",
                   "mode": "fixed"
                 }
+              },
+              {
+                "id": "displayName",
+                "value": "Battery charged total"
               }
             ]
           }
@@ -1928,6 +1952,6 @@
   "timezone": "",
   "title": "Energy",
   "uid": "vdT4UkJ4k",
-  "version": 19,
+  "version": 20,
   "weekStart": ""
 }
