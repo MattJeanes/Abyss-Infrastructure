@@ -23,6 +23,7 @@ service:
     type: LoadBalancer
     annotations:
       service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
+    externalTrafficPolicy: Local
 persistence:
   data:
     enabled: true
