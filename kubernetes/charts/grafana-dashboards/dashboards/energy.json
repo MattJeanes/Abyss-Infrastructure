@@ -178,7 +178,7 @@
             "type": "influxdb",
             "uid": "PBB7EDB19FB19A0A4"
           },
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: 2023-01-01T00:00:00Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_generated_solar_energy_total\")\r\n  |> window(every: 1d)\r\n  |> last()\r\n  |> group()\r\n  |> difference()\r\n  |> sort()\r\n  |> last()",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: 2023-01-30T00:00:00Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_generated_solar_energy_total\")\r\n  |> window(every: 1d)\r\n  |> last()\r\n  |> group()\r\n  |> difference()\r\n  |> sort()\r\n  |> last()",
           "refId": "Query"
         }
       ],
@@ -257,7 +257,7 @@
             "type": "influxdb",
             "uid": "PBB7EDB19FB19A0A4"
           },
-          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: 2023-01-01T00:00:00Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_generated_solar_energy_total\")\r\n  |> window(every: 1w)\r\n  |> last()\r\n  |> group()\r\n  |> difference()\r\n  |> sort()\r\n  |> last()",
+          "query": "from(bucket: v.defaultBucket)\r\n  |> range(start: 2023-01-30T00:00:00Z)\r\n  |> filter(fn: (r) => r[\"_measurement\"] == \"kWh\")\r\n  |> filter(fn: (r) => r[\"_field\"] == \"value\")\r\n  |> filter(fn: (r) => r[\"entity_id\"] == \"growatt_generated_solar_energy_total\")\r\n  |> window(every: 1w)\r\n  |> last()\r\n  |> group()\r\n  |> difference()\r\n  |> sort()\r\n  |> last()",
           "refId": "Query"
         }
       ],
@@ -2110,6 +2110,6 @@
   "timezone": "",
   "title": "Energy",
   "uid": "vdT4UkJ4k",
-  "version": 21,
+  "version": 22,
   "weekStart": ""
 }
