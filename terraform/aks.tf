@@ -46,7 +46,6 @@ resource "azurerm_kubernetes_cluster" "abyss" {
     network_plugin     = "azure"
     load_balancer_sku  = "basic"
     dns_service_ip     = "10.250.0.10"
-    docker_bridge_cidr = "172.17.0.1/16"
     service_cidr       = "10.250.0.0/16"
   }
 }
@@ -78,19 +77,10 @@ resource "azurerm_role_assignment" "aks_abyss_agentpool_diskaccess" {
   principal_id         = data.azurerm_user_assigned_identity.aks_abyss_agentpool.principal_id
 }
 
-# https://github.com/hashicorp/terraform-provider-azurerm/issues/9733
-data "azurerm_user_assigned_identity" "aks_abyss_aci" {
-  name                = "aciconnectorlinux-${azurerm_kubernetes_cluster.abyss.name}"
-  resource_group_name = azurerm_kubernetes_cluster.abyss.node_resource_group
-  depends_on = [
-    azurerm_kubernetes_cluster.abyss,
-  ]
-}
-
 resource "azurerm_role_assignment" "aks_abyss_aci_network_contributor_subnet" {
   scope                = azurerm_subnet.abyss_aci.id
   role_definition_name = "Network Contributor"
-  principal_id         = data.azurerm_user_assigned_identity.aks_abyss_aci.principal_id
+  principal_id         = azurerm_kubernetes_cluster.abyss.aci_connector_linux[0].connector_identity[0].object_id
 }
 
 resource "azurerm_subnet_network_security_group_association" "aks_abyss" {

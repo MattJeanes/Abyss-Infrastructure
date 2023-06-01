@@ -2,11 +2,11 @@ terraform {
   backend "azurerm" {}
   required_providers {
     azurerm = {
-      version = "3.41.0"
+      version = "3.58.0"
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "3.33.1"
+      version = "4.7.1"
     }
   }
 }
