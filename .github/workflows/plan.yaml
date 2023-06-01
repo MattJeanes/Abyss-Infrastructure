@@ -1,0 +1,41 @@
+name: Plan
+
+on:
+  workflow_dispatch:
+
+jobs:
+  plan:
+    name: Plan
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: HashiCorp - Setup Terraform
+        uses: hashicorp/setup-terraform@v2.0.0
+        with:
+          terraform_wrapper: false
+
+      - name: Terraform Init
+        run: terraform init -backend-config="storage_account_name=abyssterraform" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate" -backend-config="access_key=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}" -upgrade
+        working-directory: terraform
+
+      - name: Set Terraform variables
+        run: |
+          tee terraform.tfvars <<EOF
+          kubernetes_version = "${{ vars.KUBERNETES_VERSION }}"
+          ssh_public_key = "${{ secrets.SSH_PUBLIC_KEY }}"
+          cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          cloudflare_zone_id = "${{ vars.CLOUDFLARE_ZONE_ID }}"
+          home_ip = "${{ secrets.HOME_IP }}"
+          EOF
+        working-directory: terraform
+
+      - name: Terraform Plan
+        run: terraform plan -out tfplan
+        working-directory: terraform
+        env:
+          ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
+          ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+          ARM_TENANT_ID: ${{ vars.ARM_TENANT_ID }}
+          ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
