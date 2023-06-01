@@ -8,12 +8,8 @@ metrics:
     env:
       remote: localhost:10012
 env:
-  TS3SERVER_DB_PLUGIN: ts3db_mariadb
-  TS3SERVER_DB_SQLCREATEPATH: create_mariadb
-  TS3SERVER_DB_HOST: mariadb
-  TS3SERVER_DB_USER: teamspeak-alt
-  TS3SERVER_DB_NAME: teamspeak-alt
-  TS3SERVER_DB_WAITUNTILREADY: 30
+  TS3SERVER_DB_PLUGIN: ts3db_sqlite3
+  TS3SERVER_DB_SQLCREATEPATH: create_sqlite
   TS3SERVER_LICENSE: accept
   TS3SERVER_DEFAULT_VOICE_PORT: 9988
   TS3SERVER_QUERY_PORT: 10012

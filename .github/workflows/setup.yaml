@@ -346,29 +346,6 @@ jobs:
         shell: pwsh
         working-directory: scripts
 
-      - name: Install persistent volume for mariadb
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            mariadb-persistentvolume ./azure-persistentvolume \
-            --namespace default \
-            --set name=mariadb \
-            --set disk.capacity=4Gi \
-            --set disk.id="${{ env.mariadb_disk_id }}"
-        working-directory: kubernetes/charts
-
-      # https://artifacthub.io/packages/helm/bitnami/mariadb
-      - name: Install mariadb
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            mariadb mariadb \
-            --repo https://charts.bitnami.com/bitnami \
-            --namespace default \
-            --version 11.4.6 \
-            -f mariadb.yaml \
-            --set auth.rootPassword="${{ secrets.MARIADB_ROOT_PASSWORD }}" \
-            --set primary.service.loadBalancerIP="${{ env.public_ip_address }}"
-        working-directory: kubernetes/releases
-
       - name: Install persistent volume for teamspeak
         run: |
           helm upgrade --install --wait --atomic --debug \
@@ -391,8 +368,7 @@ jobs:
             -f teamspeak.yaml \
             --set service.main.loadBalancerIP="${{ env.public_ip_address }}" \
             --set service.udp.loadBalancerIP="${{ env.public_ip_address }}" \
-            --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}" \
-            --set env.TS3SERVER_DB_PASSWORD="${{ secrets.TEAMSPEAK_DATABASE_PASSWORD }}"
+            --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
         working-directory: kubernetes/releases
 
       - name: Install redirect for teamspeak
@@ -431,8 +407,7 @@ jobs:
             -f teamspeak-alt.yaml \
             --set service.main.loadBalancerIP="${{ env.public_ip_address }}" \
             --set service.udp.loadBalancerIP="${{ env.public_ip_address }}" \
-            --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}" \
-            --set env.TS3SERVER_DB_PASSWORD="${{ secrets.TEAMSPEAK_ALT_DATABASE_PASSWORD }}"
+            --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
         working-directory: kubernetes/releases
 
       - name: Install persistent volume for sinusbot

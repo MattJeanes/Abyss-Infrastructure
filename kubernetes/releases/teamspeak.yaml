@@ -5,12 +5,8 @@ metrics:
   prometheusRule:
     enabled: true
 env:
-  TS3SERVER_DB_PLUGIN: ts3db_mariadb
-  TS3SERVER_DB_SQLCREATEPATH: create_mariadb
-  TS3SERVER_DB_HOST: mariadb
-  TS3SERVER_DB_USER: teamspeak
-  TS3SERVER_DB_NAME: teamspeak
-  TS3SERVER_DB_WAITUNTILREADY: 30
+  TS3SERVER_DB_PLUGIN: ts3db_sqlite3
+  TS3SERVER_DB_SQLCREATEPATH: create_sqlite
   TS3SERVER_LICENSE: accept
 resources:
   requests:
