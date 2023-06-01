@@ -7,9 +7,9 @@ influxdb:
   resources:
     requests:
       cpu: 10m
-      memory: 150Mi
+      memory: 200Mi
     limits:
-      memory: 150Mi
+      memory: 200Mi
 ingress:
   enabled: true
   tls: true
