@@ -139,6 +139,7 @@ kubeProxy:
 defaultRules:
   disabled:
     TargetDown: true
+    KubeAggregatedAPIErrors: true
 additionalPrometheusRulesMap:
   patched-default-rules:
     groups:
