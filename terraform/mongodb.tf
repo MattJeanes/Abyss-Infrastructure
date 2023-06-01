@@ -8,6 +8,11 @@ resource "azurerm_managed_disk" "mongodb" {
 
   lifecycle {
     prevent_destroy = true
+    ignore_changes = [
+      # Allow the disk to be restored from a snapshot without causing Terraform to try to recreate it
+      create_option,
+      source_resource_id
+    ]
   }
 }
 
