@@ -435,29 +435,6 @@ jobs:
         shell: pwsh
         working-directory: scripts
 
-      - name: Install persistent volume for mongodb
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            mongodb-persistentvolume ./azure-persistentvolume \
-            --namespace default \
-            --set name=mongodb \
-            --set disk.capacity=4Gi \
-            --set disk.id="${{ env.mongodb_disk_id }}"
-        working-directory: kubernetes/charts
-
-      # https://artifacthub.io/packages/helm/bitnami/mongodb
-      - name: Install mongodb
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            mongodb mongodb \
-            --repo https://charts.bitnami.com/bitnami \
-            --namespace default \
-            --version 13.6.7 \
-            -f mongodb.yaml \
-            --set auth.rootPassword="${{ secrets.MONGODB_ROOT_PASSWORD }}" \
-            --set service.loadBalancerIP="${{ env.public_ip_address }}"
-        working-directory: kubernetes/releases
-
       - name: Install persistent volume for postgresql
         run: |
           helm upgrade --install --wait --atomic --debug \
