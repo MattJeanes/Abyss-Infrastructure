@@ -32,7 +32,8 @@ resource "azurerm_kubernetes_cluster" "abyss" {
     enable_auto_scaling  = false
     node_count           = 2
     max_pods             = 50
-    vm_size              = "Standard_D2as_v5"
+    vm_size              = "Standard_E2as_v5"
+    os_sku               = "AzureLinux"
     os_disk_size_gb      = 64
     vnet_subnet_id       = azurerm_subnet.abyss_aks.id
     orchestrator_version = var.kubernetes_version
@@ -43,10 +44,10 @@ resource "azurerm_kubernetes_cluster" "abyss" {
   }
 
   network_profile {
-    network_plugin     = "azure"
-    load_balancer_sku  = "basic"
-    dns_service_ip     = "10.250.0.10"
-    service_cidr       = "10.250.0.0/16"
+    network_plugin    = "azure"
+    load_balancer_sku = "basic"
+    dns_service_ip    = "10.250.0.10"
+    service_cidr      = "10.250.0.0/16"
   }
 }
 

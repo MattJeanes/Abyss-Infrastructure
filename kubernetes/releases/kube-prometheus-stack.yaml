@@ -154,6 +154,34 @@ additionalPrometheusRulesMap:
         for: 10m
         labels:
           severity: warning
+  custom-rules:
+    groups:
+    - name: custom.rules
+      rules:
+      - alert: CPUUsageHigh
+        annotations:
+          description: '{{`{{`}} $value | humanizePercentage {{`}}`}} CPU usage relative to requests in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}}.'
+          summary: Container experienced elevated CPU usage relative to requests
+        expr: |-
+          sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate) by (namespace, pod, container)
+            /
+          (sum(kube_pod_container_resource_requests{resource="cpu", unit="core"}) by (namespace, pod, container))
+            > ( 150 / 100 )
+        for: 15m
+        labels:
+          severity: warning
+      - alert: MemoryUsageHigh
+        annotations:
+          description: '{{`{{`}} $value | humanizePercentage {{`}}`}} memory usage relative to requests in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}}.'
+          summary: Container experienced elevated memory usage relative to requests
+        expr: |-
+          sum(node_namespace_pod_container:container_memory_working_set_bytes) by (namespace, pod, container)
+            /
+          (sum(kube_pod_container_resource_requests{resource="memory", unit="byte"}) by (namespace, pod, container))
+            > ( 150 / 100 )
+        for: 15m
+        labels:
+          severity: warning
 kube-state-metrics:
   resources:
     requests:

@@ -1,4 +1,0 @@
-apiVersion: v2
-name: dashboard-service-account
-type: application
-version: 1.0.0

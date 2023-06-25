@@ -4,6 +4,8 @@ metrics:
     enabled: true
     namespace: monitoring
 influxdb:
+  updateStrategy:
+    type: Recreate
   resources:
     requests:
       cpu: 10m

@@ -1,6 +1,5 @@
 locals {
   dns_records = [
-    "kubedashboard",
     "hello-world",
     "abyss",
     "gpt",

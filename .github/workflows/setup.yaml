@@ -82,7 +82,6 @@ jobs:
         run: |
           $variables = @{
             hello_world_host = "hello-world.${{ vars.HOST }}"
-            dashboard_host = "kubedashboard.${{ vars.HOST }}"
             alertmanager_host = "alertmanager.${{ vars.HOST }}"
             grafana_host = "grafana.${{ vars.HOST }}"
             prometheus_host = "prometheus.${{ vars.HOST }}"
@@ -288,55 +287,6 @@ jobs:
         run: |
           ./TestAuthRedirect.ps1 -Url "https://${{ env.prometheus_host }}"
           ./TestAuthRedirect.ps1 -Url "https://${{ env.alertmanager_host }}"
-        shell: pwsh
-        working-directory: scripts
-
-      - name: Install dashboard-service-account
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            dashboard-service-account ./dashboard-service-account \
-            --namespace dashboard \
-            --create-namespace
-        working-directory: kubernetes/charts
-
-      - name: Create dashboard account
-        run: |
-          Write-Host "Retrieving dashboard token"
-          $dashboardAdminUserToken = kubectl get secret -n dashboard dashboard-admin-user-token -o json | ConvertFrom-Json
-          $tokenBase64 = $dashboardAdminUserToken.data.token
-          if ($LASTEXITCODE -ne 0) {
-              Write-Error "Failed to get dashboard token"
-          }
-          $token = [System.Text.Encoding]::UTF8.GetString([System.Convert]::FromBase64String($tokenBase64))
-          Write-Host "::add-mask::$token"
-          "dashboard_token=$token" >> $env:GITHUB_ENV
-        shell: pwsh
-
-      # https://artifacthub.io/packages/helm/k8s-dashboard/kubernetes-dashboard
-      - name: Install kubernetes-dashboard
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            kubernetes-dashboard kubernetes-dashboard \
-            --repo https://kubernetes.github.io/dashboard \
-            --namespace dashboard \
-            --create-namespace \
-            --version 6.0.0 \
-            -f kubernetes-dashboard.yaml \
-            --set ingress.hosts[0]="${{ env.dashboard_host }}" \
-            --set ingress.tls[0].hosts[0]="${{ env.dashboard_host }}" \
-            --set ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/configuration-snippet="proxy_set_header Authorization \"Bearer ${{ env.dashboard_token }}\";" \
-            --set ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
-            --set ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}"
-        working-directory: kubernetes/releases
-
-      - name: Wait for dashboard certificate to be ready
-        run: ./WaitKubeCertificate.ps1 -Name "dashboard-tls" -Namespace "dashboard"
-        shell: pwsh
-        working-directory: scripts
-
-      - name: Test auth redirect for dashboard
-        run: |
-          ./TestAuthRedirect.ps1 -Url "https://${{ env.dashboard_host }}"
         shell: pwsh
         working-directory: scripts
 
