@@ -31,3 +31,9 @@ persistence:
     enabled: true
     existingClaim: qbittorrent-downloads
     mountPath: /downloads
+resources:
+  requests:
+    cpu: 5m
+    memory: 256Mi
+  limits:
+    memory: 256Mi
