@@ -1,6 +1,12 @@
 env:
   DOCKER_MODS: ghcr.io/gabe565/linuxserver-mod-vuetorrent
   TZ: Europe/London
+service:
+  bittorrent:
+    enabled: true
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
 ingress:
   main:
     enabled: true
