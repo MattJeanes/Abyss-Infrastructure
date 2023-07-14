@@ -9,6 +9,7 @@ locals {
     "auth",
     "ts",
     "musicbot",
+    "torrent",
     "teslamate",
     "influxdb",
     "youtubedl",

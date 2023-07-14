@@ -86,6 +86,7 @@ jobs:
             grafana_host = "grafana.${{ vars.HOST }}"
             prometheus_host = "prometheus.${{ vars.HOST }}"
             sinusbot_host = "musicbot.${{ vars.HOST }}"
+            qbittorrent_host = "torrent.${{ vars.HOST }}"
             teamspeak_host = "ts.${{ vars.HOST }}"
             teslamate_host = "teslamate.${{ vars.HOST }}"
             influxdb_host = "influxdb.${{ vars.HOST }}"
@@ -515,4 +516,43 @@ jobs:
             --set auth.admin.password="${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" \
             --set auth.admin.token="${{ secrets.INFLUXDB_ADMIN_TOKEN }}" \
             --set ingress.hostname="${{ env.influxdb_host }}"
+        working-directory: kubernetes/releases
+
+      - name: Install persistent volume for qbittorrent-config
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            qbittorrent-config-persistentvolume ./azure-persistentvolume \
+            --namespace default \
+            --set name=qbittorrent-config \
+            --set disk.capacity=1Gi \
+            --set useFileShare=true \
+            --set fileShare.name=qbittorrent-config \
+            --set fileShare.uid=911 \
+            --set fileShare.gid=911
+        working-directory: kubernetes/charts
+
+      - name: Install persistent volume for qbittorrent-downloads
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            qbittorrent-downloads-persistentvolume ./azure-persistentvolume \
+            --namespace default \
+            --set name=qbittorrent-downloads \
+            --set disk.capacity=100Gi \
+            --set useFileShare=true \
+            --set fileShare.name=qbittorrent-downloads \
+            --set fileShare.uid=911 \
+            --set fileShare.gid=911
+        working-directory: kubernetes/charts
+
+      # https://artifacthub.io/packages/helm/gabe565/qbittorrent
+      - name: Install qBittorrent
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            qbittorrent qbittorrent \
+            --repo https://charts.gabe565.com \
+            --namespace default \
+            --version 0.2.2 \
+            -f qbittorrent.yaml \
+            --set ingress.main.hosts[0].host="${{ env.qbittorrent_host }}" \
+            --set ingress.main.tls[0].hosts[0]="${{ env.qbittorrent_host }}"
         working-directory: kubernetes/releases
