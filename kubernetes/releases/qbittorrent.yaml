@@ -5,8 +5,10 @@ service:
   bittorrent:
     enabled: true
     type: LoadBalancer
+    externalTrafficPolicy: Local
     annotations:
       service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
+      service.beta.kubernetes.io/port_6881_no_probe_rule: 'true'
 ingress:
   main:
     enabled: true
