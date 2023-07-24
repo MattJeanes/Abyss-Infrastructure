@@ -2,6 +2,7 @@ locals {
   servers = {
     "server-1" = {
       name         = "abyss-server-1",
+      dns_name     = "arma"
       vm_size      = "Standard_D2s_v3",
       os_type      = "Linux",
       disk_size_gb = 64
@@ -11,7 +12,7 @@ locals {
         sku       = "18.04-LTS"
       }
       network_security_rules = {
-        arma = {
+        "arma" = {
           name                       = "ARMA"
           priority                   = 310
           protocol                   = "Tcp"
@@ -23,6 +24,7 @@ locals {
     }
     "server-3" = {
       name         = "abyss-server-3",
+      dns_name     = "gamenight"
       vm_size      = "Standard_D2s_v3",
       os_type      = "Linux",
       disk_size_gb = 30,
@@ -32,7 +34,7 @@ locals {
         sku       = "20_04-lts",
       }
       network_security_rules = {
-        gmod = {
+        "gmod" = {
           name                       = "GMod"
           priority                   = 310
           protocol                   = "*"
@@ -44,6 +46,7 @@ locals {
     }
     "server-4" = {
       name         = "abyss-server-4",
+      dns_name     = "spaceengineers"
       vm_size      = "Standard_D2ds_v5",
       os_type      = "Windows",
       disk_size_gb = 32,
@@ -53,7 +56,7 @@ locals {
         sku       = "2019-Datacenter",
       }
       network_security_rules = {
-        space_engineers = {
+        "space_engineers" = {
           name                       = "SpaceEngineers"
           priority                   = 310
           protocol                   = "Udp"
@@ -61,7 +64,7 @@ locals {
           destination_port_range     = "27016"
           destination_address_prefix = "*"
         }
-        http = {
+        "http" = {
           name                       = "HTTP"
           priority                   = 320
           protocol                   = "*"
@@ -73,6 +76,7 @@ locals {
     }
     "server-5" = {
       name         = "abyss-server-5",
+      dns_name     = "satisfactory"
       vm_size      = "Standard_D4ads_v5",
       os_type      = "Linux",
       disk_size_gb = 30,
@@ -82,7 +86,7 @@ locals {
         sku       = "20_04-lts",
       }
       network_security_rules = {
-        satisfactory = {
+        "satisfactory" = {
           name                       = "Satisfactory"
           priority                   = 310
           protocol                   = "Udp"
@@ -90,7 +94,7 @@ locals {
           destination_port_ranges    = ["7777", "15000", "15777"]
           destination_address_prefix = "*"
         }
-        http = {
+        "http" = {
           name                       = "HTTP"
           priority                   = 320
           protocol                   = "*"
@@ -102,6 +106,7 @@ locals {
     }
     "server-6" = {
       name         = "abyss-server-6",
+      dns_name     = "csgo"
       vm_size      = "Standard_D2ds_v5",
       os_type      = "Linux",
       disk_size_gb = 64,
@@ -111,12 +116,42 @@ locals {
         sku       = "22_04-lts-gen2",
       }
       network_security_rules = {
-        csgo = {
+        "csgo" = {
           name                       = "CSGO"
           priority                   = 310
           protocol                   = "*"
           source_address_prefix      = "*"
           destination_port_ranges    = ["27005", "27015"]
+          destination_address_prefix = "*"
+        }
+      }
+    }
+    "server-7" = {
+      name         = "abyss-server-7",
+      dns_name     = "7daystodie"
+      vm_size      = "Standard_D2ds_v5",
+      os_type      = "Linux",
+      disk_size_gb = 32,
+      source_image_reference = {
+        publisher = "canonical",
+        offer     = "0001-com-ubuntu-server-jammy",
+        sku       = "22_04-lts-gen2",
+      }
+      network_security_rules = {
+        "7daystodie" = {
+          name                       = "7DaysToDie"
+          priority                   = 310
+          protocol                   = "*"
+          source_address_prefix      = "*"
+          destination_port_range     = "26900-26902"
+          destination_address_prefix = "*"
+        }
+        "7daystodie_2" = {
+          name                       = "7DaysToDie_WebAdmin"
+          priority                   = 311
+          protocol                   = "Tcp"
+          source_address_prefix      = "*"
+          destination_port_range     = "8080"
           destination_address_prefix = "*"
         }
       }
@@ -293,4 +328,32 @@ resource "azurerm_windows_virtual_machine" "servers" {
     sku       = each.value.source_image_reference.sku
     version   = "latest"
   }
+}
+
+resource "cloudflare_record" "servers" {
+  for_each = local.servers
+
+  lifecycle {
+    ignore_changes = [
+      value
+    ]
+  }
+
+  zone_id = var.cloudflare_zone_id
+  name    = each.key
+  type    = "A"
+  value   = coalesce(azurerm_public_ip.servers[each.key].ip_address, "192.0.2.0") # IPv4 reserved test address
+  ttl     = 1
+  proxied = false
+}
+
+resource "cloudflare_record" "servers_cname" {
+  for_each = { for key, val in local.servers : key => val if val.dns_name != null }
+
+  zone_id = var.cloudflare_zone_id
+  name    = each.value.dns_name
+  type    = "CNAME"
+  value   = cloudflare_record.servers[each.key].hostname
+  ttl     = 1
+  proxied = false
 }
