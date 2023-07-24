@@ -146,12 +146,12 @@ locals {
           destination_port_range     = "26900-26902"
           destination_address_prefix = "*"
         }
-        "7daystodie_2" = {
-          name                       = "7DaysToDie_WebAdmin"
-          priority                   = 311
-          protocol                   = "Tcp"
+        "http" = {
+          name                       = "HTTP"
+          priority                   = 320
+          protocol                   = "*"
           source_address_prefix      = "*"
-          destination_port_range     = "8080"
+          destination_port_ranges    = ["80", "443"]
           destination_address_prefix = "*"
         }
       }
@@ -343,7 +343,7 @@ resource "cloudflare_record" "servers" {
   name    = each.key
   type    = "A"
   value   = coalesce(azurerm_public_ip.servers[each.key].ip_address, "192.0.2.0") # IPv4 reserved test address
-  ttl     = 1
+  ttl     = 60
   proxied = false
 }
 
