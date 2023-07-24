@@ -5,12 +5,6 @@ resource "azurerm_kubernetes_cluster" "abyss" {
   dns_prefix          = "abyss"
   kubernetes_version  = var.kubernetes_version
 
-  lifecycle {
-    ignore_changes = [
-      default_node_pool[0].node_count
-    ]
-  }
-
   identity {
     type = "SystemAssigned"
   }

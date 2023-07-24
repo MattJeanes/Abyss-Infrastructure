@@ -17,3 +17,7 @@ variable "cloudflare_zone_id" {
 variable "home_ip" {
   sensitive = true
 }
+
+variable "windows_server_password" {
+  sensitive = true
+}

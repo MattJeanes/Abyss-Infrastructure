@@ -33,6 +33,7 @@ jobs:
           cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
           cloudflare_zone_id = "${{ vars.CLOUDFLARE_ZONE_ID }}"
           home_ip = "${{ secrets.HOME_IP }}"
+          windows_server_password = "${{ secrets.WINDOWS_SERVER_PASSWORD }}"
           EOF
         working-directory: terraform
 
