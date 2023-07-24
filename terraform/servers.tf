@@ -261,7 +261,7 @@ resource "azurerm_windows_virtual_machine" "servers" {
   for_each = { for key, val in local.servers : key => val if val.os_type == "Windows" }
 
   lifecycle {
-    # prevent_destroy = true
+    prevent_destroy = true
   }
 
   name                = each.value.name
