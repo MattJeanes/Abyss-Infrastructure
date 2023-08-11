@@ -215,7 +215,7 @@ jobs:
             --namespace monitoring \
             --create-namespace \
             --set name=prometheus \
-            --set disk.capacity=4Gi \
+            --set disk.capacity=8Gi \
             --set disk.id="${{ env.prometheus_disk_id }}" \
             --set persistentVolumeClaim.enabled=false
         working-directory: kubernetes/charts

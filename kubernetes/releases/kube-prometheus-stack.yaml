@@ -106,7 +106,7 @@ prometheus:
           volumeName: prometheus
           resources:
             requests:
-              storage: 4Gi
+              storage: 8Gi
           accessModes:
           - ReadWriteOnce
           storageClassName: managed-csi
