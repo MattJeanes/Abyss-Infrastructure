@@ -4,7 +4,7 @@ resource "azurerm_managed_disk" "prometheus" {
   resource_group_name  = azurerm_resource_group.abyss.name
   storage_account_type = "StandardSSD_LRS"
   create_option        = "Empty"
-  disk_size_gb         = 4
+  disk_size_gb         = 8
 
   lifecycle {
     prevent_destroy = true
