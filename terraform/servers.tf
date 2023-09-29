@@ -106,7 +106,7 @@ locals {
     }
     "server-6" = {
       name         = "abyss-server-6",
-      dns_name     = "csgo"
+      dns_name     = "cs2"
       vm_size      = "Standard_D2ds_v5",
       os_type      = "Linux",
       disk_size_gb = 64,
@@ -116,8 +116,8 @@ locals {
         sku       = "22_04-lts-gen2",
       }
       network_security_rules = {
-        "csgo" = {
-          name                       = "CSGO"
+        "cs2" = {
+          name                       = "CS2"
           priority                   = 310
           protocol                   = "*"
           source_address_prefix      = "*"
