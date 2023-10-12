@@ -3,6 +3,7 @@ locals {
     "server-1" = {
       name         = "abyss-server-1",
       dns_name     = "arma"
+      rcon         = false
       vm_size      = "Standard_D2s_v3",
       os_type      = "Linux",
       disk_size_gb = 64
@@ -25,6 +26,7 @@ locals {
     "server-3" = {
       name         = "abyss-server-3",
       dns_name     = "gamenight"
+      rcon         = false
       vm_size      = "Standard_D2s_v3",
       os_type      = "Linux",
       disk_size_gb = 30,
@@ -47,6 +49,7 @@ locals {
     "server-4" = {
       name         = "abyss-server-4",
       dns_name     = "spaceengineers"
+      rcon         = false
       vm_size      = "Standard_D2ds_v5",
       os_type      = "Windows",
       disk_size_gb = 32,
@@ -77,6 +80,7 @@ locals {
     "server-5" = {
       name         = "abyss-server-5",
       dns_name     = "satisfactory"
+      rcon         = false
       vm_size      = "Standard_D4ads_v5",
       os_type      = "Linux",
       disk_size_gb = 30,
@@ -107,6 +111,7 @@ locals {
     "server-6" = {
       name         = "abyss-server-6",
       dns_name     = "cs2"
+      rcon         = true
       vm_size      = "Standard_D2ds_v5",
       os_type      = "Linux",
       disk_size_gb = 64,
@@ -137,6 +142,7 @@ locals {
     "server-7" = {
       name         = "abyss-server-7",
       dns_name     = "7daystodie"
+      rcon         = false
       vm_size      = "Standard_D2ds_v5",
       os_type      = "Linux",
       disk_size_gb = 32,
@@ -360,6 +366,17 @@ resource "cloudflare_record" "servers_cname" {
 
   zone_id = var.cloudflare_zone_id
   name    = each.value.dns_name
+  type    = "CNAME"
+  value   = cloudflare_record.servers[each.key].hostname
+  ttl     = 1
+  proxied = false
+}
+
+resource "cloudflare_record" "servers_rcon" {
+  for_each = { for key, val in local.servers : key => val if val.dns_name != null && val.rcon }
+
+  zone_id = var.cloudflare_zone_id
+  name    = "rcon.${each.value.dns_name}"
   type    = "CNAME"
   value   = cloudflare_record.servers[each.key].hostname
   ttl     = 1
