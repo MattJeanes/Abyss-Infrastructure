@@ -124,6 +124,14 @@ locals {
           destination_port_ranges    = ["27005", "27015"]
           destination_address_prefix = "*"
         }
+        "http" = {
+          name                       = "HTTP"
+          priority                   = 320
+          protocol                   = "*"
+          source_address_prefix      = "*"
+          destination_port_ranges    = ["80", "443"]
+          destination_address_prefix = "*"
+        }
       }
     }
     "server-7" = {
