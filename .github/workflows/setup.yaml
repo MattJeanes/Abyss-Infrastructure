@@ -112,8 +112,10 @@ jobs:
           helm upgrade --install --wait --atomic --debug \
             storage-account-secret ./storage-account-secret \
             --namespace default \
-            --set storageAccountName="${{ env.storage_account_name }}" \
-            --set storageAccountKey="${{ env.storage_account_key }}"
+            --set storageAccount.name='${{ env.storage_account_name }}' \
+            --set storageAccount.key='${{ env.storage_account_key }}' \
+            --set crypt.password='${{ secrets.RCLONE_CRYPT_PASSWORD }}' \
+            --set crypt.salt='${{ secrets.RCLONE_CRYPT_SALT }}'
         working-directory: kubernetes/charts
 
       - name: Add github-registry secret
@@ -518,10 +520,6 @@ jobs:
             --set auth.admin.token="${{ secrets.INFLUXDB_ADMIN_TOKEN }}" \
             --set ingress.hostname="${{ env.influxdb_host }}"
         working-directory: kubernetes/releases
-
-      - name: Install csi-rclone
-        run: helm upgrade --install --wait --atomic --debug csi-rclone . --create-namespace --namespace csi-rclone
-        working-directory: kubernetes/charts/csi-rclone
 
       - name: Install persistent volume for qbittorrent-config
         run: |

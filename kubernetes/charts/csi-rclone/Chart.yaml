@@ -1,6 +1,0 @@
-apiVersion: v2
-name: csi-rclone
-type: application
-version: 1.0.0
-sources:
-- https://github.com/wunderio/csi-rclone
