@@ -5,12 +5,16 @@ image:
   pullPolicy: IfNotPresent
   tag: version-4.6.0-r0
 initContainers:
-  vuetorrent: # a init container to download  and extract it to mounted /vuetorrent
+  init:
     image: busybox
     imagePullPolicy: IfNotPresent
     command: ["/bin/sh", "-c"]
     args:
     - |
+      # Create empty directory for rclone mount
+      mkdir -p /mnt/rclone/encrypted
+
+      # Setup vuetorrent UI
       wget https://github.com/WDaan/VueTorrent/releases/download/v2.1.0/vuetorrent.zip -O /tmp/vuetorrent.zip
       rm -rf /vuetorrent/*
       mkdir /tmp/vuetorrent
@@ -19,6 +23,8 @@ initContainers:
     volumeMounts:
     - name: vuetorrent
       mountPath: /vuetorrent
+    - name: rclone
+      mountPath: /mnt/rclone
 addons:
   vpn:
     enabled: true
@@ -46,17 +52,21 @@ sidecars:
   rclone:
     image: rclone/rclone:1.64.2
     imagePullPolicy: IfNotPresent
-    command: ["/bin/sh"]
     args:
-    - -c
-    - while true; do sleep 86400; done
+    - mount
+    - azureblob-encrypted:/
+    - /mnt/rclone/encrypted
     env:
       RCLONE_CONFIG: /config/rclone.conf
     volumeMounts:
     - name: rclone
-      mountPath: /rclone
+      mountPath: /mnt/rclone
+      mountPropagation: Bidirectional
     - name: rclone-config
       mountPath: /config
+    securityContext:
+      privileged: true
+      allowPrivilegeEscalation: true
 env:
   TZ: Europe/London
 service:
@@ -91,15 +101,16 @@ persistence:
   config:
     enabled: true
     existingClaim: qbittorrent-config
-  rclone:
-    enabled: true
-    type: emptyDir
-    mountPath: /rclone
   media:
     enabled: false
   vuetorrent:
     enabled: true
     type: emptyDir
+  rclone:
+    enabled: true
+    type: emptyDir
+    mountPath: /mnt/rclone
+    mountPropagation: HostToContainer
   rclone-config:
     enabled: true
     type: secret
