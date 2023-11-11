@@ -1,6 +1,5 @@
 {
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "logLevel": "debug",
     "logFileLevel": "debug",
     "enabledManagers": [
         "helmv3",
@@ -8,18 +7,15 @@
     ],
     "autodiscover": true,
     "rangeStrategy": "auto",
+    "automerge": true,
+    "automergeType": "pr",
+    "automergeStrategy": "squash",
     "packageRules": [
-        {
-            "automerge": true,
-            "automergeType": "pr",
-            "automergeStrategy": "squash"
-        },
         {
             "matchUpdateTypes": [
                 "major"
             ],
-            "automerge": false,
-            "enabled": false
+            "automerge": false
         }
     ],
     "platformAutomerge": true,
