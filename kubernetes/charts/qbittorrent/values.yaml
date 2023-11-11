@@ -11,10 +11,7 @@ initContainers:
     command: ["/bin/sh", "-c"]
     args:
     - |
-      # Create empty directory for rclone mount
       mkdir -p /mnt/rclone/encrypted
-
-      # Setup vuetorrent UI
       wget https://github.com/WDaan/VueTorrent/releases/download/v2.1.0/vuetorrent.zip -O /tmp/vuetorrent.zip
       rm -rf /vuetorrent/*
       mkdir /tmp/vuetorrent

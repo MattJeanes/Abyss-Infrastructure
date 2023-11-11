@@ -534,19 +534,6 @@ jobs:
             --set fileShare.gid=911
         working-directory: kubernetes/charts
 
-      - name: Install persistent volume for qbittorrent-downloads
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            qbittorrent-downloads-persistentvolume ./azure-persistentvolume \
-            --namespace default \
-            --set name=qbittorrent-downloads \
-            --set disk.capacity=100Gi \
-            --set useFileShare=true \
-            --set fileShare.name=qbittorrent-downloads \
-            --set fileShare.uid=911 \
-            --set fileShare.gid=911
-        working-directory: kubernetes/charts
-
       - name: Install qBittorrent
         run: |
           helm dependency update .
