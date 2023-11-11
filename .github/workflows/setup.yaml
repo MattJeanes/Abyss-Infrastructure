@@ -313,7 +313,6 @@ jobs:
             --namespace default \
             -f values.yaml \
             --set service.main.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
-            --set service.udp.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
             --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
         working-directory: kubernetes/charts/teamspeak
 
@@ -351,7 +350,6 @@ jobs:
             -f values.yaml \
             -f values.alt.yaml \
             --set service.main.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
-            --set service.udp.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
             --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
         working-directory: kubernetes/charts/teamspeak
 

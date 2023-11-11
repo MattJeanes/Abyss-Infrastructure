@@ -6,12 +6,12 @@ env:
 service:
   main:
     ports:
-      voice:
-        port: 9988
       serverquery:
         port: 10012
       filetransfer:
         port: 30034
+      voice:
+        port: 9988
 probes:
   readiness:
     custom: true
