@@ -1,0 +1,108 @@
+# https://github.com/bjw-s/helm-charts/blob/a081de5/charts/library/common/values.yaml
+
+image:
+  repository: ghcr.io/linuxserver/qbittorrent
+  pullPolicy: IfNotPresent
+  tag: version-4.6.0-r0
+initContainers:
+  vuetorrent: # a init container to download  and extract it to mounted /vuetorrent
+    image: busybox
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/sh", "-c"]
+    args:
+    - |
+      wget https://github.com/WDaan/VueTorrent/releases/download/v2.1.0/vuetorrent.zip -O /tmp/vuetorrent.zip
+      rm -rf /vuetorrent/*
+      mkdir /tmp/vuetorrent
+      unzip /tmp/vuetorrent.zip -d /tmp/vuetorrent
+      mv /tmp/vuetorrent/vuetorrent/* /vuetorrent
+    volumeMounts:
+    - name: vuetorrent
+      mountPath: /vuetorrent
+sidecars:
+  gluetun:
+    image: ghcr.io/qdm12/gluetun:v3.36.0
+    imagePullPolicy: IfNotPresent
+    securityContext:
+      capabilities:
+        add: ["NET_ADMIN"]
+    env:
+      TZ: Europe/London
+      VPN_TYPE: openvpn
+      VPN_SERVICE_PROVIDER: mullvad
+      OPENVPN_USER: "" # set in CLI
+      SERVER_CITIES: amsterdam
+      FIREWALL_INPUT_PORTS: '8080,6881'
+    volumeMounts:
+    - name: gluetun-config
+      mountPath: /gluetun
+    startupProbe:
+      exec:
+        command: 
+        - /gluetun-entrypoint
+        - healthcheck
+      failureThreshold: 10
+      initialDelaySeconds: 10
+      periodSeconds: 5
+      timeoutSeconds: 5
+    livenessProbe:
+      exec:
+        command: 
+        - /gluetun-entrypoint
+        - healthcheck
+      failureThreshold: 3
+      periodSeconds: 5
+      timeoutSeconds: 5
+env:
+  TZ: Europe/London
+service:
+  main:
+    ports:
+      http:
+        port: 8080
+  bittorrent:
+    enabled: true
+    type: LoadBalancer
+    externalTrafficPolicy: Local
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
+      service.beta.kubernetes.io/port_6881_no_probe_rule: 'true'
+    ports:
+      bittorrent:
+        enabled: true
+        port: 6881
+        protocol: TCP
+ingress:
+  main:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+    hosts:
+    - paths:
+      - path: /
+    tls:
+    - secretName: qbittorrent-tls
+persistence:
+  config:
+    enabled: true
+    existingClaim: qbittorrent-config
+  downloads:
+    enabled: true
+    existingClaim: qbittorrent-downloads
+    mountPath: /downloads
+  media:
+    enabled: false
+  vuetorrent:
+    enabled: true
+    type: emptyDir
+  gluetun-config:
+    enabled: true
+    type: emptyDir
+    mountPath: '-'
+resources:
+  requests:
+    cpu: 5m
+    memory: 256Mi
+  limits:
+    memory: 256Mi

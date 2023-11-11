@@ -1,3 +1,4 @@
 .terraform
 .terraform.lock.hcl
 terraform.tfvars
+kubernetes/charts/**/*.tgz

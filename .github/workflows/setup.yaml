@@ -519,6 +519,10 @@ jobs:
             --set ingress.hostname="${{ env.influxdb_host }}"
         working-directory: kubernetes/releases
 
+      - name: Install csi-rclone
+        run: helm upgrade --install --wait --atomic --debug csi-rclone . --create-namespace --namespace csi-rclone
+        working-directory: kubernetes/charts/csi-rclone
+
       - name: Install persistent volume for qbittorrent-config
         run: |
           helm upgrade --install --wait --atomic --debug \
@@ -545,16 +549,15 @@ jobs:
             --set fileShare.gid=911
         working-directory: kubernetes/charts
 
-      # https://artifacthub.io/packages/helm/gabe565/qbittorrent
       - name: Install qBittorrent
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
-            qbittorrent qbittorrent \
-            --repo https://charts.gabe565.com \
+            qbittorrent . \
             --namespace default \
-            --version 0.2.2 \
-            -f qbittorrent.yaml \
+            -f values.yaml \
             --set service.bittorrent.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
             --set ingress.main.hosts[0].host="${{ env.qbittorrent_host }}" \
-            --set ingress.main.tls[0].hosts[0]="${{ env.qbittorrent_host }}"
-        working-directory: kubernetes/releases
+            --set ingress.main.tls[0].hosts[0]="${{ env.qbittorrent_host }}" \
+            --set sidecars.gluetun.env.OPENVPN_USER="${{ secrets.MULLVAD_ACCOUNT_NUMBER }}"
+        working-directory: kubernetes/charts/qbittorrent
