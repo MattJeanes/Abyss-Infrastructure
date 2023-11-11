@@ -53,17 +53,32 @@ sidecars:
     - mount
     - azureblob-encrypted:/
     - /mnt/rclone/encrypted
+    - --allow-other
+    - --cache-dir
+    - /rclone/cache
+    - --vfs-cache-mode
+    - writes
+    - -v
     env:
-      RCLONE_CONFIG: /config/rclone.conf
+      RCLONE_CONFIG: /rclone/config/rclone.conf
     volumeMounts:
     - name: rclone
       mountPath: /mnt/rclone
       mountPropagation: Bidirectional
     - name: rclone-config
-      mountPath: /config
+      mountPath: /rclone/config
+    - name: rclone-cache
+      mountPath: /rclone/cache
     securityContext:
       privileged: true
       allowPrivilegeEscalation: true
+    lifecycle:
+      preStop:
+        exec:
+          command:
+          - /bin/sh
+          - -c
+          - umount -l /mnt/rclone/encrypted; true
 env:
   TZ: Europe/London
 service:
@@ -112,6 +127,10 @@ persistence:
     enabled: true
     type: secret
     name: azure-storage-account-rclone
+    mountPath: '-'
+  rclone-cache:
+    enabled: true
+    type: emptyDir
     mountPath: '-'
 resources:
   requests:
