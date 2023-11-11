@@ -541,7 +541,6 @@ jobs:
             qbittorrent . \
             --namespace default \
             -f values.yaml \
-            --set service.bittorrent.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
             --set ingress.main.hosts[0].host="${{ env.qbittorrent_host }}" \
             --set ingress.main.tls[0].hosts[0]="${{ env.qbittorrent_host }}" \
             --set addons.vpn.env.OPENVPN_USER="${{ secrets.MULLVAD_ACCOUNT_NUMBER }}"

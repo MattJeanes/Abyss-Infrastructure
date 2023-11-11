@@ -35,7 +35,7 @@ addons:
       VPN_SERVICE_PROVIDER: mullvad
       OPENVPN_USER: "" # set in CLI
       SERVER_CITIES: amsterdam
-      FIREWALL_INPUT_PORTS: '8080,6881'
+      FIREWALL_INPUT_PORTS: '8080'
     livenessProbe:
       exec:
         command: 
@@ -86,18 +86,6 @@ service:
     ports:
       http:
         port: 8080
-  bittorrent:
-    enabled: true
-    type: LoadBalancer
-    externalTrafficPolicy: Local
-    annotations:
-      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
-      service.beta.kubernetes.io/port_6881_no_probe_rule: 'true'
-    ports:
-      bittorrent:
-        enabled: true
-        port: 6881
-        protocol: TCP
 ingress:
   main:
     enabled: true
