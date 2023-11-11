@@ -6,6 +6,7 @@
         "helmv3",
         "helm-values"
     ],
+    "autodiscover": true,
     "rangeStrategy": "auto",
     "packageRules": [
         {
