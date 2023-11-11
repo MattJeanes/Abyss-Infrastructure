@@ -1,0 +1,8 @@
+apiVersion: v2
+name: teamspeak
+type: application
+version: 1.0.0
+dependencies:
+  - name: common
+    repository: https://bjw-s.github.io/helm-charts
+    version: 1.5.1

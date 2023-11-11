@@ -1,32 +1,10 @@
-image:
-  tag: 3.13.7
-metrics:
-  enabled: true
-  prometheusRule:
-    enabled: true
-  exporter:
-    env:
-      remote: localhost:10012
 env:
-  TS3SERVER_DB_PLUGIN: ts3db_sqlite3
-  TS3SERVER_DB_SQLCREATEPATH: create_sqlite
-  TS3SERVER_LICENSE: accept
   TS3SERVER_DEFAULT_VOICE_PORT: 9988
   TS3SERVER_QUERY_PORT: 10012
   TS3SERVER_FILETRANSFER_PORT: 30034
   TS3SERVER_FILETRANSFER_IP: 0.0.0.0
-resources:
-  requests:
-    cpu: 20m
-    memory: 30Mi
-  limits:
-    memory: 30Mi
 service:
   main:
-    type: LoadBalancer
-    annotations:
-      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
-    externalTrafficPolicy: Local
     ports:
       voice:
         port: 9988
@@ -52,6 +30,8 @@ probes:
         port: 10012
 persistence:
   data:
-    enabled: true
-    type: pvc
     existingClaim: teamspeak-alt
+metrics:
+  exporter:
+    env:
+      remote: localhost:10012

@@ -110,13 +110,13 @@ jobs:
       - name: Install storage-account-secret
         run: |
           helm upgrade --install --wait --atomic --debug \
-            storage-account-secret ./storage-account-secret \
+            storage-account-secret . \
             --namespace default \
             --set storageAccount.name="${{ env.storage_account_name }}" \
             --set storageAccount.key="${{ env.storage_account_key }}" \
             --set crypt.obscuredPassword="${{ secrets.RCLONE_CRYPT_PASSWORD }}" \
             --set crypt.obscuredSalt="${{ secrets.RCLONE_CRYPT_SALT }}"
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/storage-account-secret
 
       - name: Add github-registry secret
         run: |
@@ -155,18 +155,18 @@ jobs:
       - name: Install certificate-issuers
         run: |
           helm upgrade --install --wait --atomic --debug \
-            certificate-issuers ./certificate-issuers \
+            certificate-issuers . \
             --namespace cert-manager \
             --set letsEncrypt.email="${{ vars.EMAIL }}"
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/certificate-issuers
 
       - name: Install Hello World
         run: |
           helm upgrade --install --wait --atomic --debug \
-            hello-world ./hello-world \
+            hello-world . \
             --namespace default \
             --set host="${{ env.hello_world_host }}"
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/hello-world
 
       - name: Wait for hello world certificate to be ready
         run: ./WaitKubeCertificate.ps1 -Name "hello-world-tls"
@@ -213,38 +213,38 @@ jobs:
       - name: Install persistent volume for prometheus
         run: |
           helm upgrade --install --wait --atomic --debug \
-            prometheus-persistentvolume ./azure-persistentvolume \
+            prometheus-persistentvolume . \
             --namespace monitoring \
             --create-namespace \
             --set name=prometheus \
             --set disk.capacity=8Gi \
             --set disk.id="${{ env.prometheus_disk_id }}" \
             --set persistentVolumeClaim.enabled=false
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/azure-persistentvolume
 
       - name: Install persistent volume for alertmanager
         run: |
           helm upgrade --install --wait --atomic --debug \
-            alertmanager-persistentvolume ./azure-persistentvolume \
+            alertmanager-persistentvolume . \
             --namespace monitoring \
             --create-namespace \
             --set name=alertmanager \
             --set disk.capacity=4Gi \
             --set disk.id="${{ env.alertmanager_disk_id }}" \
             --set persistentVolumeClaim.enabled=false
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/azure-persistentvolume
 
       - name: Install persistent volume for grafana
         run: |
           helm upgrade --install --wait --atomic --debug \
-            grafana-persistentvolume ./azure-persistentvolume \
+            grafana-persistentvolume . \
             --namespace monitoring \
             --create-namespace \
             --set name=grafana \
             --set disk.capacity=1Gi \
             --set useFileShare=true \
             --set fileShare.name=grafana
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/azure-persistentvolume
 
       # https://artifacthub.io/packages/helm/prometheus-community/kube-prometheus-stack
       - name: Install prometheus
@@ -275,9 +275,9 @@ jobs:
       - name: Install prometheus-vpa
         run: |
           helm upgrade --install --wait --atomic --debug \
-            prometheus-vpa ./prometheus-vpa \
+            prometheus-vpa . \
             --namespace monitoring
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/prometheus-vpa
 
       - name: Wait for kube-prometheus-stack certificates to be ready
         run: |
@@ -297,36 +297,34 @@ jobs:
       - name: Install persistent volume for teamspeak
         run: |
           helm upgrade --install --wait --atomic --debug \
-            teamspeak-persistentvolume ./azure-persistentvolume \
+            teamspeak-persistentvolume . \
             --namespace default \
             --set name=teamspeak \
             --set disk.capacity=10Gi \
             --set useFileShare=true \
             --set fileShare.name=teamspeak
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/azure-persistentvolume
 
-      # https://artifacthub.io/packages/helm/k8s-at-home/teamspeak
       - name: Install teamspeak
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
-            teamspeak teamspeak \
-            --repo https://k8s-at-home.com/charts \
+            teamspeak . \
             --namespace default \
-            --version 0.7.2 \
-            -f teamspeak.yaml \
+            -f values.yaml \
             --set service.main.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
             --set service.udp.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
             --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
-        working-directory: kubernetes/releases
+        working-directory: kubernetes/charts/teamspeak
 
       - name: Install redirect for teamspeak
         run: |
           helm upgrade --install --wait --atomic --debug \
-            teamspeak-redirect ./ingress-redirect \
+            teamspeak-redirect . \
             --namespace default \
             --set host="${{ env.teamspeak_host }}" \
             --set redirect="ts3server://\$HOST"
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/ingress-redirect
 
       - name: Wait for teamspeak redirect certificate to be ready
         run: ./WaitKubeCertificate.ps1 -Name "teamspeak-redirect-tls"
@@ -336,32 +334,31 @@ jobs:
       - name: Install persistent volume for teamspeak-alt
         run: |
           helm upgrade --install --wait --atomic --debug \
-            teamspeak-alt-persistentvolume ./azure-persistentvolume \
+            teamspeak-alt-persistentvolume . \
             --namespace default \
             --set name=teamspeak-alt \
             --set disk.capacity=10Gi \
             --set useFileShare=true \
             --set fileShare.name=teamspeak-alt
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/azure-persistentvolume
 
-      # https://artifacthub.io/packages/helm/k8s-at-home/teamspeak
       - name: Install teamspeak-alt
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
-            teamspeak-alt teamspeak \
-            --repo https://k8s-at-home.com/charts \
+            teamspeak-alt . \
             --namespace default \
-            --version 0.7.2 \
-            -f teamspeak-alt.yaml \
+            -f values.yaml \
+            -f values.alt.yaml \
             --set service.main.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
             --set service.udp.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
             --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
-        working-directory: kubernetes/releases
+        working-directory: kubernetes/charts/teamspeak
 
       - name: Install persistent volume for sinusbot
         run: |
           helm upgrade --install --wait --atomic --debug \
-            sinusbot-persistentvolume ./azure-persistentvolume \
+            sinusbot-persistentvolume . \
             --namespace default \
             --set name=sinusbot \
             --set disk.capacity=10Gi \
@@ -369,20 +366,18 @@ jobs:
             --set fileShare.name=sinusbot \
             --set fileShare.uid=1001 \
             --set fileShare.gid=1001
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/azure-persistentvolume
 
-      # https://artifacthub.io/packages/helm/k8s-at-home/sinusbot
       - name: Install sinusbot
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
-            sinusbot sinusbot \
-            --repo https://k8s-at-home.com/charts \
+            sinusbot . \
             --namespace default \
-            --version 0.4.2 \
-            -f sinusbot.yaml \
+            -f values.yaml \
             --set ingress.main.hosts[0].host="${{ env.sinusbot_host }}" \
             --set ingress.main.tls[0].hosts[0]="${{ env.sinusbot_host }}"
-        working-directory: kubernetes/releases
+        working-directory: kubernetes/charts/sinusbot
 
       - name: Wait for sinusbot certificate to be ready
         run: ./WaitKubeCertificate.ps1 -Name "sinusbot-tls"
@@ -392,12 +387,12 @@ jobs:
       - name: Install persistent volume for postgresql
         run: |
           helm upgrade --install --wait --atomic --debug \
-            postgresql-persistentvolume ./azure-persistentvolume \
+            postgresql-persistentvolume . \
             --namespace default \
             --set name=postgresql \
             --set disk.capacity=4Gi \
             --set disk.id="${{ env.postgresql_disk_id }}"
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/azure-persistentvolume
 
       # https://artifacthub.io/packages/helm/bitnami/postgresql
       - name: Install postgresql
@@ -412,16 +407,13 @@ jobs:
             --set primary.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}"
         working-directory: kubernetes/releases
 
-      # https://artifacthub.io/packages/helm/k8s-at-home/teslamate
       - name: Install teslamate
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
-            teslamate teslamate \
-            --repo https://k8s-at-home.com/charts \
+            teslamate . \
             --namespace default \
-            --version 7.0.1 \
-            -f teslamate.yaml \
-            --set image.tag="${{ vars.TESLAMATE_VERSION }}" \
+            -f values.yaml \
             --set ingress.main.hosts[0].host="${{ env.teslamate_host }}" \
             --set ingress.main.tls[0].hosts[0]="${{ env.teslamate_host }}" \
             --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
@@ -431,7 +423,7 @@ jobs:
             --set env.MQTT_HOST="${{ env.mqtt_host }}" \
             --set env.MQTT_USERNAME="${{ vars.TESLAMATE_MQTT_USERNAME }}" \
             --set env.MQTT_PASSWORD="${{ secrets.TESLAMATE_MQTT_PASSWORD }}"
-        working-directory: kubernetes/releases
+        working-directory: kubernetes/charts/teslamate
 
       - name: Wait for teslamate certificate to be ready
         run: ./WaitKubeCertificate.ps1 -Name "teslamate-tls"
@@ -475,22 +467,22 @@ jobs:
       - name: Install grafana-dashboards
         run: |
           helm upgrade --install --wait --atomic --debug \
-            grafana-dashboards ./grafana-dashboards \
+            grafana-dashboards . \
             --namespace default \
             --set teslamate.database.pass="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
             --set influxdb.organization="${{ vars.INFLUXDB_ORGANIZATION }}" \
             --set influxdb.token="${{ secrets.INFLUXDB_GRAFANA_API_TOKEN }}"
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/grafana-dashboards
 
       - name: Install youtransfer
         run: |
           helm upgrade --install --wait --atomic --debug \
-            youtransfer ./youtransfer \
+            youtransfer . \
             --namespace default \
             --set ingress.host="${{ env.send_host }}" \
             --set auth.username="${{ vars.YOUTRANSFER_USERNAME }}" \
             --set auth.password="${{ secrets.YOUTRANSFER_PASSWORD }}"
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/youtransfer
 
       - name: Wait for youtransfer certificate to be ready
         run: ./WaitKubeCertificate.ps1 -Name "youtransfer-tls"
@@ -500,12 +492,12 @@ jobs:
       - name: Install persistent volume for influxdb
         run: |
           helm upgrade --install --wait --atomic --debug \
-            influxdb-persistentvolume ./azure-persistentvolume \
+            influxdb-persistentvolume . \
             --namespace default \
             --set name=influxdb \
             --set disk.capacity=4Gi \
             --set disk.id="${{ env.influxdb_disk_id }}"
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/azure-persistentvolume
 
       # https://artifacthub.io/packages/helm/bitnami/influxdb
       - name: Install influxdb
@@ -524,7 +516,7 @@ jobs:
       - name: Install persistent volume for qbittorrent-config
         run: |
           helm upgrade --install --wait --atomic --debug \
-            qbittorrent-config-persistentvolume ./azure-persistentvolume \
+            qbittorrent-config-persistentvolume . \
             --namespace default \
             --set name=qbittorrent-config \
             --set disk.capacity=1Gi \
@@ -532,7 +524,7 @@ jobs:
             --set fileShare.name=qbittorrent-config \
             --set fileShare.uid=911 \
             --set fileShare.gid=911
-        working-directory: kubernetes/charts
+        working-directory: kubernetes/charts/azure-persistentvolume
 
       - name: Install qBittorrent
         run: |

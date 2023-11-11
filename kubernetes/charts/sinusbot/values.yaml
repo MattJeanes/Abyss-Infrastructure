@@ -1,0 +1,50 @@
+# https://github.com/bjw-s/helm-charts/blob/a081de5/charts/library/common/values.yaml
+
+image:
+  repository: sinusbot/docker
+  tag: 1.0.0-beta.14-dc94a7c
+  pullPolicy: IfNotPresent
+env:
+  UID: "1001"
+  GID: "1001"
+service:
+  main:
+    ports:
+      http:
+        port: 8087
+ingress:
+  main:
+    enabled: true
+    annotations:
+      kubernetes.io/ingress.class: nginx
+      cert-manager.io/cluster-issuer: letsencrypt-prod
+      nginx.ingress.kubernetes.io/proxy-body-size: 10m
+    hosts:
+    - paths:
+      - path: /
+    tls:
+    - secretName: sinusbot-tls
+persistence:
+  sinusbot:
+    enabled: true
+    type: pvc
+    existingClaim: sinusbot
+    subPath:
+      - mountPath: /opt/sinusbot/data
+        path: data
+      - mountPath: /opt/sinusbot/scripts
+        path: scripts
+  data:
+    enabled: false
+    mountPath: /opt/sinusbot/data
+  scripts:
+    enabled: false
+    mountPath: /opt/sinusbot/scripts
+nodeSelector:
+  kubernetes.io/arch: amd64
+resources:
+  requests:
+    cpu: 15m
+    memory: 200Mi
+  limits:
+    memory: 200Mi

@@ -1,0 +1,81 @@
+# https://github.com/bjw-s/helm-charts/blob/a081de5/charts/library/common/values.yaml
+
+image:
+  repository: teamspeak
+  tag: 3.13.7
+  pullPolicy: IfNotPresent
+env:
+  TZ: UTC
+  TS3SERVER_DB_PLUGIN: ts3db_sqlite3
+  TS3SERVER_DB_SQLCREATEPATH: create_sqlite
+  TS3SERVER_LICENSE: accept
+service:
+  main:
+    type: LoadBalancer
+    annotations:
+      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
+    externalTrafficPolicy: Local
+    ports:
+      http:
+        enabled: false
+        primary: false
+      serverquery:
+        enabled: true
+        port: 10011
+      filetransfer:
+        enabled: true
+        port: 30033
+      voice:
+        enabled: true
+        primary: true
+        port: 9987
+        protocol: UDP
+probes:
+  readiness:
+    custom: true
+    spec:
+      tcpSocket:
+        port: 10011
+  liveness:
+    custom: true
+    spec:
+      tcpSocket:
+        port: 10011
+  startup:
+    custom: true
+    spec:
+      tcpSocket:
+        port: 10011
+persistence:
+  data:
+    enabled: true
+    type: pvc
+    existingClaim: teamspeak
+    mountPath: /var/ts3server
+metrics:
+  enabled: true
+  serviceMonitor:
+    interval: 1m
+    scrapeTimeout: 30s
+    labels: {}
+  prometheusRule:
+    enabled: true
+    labels: {}
+    rules: []
+  exporter:
+    image:
+      repository: quay.io/ricardbejarano/ts3exporter
+      tag: 0.0.7
+      pullPolicy: IfNotPresent
+    env:
+      port: 9189
+      remote: localhost:10011
+      enableChannelMetrics: false
+nodeSelector:
+  kubernetes.io/arch: amd64
+resources:
+  requests:
+    cpu: 20m
+    memory: 35Mi
+  limits:
+    memory: 35Mi
