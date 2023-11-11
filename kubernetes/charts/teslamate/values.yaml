@@ -2,7 +2,7 @@
 
 image:
   repository: teslamatefork/teslamatefork
-  tag: sha256:23c2b07129251f3f7b062f3f78841eb06e61426683051650ea78b81c985fb160
+  tag: edge
   pullPolicy: IfNotPresent
 env:
   DISABLE_MQTT: "false"
