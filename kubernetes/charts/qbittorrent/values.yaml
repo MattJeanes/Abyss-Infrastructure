@@ -19,13 +19,13 @@ initContainers:
     volumeMounts:
     - name: vuetorrent
       mountPath: /vuetorrent
-sidecars:
-  gluetun:
-    image: ghcr.io/qdm12/gluetun:v3.36.0
-    imagePullPolicy: IfNotPresent
-    securityContext:
-      capabilities:
-        add: ["NET_ADMIN"]
+addons:
+  vpn:
+    enabled: true
+    gluetun:
+      image:
+        repository: ghcr.io/qdm12/gluetun
+        tag: v3.36.0
     env:
       TZ: Europe/London
       VPN_TYPE: openvpn
@@ -33,26 +33,30 @@ sidecars:
       OPENVPN_USER: "" # set in CLI
       SERVER_CITIES: amsterdam
       FIREWALL_INPUT_PORTS: '8080,6881'
-    volumeMounts:
-    - name: gluetun-config
-      mountPath: /gluetun
-    startupProbe:
-      exec:
-        command: 
-        - /gluetun-entrypoint
-        - healthcheck
-      failureThreshold: 10
-      initialDelaySeconds: 10
-      periodSeconds: 5
-      timeoutSeconds: 5
     livenessProbe:
       exec:
         command: 
         - /gluetun-entrypoint
         - healthcheck
-      failureThreshold: 3
+      failureThreshold: 6
+      initialDelaySeconds: 30
       periodSeconds: 5
       timeoutSeconds: 5
+sidecars:
+  rclone:
+    image: rclone/rclone:1.64.2
+    imagePullPolicy: IfNotPresent
+    command: ["/bin/sh"]
+    args:
+    - -c
+    - while true; do sleep 86400; done
+    env:
+      RCLONE_CONFIG: /config/rclone.conf
+    volumeMounts:
+    - name: rclone
+      mountPath: /rclone
+    - name: rclone-config
+      mountPath: /config
 env:
   TZ: Europe/London
 service:
@@ -87,18 +91,19 @@ persistence:
   config:
     enabled: true
     existingClaim: qbittorrent-config
-  downloads:
+  rclone:
     enabled: true
-    existingClaim: qbittorrent-downloads
-    mountPath: /downloads
+    type: emptyDir
+    mountPath: /rclone
   media:
     enabled: false
   vuetorrent:
     enabled: true
     type: emptyDir
-  gluetun-config:
+  rclone-config:
     enabled: true
-    type: emptyDir
+    type: secret
+    name: azure-storage-account-rclone
     mountPath: '-'
 resources:
   requests:

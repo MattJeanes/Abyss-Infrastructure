@@ -112,10 +112,10 @@ jobs:
           helm upgrade --install --wait --atomic --debug \
             storage-account-secret ./storage-account-secret \
             --namespace default \
-            --set storageAccount.name='${{ env.storage_account_name }}' \
-            --set storageAccount.key='${{ env.storage_account_key }}' \
-            --set crypt.password='${{ secrets.RCLONE_CRYPT_PASSWORD }}' \
-            --set crypt.salt='${{ secrets.RCLONE_CRYPT_SALT }}'
+            --set storageAccount.name="${{ env.storage_account_name }}" \
+            --set storageAccount.key="${{ env.storage_account_key }}" \
+            --set crypt.obscuredPassword="${{ secrets.RCLONE_CRYPT_PASSWORD }}" \
+            --set crypt.obscuredSalt="${{ secrets.RCLONE_CRYPT_SALT }}"
         working-directory: kubernetes/charts
 
       - name: Add github-registry secret
