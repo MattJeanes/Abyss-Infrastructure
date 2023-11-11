@@ -35,7 +35,7 @@ addons:
       VPN_SERVICE_PROVIDER: mullvad
       OPENVPN_USER: "" # set in CLI
       SERVER_CITIES: amsterdam
-      FIREWALL_INPUT_PORTS: '8080'
+      FIREWALL_INPUT_PORTS: '8080,56778'
     livenessProbe:
       exec:
         command: 
