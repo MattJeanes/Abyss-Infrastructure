@@ -1,8 +1,8 @@
 # https://github.com/bjw-s/helm-charts/blob/a081de5/charts/library/common/values.yaml
 
 image:
-  repository: teslamatefork/teslamatefork
-  tag: edge
+  repository: teslamate/teslamate
+  tag: 1.27.3
   pullPolicy: IfNotPresent
 env:
   DISABLE_MQTT: "false"
