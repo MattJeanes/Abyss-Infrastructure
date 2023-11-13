@@ -439,7 +439,7 @@ jobs:
           Install-Module powershell-yaml -Force
 
           $tempDirectory = $env:RUNNER_TEMP
-          $teslamateVersion = (Get-Content "teslamate/values.yaml" | ConvertFrom-Yaml).image.tag
+          $teslamateVersion = "v$((Get-Content "teslamate/values.yaml" | ConvertFrom-Yaml).image.tag)"
 
           $teslamatePath = Join-Path $tempDirectory "teslamate"
           $dashboardsPath = Join-Path "grafana-dashboards" "dashboards" "teslamate"
