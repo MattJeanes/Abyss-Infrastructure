@@ -29,13 +29,15 @@ jobs:
 
       - name: Prepare teslamate grafana dashboards
         run: |
+          Install-Module powershell-yaml -Force
+
           $tempDirectory = $env:RUNNER_TEMP
-          $teslamateVersion = $env:TESLAMATE_VERSION
+          $teslamateVersion = (Get-Content "teslamate/values.yaml" | ConvertFrom-Yaml).image.tag
 
           $teslamatePath = Join-Path $tempDirectory "teslamate"
-          $dashboardsPath = Join-Path "dashboards" "teslamate"
+          $dashboardsPath = Join-Path "grafana-dashboards" "dashboards" "teslamate"
 
-          git clone https://github.com/adriankumpf/teslamate.git $teslamatePath
+          git clone https://github.com/teslamate-org/teslamate.git $teslamatePath
           if ($LASTEXITCODE -ne 0) {
               Write-Error "git exited with code $LASTEXITCODE"
           }
@@ -51,9 +53,7 @@ jobs:
               Move-Item -Path $_.FullName -Destination (Join-Path $_.DirectoryName ("teslamate-" + $_.Name))
           }
         shell: pwsh
-        working-directory: kubernetes/charts/grafana-dashboards
-        env:
-          TESLAMATE_VERSION: v${{ vars.TESLAMATE_VERSION }}
+        working-directory: kubernetes/charts
 
       - name: Install grafana-dashboards
         run: |
