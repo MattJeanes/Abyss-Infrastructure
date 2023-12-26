@@ -79,6 +79,11 @@ sidecars:
           - /bin/sh
           - -c
           - umount -l /mnt/rclone/encrypted; true
+command:
+  - '/bin/sh'
+args:
+  - '-c'
+  - while ! ip link show tun0 &>/dev/null; do sleep 1; done && /init
 env:
   TZ: Europe/London
 service:
