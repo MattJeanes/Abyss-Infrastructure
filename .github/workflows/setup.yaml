@@ -398,7 +398,7 @@ jobs:
             postgresql postgresql \
             --repo https://charts.bitnami.com/bitnami \
             --namespace default \
-            --version 12.1.15 \
+            --version 13.3.0 \
             -f postgresql.yaml \
             --set auth.postgresPassword="${{ secrets.POSTGRESQL_POSTGRES_PASSWORD }}" \
             --set primary.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}"
