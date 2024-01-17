@@ -1,7 +1,3 @@
-variable "kubernetes_version" {
-  sensitive = false
-}
-
 variable "ssh_public_key" {
   sensitive = true
 }

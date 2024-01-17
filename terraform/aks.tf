@@ -1,9 +1,9 @@
 resource "azurerm_kubernetes_cluster" "abyss" {
-  name                = "abyss"
-  resource_group_name = azurerm_resource_group.abyss.name
-  location            = azurerm_resource_group.abyss.location
-  dns_prefix          = "abyss"
-  kubernetes_version  = var.kubernetes_version
+  name                      = "abyss"
+  resource_group_name       = azurerm_resource_group.abyss.name
+  location                  = azurerm_resource_group.abyss.location
+  dns_prefix                = "abyss"
+  automatic_channel_upgrade = "rapid"
 
   identity {
     type = "SystemAssigned"
@@ -22,15 +22,14 @@ resource "azurerm_kubernetes_cluster" "abyss" {
   }
 
   default_node_pool {
-    name                 = "agentpool"
-    enable_auto_scaling  = false
-    node_count           = 1
-    max_pods             = 110
-    vm_size              = "Standard_E2as_v5"
-    os_sku               = "AzureLinux"
-    os_disk_size_gb      = 64
-    vnet_subnet_id       = azurerm_subnet.abyss_aks.id
-    orchestrator_version = var.kubernetes_version
+    name                = "agentpool"
+    enable_auto_scaling = false
+    node_count          = 1
+    max_pods            = 110
+    vm_size             = "Standard_E2as_v5"
+    os_sku              = "AzureLinux"
+    os_disk_size_gb     = 64
+    vnet_subnet_id      = azurerm_subnet.abyss_aks.id
   }
 
   aci_connector_linux {

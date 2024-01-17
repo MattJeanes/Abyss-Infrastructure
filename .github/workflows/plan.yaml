@@ -28,7 +28,6 @@ jobs:
       - name: Set Terraform variables
         run: |
           tee terraform.tfvars <<EOF
-          kubernetes_version = "${{ vars.KUBERNETES_VERSION }}"
           ssh_public_key = "${{ secrets.SSH_PUBLIC_KEY }}"
           cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
           cloudflare_zone_id = "${{ vars.CLOUDFLARE_ZONE_ID }}"
