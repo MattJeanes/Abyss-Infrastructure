@@ -175,10 +175,10 @@ additionalPrometheusRulesMap:
           description: '{{`{{`}} $value | humanizePercentage {{`}}`}} memory usage relative to requests in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}}.'
           summary: Container experienced elevated memory usage relative to requests
         expr: |-
-          sum(node_namespace_pod_container:container_memory_working_set_bytes) by (namespace, pod, container)
+          sum(node_namespace_pod_container:container_memory_working_set_bytes{namespace != "kube-system"}) by (namespace, pod, container)
             /
-          (sum(kube_pod_container_resource_requests{resource="memory", unit="byte"}) by (namespace, pod, container))
-            > ( 150 / 100 )
+          (sum(kube_pod_container_resource_requests{namespace != "kube-system", resource="memory", unit="byte"}) by (namespace, pod, container))
+            > ( 125 / 100 )
         for: 15m
         labels:
           severity: warning

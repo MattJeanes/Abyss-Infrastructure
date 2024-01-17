@@ -135,7 +135,7 @@ jobs:
             --repo https://kubernetes.github.io/ingress-nginx \
             --namespace ingress-nginx \
             --create-namespace \
-            --version 4.4.2 \
+            --version 4.9.0 \
             -f ingress-nginx.yaml \
             --set controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}"
         working-directory: kubernetes/releases
@@ -148,7 +148,7 @@ jobs:
             --repo https://charts.jetstack.io \
             --namespace cert-manager \
             --create-namespace \
-            --version 1.11.0 \
+            --version 1.13.3 \
             -f cert-manager.yaml
         working-directory: kubernetes/releases
 
@@ -181,7 +181,7 @@ jobs:
             --repo https://oauth2-proxy.github.io/manifests \
             --namespace oauth2-proxy \
             --create-namespace \
-            --version 6.8.0 \
+            --version 6.23.1 \
             -f oauth2-proxy.yaml \
             --set config.clientID="${{ vars.OAUTH2_CLIENT_ID }}" \
             --set config.clientSecret="${{ secrets.OAUTH2_CLIENT_SECRET }}" \
@@ -206,7 +206,7 @@ jobs:
             --repo https://charts.fairwinds.com/stable \
             --namespace vpa \
             --create-namespace \
-            --version 1.6.1 \
+            --version 4.4.1 \
             -f vpa.yaml
         working-directory: kubernetes/releases
 
@@ -254,7 +254,7 @@ jobs:
             --repo https://prometheus-community.github.io/helm-charts \
             --namespace monitoring \
             --create-namespace \
-            --version 45.0.0 \
+            --version 55.11.0 \
             -f kube-prometheus-stack.yaml \
             --set alertmanager.ingress.hosts[0]="${{ env.alertmanager_host }}" \
             --set alertmanager.ingress.tls[0].hosts[0]="${{ env.alertmanager_host }}" \
@@ -504,7 +504,7 @@ jobs:
             influxdb influxdb \
             --repo https://charts.bitnami.com/bitnami \
             --namespace default \
-            --version 5.4.15 \
+            --version 5.12.0 \
             -f influxdb.yaml \
             --set auth.admin.password="${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" \
             --set auth.admin.token="${{ secrets.INFLUXDB_ADMIN_TOKEN }}" \

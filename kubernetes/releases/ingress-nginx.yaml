@@ -1,4 +1,8 @@
 controller:
+  resources:
+    requests:
+      cpu: 100m
+      memory: 150Mi
   service:
     externalTrafficPolicy: Local
     annotations:
