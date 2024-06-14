@@ -47,7 +47,7 @@ addons:
       timeoutSeconds: 5
 sidecars:
   rclone:
-    image: rclone/rclone:1.66.0
+    image: rclone/rclone:1.67.0
     imagePullPolicy: IfNotPresent
     args:
     - mount
