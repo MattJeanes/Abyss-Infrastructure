@@ -28,7 +28,7 @@ addons:
     gluetun:
       image:
         repository: ghcr.io/qdm12/gluetun
-        tag: v3.37.0
+        tag: v3.38.0
     env:
       TZ: Europe/London
       VPN_TYPE: openvpn
@@ -47,7 +47,7 @@ addons:
       timeoutSeconds: 5
 sidecars:
   rclone:
-    image: rclone/rclone:1.65.2
+    image: rclone/rclone:1.67.0
     imagePullPolicy: IfNotPresent
     args:
     - mount
