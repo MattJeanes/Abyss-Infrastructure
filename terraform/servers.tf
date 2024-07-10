@@ -174,7 +174,7 @@ locals {
       name         = "abyss-server-8",
       dns_name     = "minecraft"
       rcon         = false
-      vm_size      = "Standard_D4ads_v5",
+      vm_size      = "Standard_E2ads_v5",
       os_type      = "Linux",
       disk_size_gb = 32,
       source_image_reference = {
