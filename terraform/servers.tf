@@ -172,7 +172,7 @@ locals {
     }
     "server-8" = {
       name         = "abyss-server-8",
-      dns_name     = "minecraft"
+      dns_name     = null
       rcon         = false
       vm_size      = "Standard_D4ads_v5",
       os_type      = "Linux",
