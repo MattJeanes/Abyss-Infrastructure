@@ -11,7 +11,7 @@ spec:
     containerPolicies:
     - containerName: "prometheus"
       maxAllowed:
-        cpu: 250m
+        cpu: 200m
         memory: 2Gi
       mode: Auto
   updatePolicy:

@@ -4,6 +4,8 @@ image:
   repository: ghcr.io/linuxserver/qbittorrent
   pullPolicy: IfNotPresent
   tag: version-4.6.0-r0
+controller:
+  replicas: 0
 initContainers:
   init:
     image: busybox
