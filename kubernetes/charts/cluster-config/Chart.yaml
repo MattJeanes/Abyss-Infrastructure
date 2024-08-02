@@ -1,4 +1,0 @@
-apiVersion: v2
-name: cluster-config
-type: application
-version: 1.0.0
