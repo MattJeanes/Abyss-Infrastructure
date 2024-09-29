@@ -30,7 +30,7 @@ addons:
     gluetun:
       image:
         repository: ghcr.io/qdm12/gluetun
-        tag: v3.39.0
+        tag: v3.39.1
     env:
       TZ: Europe/London
       VPN_TYPE: openvpn
