@@ -7,6 +7,11 @@ on:
         description: "Terraform run apply"
         required: true
         default: "false"
+  pull_request:
+    branches:
+      - main
+    paths:
+      - terraform/**
 
 jobs:
   plan:
