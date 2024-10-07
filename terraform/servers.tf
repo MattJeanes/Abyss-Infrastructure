@@ -170,29 +170,6 @@ locals {
         }
       }
     }
-    "server-8" = {
-      name         = "abyss-server-8",
-      dns_name     = null
-      rcon         = false
-      vm_size      = "Standard_D4ads_v5",
-      os_type      = "Linux",
-      disk_size_gb = 32,
-      source_image_reference = {
-        publisher = "canonical",
-        offer     = "ubuntu-24_04-lts",
-        sku       = "server",
-      }
-      network_security_rules = {
-        "minecraft" = {
-          name                       = "Minecraft"
-          priority                   = 310
-          protocol                   = "*"
-          source_address_prefix      = "*"
-          destination_port_range     = "25565"
-          destination_address_prefix = "*"
-        }
-      }
-    }
   }
   nsg_rules = flatten([
     for server_key, server in local.servers : [
