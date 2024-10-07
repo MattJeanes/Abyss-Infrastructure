@@ -2,7 +2,8 @@
     "$schema": "https://docs.renovatebot.com/renovate-schema.json",
     "enabledManagers": [
         "helmv3",
-        "helm-values"
+        "helm-values",
+        "terraform"
     ],
     "autodiscover": true,
     "rangeStrategy": "auto",

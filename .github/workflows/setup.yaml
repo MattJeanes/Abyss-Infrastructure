@@ -28,6 +28,7 @@ jobs:
           cloudflare_zone_id = "${{ vars.CLOUDFLARE_ZONE_ID }}"
           home_ip = "${{ secrets.HOME_IP }}"
           windows_server_password = "${{ secrets.WINDOWS_SERVER_PASSWORD }}"
+          azure_subscription_id = "${{ vars.AZURE_SUBSCRIPTION_ID }}"
           EOF
         working-directory: terraform
 

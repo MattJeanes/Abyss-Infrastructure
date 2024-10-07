@@ -2,16 +2,18 @@ terraform {
   backend "azurerm" {}
   required_providers {
     azurerm = {
-      version = "3.69.0"
+      source  = "hashicorp/azurerm"
+      version = "4.4.0"
     }
     cloudflare = {
       source  = "cloudflare/cloudflare"
-      version = "4.12.0"
+      version = "4.43.0"
     }
   }
 }
 
 provider "azurerm" {
+  subscription_id = var.azure_subscription_id
   features {
     key_vault {
       purge_soft_delete_on_destroy = true

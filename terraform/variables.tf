@@ -17,3 +17,7 @@ variable "home_ip" {
 variable "windows_server_password" {
   sensitive = true
 }
+
+variable "azure_subscription_id" {
+  sensitive = true
+}

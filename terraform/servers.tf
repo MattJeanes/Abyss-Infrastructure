@@ -244,7 +244,7 @@ resource "azurerm_network_interface" "servers" {
   location            = azurerm_resource_group.abyss.location
   resource_group_name = azurerm_resource_group.abyss.name
 
-  enable_accelerated_networking = true
+  accelerated_networking_enabled = true
 
   ip_configuration {
     name                          = "ipconfig1"
@@ -349,14 +349,14 @@ resource "cloudflare_record" "servers" {
 
   lifecycle {
     ignore_changes = [
-      value
+      content
     ]
   }
 
   zone_id = var.cloudflare_zone_id
   name    = each.key
   type    = "A"
-  value   = coalesce(azurerm_public_ip.servers[each.key].ip_address, "192.0.2.0") # IPv4 reserved test address
+  content = coalesce(azurerm_public_ip.servers[each.key].ip_address, "192.0.2.0") # IPv4 reserved test address
   ttl     = 60
   proxied = false
 }
@@ -367,7 +367,7 @@ resource "cloudflare_record" "servers_cname" {
   zone_id = var.cloudflare_zone_id
   name    = each.value.dns_name
   type    = "CNAME"
-  value   = cloudflare_record.servers[each.key].hostname
+  content = cloudflare_record.servers[each.key].hostname
   ttl     = 1
   proxied = false
 }
@@ -378,7 +378,7 @@ resource "cloudflare_record" "servers_rcon" {
   zone_id = var.cloudflare_zone_id
   name    = "rcon.${each.value.dns_name}"
   type    = "CNAME"
-  value   = cloudflare_record.servers[each.key].hostname
+  content = cloudflare_record.servers[each.key].hostname
   ttl     = 1
   proxied = false
 }
