@@ -134,6 +134,7 @@ jobs:
 
       - name: Install ingress-nginx
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
             ingress-nginx . \
             --namespace ingress-nginx \
@@ -143,6 +144,7 @@ jobs:
 
       - name: Install cert-manager
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
             cert-manager . \
             --namespace cert-manager \
@@ -172,6 +174,7 @@ jobs:
 
       - name: Install oauth2-proxy
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
             oauth2-proxy . \
             --namespace oauth2-proxy \
@@ -193,6 +196,7 @@ jobs:
 
       - name: Install vpa
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
             vpa . \
             --namespace vpa \
@@ -237,6 +241,7 @@ jobs:
 
       - name: Install prometheus
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
             kube-prometheus-stack . \
             --namespace monitoring \
@@ -379,6 +384,7 @@ jobs:
 
       - name: Install postgresql
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
             postgresql . \
             --namespace default \
@@ -480,6 +486,7 @@ jobs:
 
       - name: Install influxdb
         run: |
+          helm dependency update .
           helm upgrade --install --wait --atomic --debug \
             influxdb . \
             --namespace default \
