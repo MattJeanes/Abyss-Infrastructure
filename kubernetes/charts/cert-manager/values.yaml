@@ -1,0 +1,8 @@
+cert-manager:
+  installCRDs: true
+  resources:
+    requests:
+      memory: 250Mi
+      cpu: 2m
+    limits:
+      memory: 250Mi

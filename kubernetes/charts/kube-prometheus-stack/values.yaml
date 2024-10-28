@@ -1,0 +1,192 @@
+kube-prometheus-stack:
+  prometheus-node-exporter:
+    affinity:
+      nodeAffinity:
+        requiredDuringSchedulingIgnoredDuringExecution:
+          nodeSelectorTerms:
+          - matchExpressions:
+            - key: type
+              operator: NotIn
+              values:
+              - virtual-kubelet
+  alertmanager:
+    alertmanagerSpec:
+      storage:
+        volumeClaimTemplate:
+          spec:
+            volumeName: alertmanager
+            resources:
+              requests:
+                storage: 4Gi
+            accessModes:
+            - ReadWriteOnce
+            storageClassName: managed-csi
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      tls:
+      - secretName: alertmanager-tls
+    config:
+      route:
+        receiver: pagerduty
+        routes:
+        - matchers:
+          - alertname = Watchdog
+          receiver: deadmanssnitch
+          repeat_interval: 15m
+        - matchers:
+          - alertname = InfoInhibitor
+          receiver: "null"
+      receivers:
+      - name: pagerduty
+      - name: deadmanssnitch
+        webhook_configs:
+        - send_resolved: false
+      - name: "null"
+      inhibit_rules:
+      - equal:
+        - namespace
+        - alertname
+        source_matchers:
+        - severity = critical
+        target_matchers:
+        - severity =~ warning|info
+      - equal:
+        - namespace
+        - alertname
+        source_matchers:
+        - severity = warning
+        target_matchers:
+        - severity = info
+      - equal:
+        - namespace
+        source_matchers:
+        - alertname = InfoInhibitor
+        target_matchers:
+        - severity = info
+  grafana:
+    persistence:
+      enabled: true
+      type: pvc
+      existingClaim: grafana
+    resources:
+      requests:
+        cpu: 15m
+        memory: 300Mi
+      limits:
+        memory: 300Mi
+    sidecar:
+      dashboards:
+        enabled: true
+        searchNamespace: ALL
+      datasources:
+        enabled: true
+        searchNamespace: ALL
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      tls:
+      - secretName: grafana-tls
+    env:
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: panodata-map-panel
+  prometheus:
+    prometheusSpec:
+      resources:
+        requests:
+          cpu: 50m
+          memory: 800Mi
+        limits:
+          memory: 800Mi
+      storageSpec:
+        volumeClaimTemplate:
+          spec:
+            volumeName: prometheus
+            resources:
+              requests:
+                storage: 8Gi
+            accessModes:
+            - ReadWriteOnce
+            storageClassName: managed-csi
+      ruleSelectorNilUsesHelmValues: false
+      serviceMonitorSelectorNilUsesHelmValues: false
+      podMonitorSelectorNilUsesHelmValues: false
+      probeSelectorNilUsesHelmValues: false
+    ingress:
+      enabled: true
+      annotations:
+        kubernetes.io/ingress.class: nginx
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+      tls:
+      - secretName: prometheus-tls
+  prometheusOperator:
+    prometheusConfigReloader:
+      resources:
+        requests:
+          cpu: 5m
+          memory: 40Mi
+        limits:
+          cpu: "0"
+          memory: 40Mi
+  kubeScheduler:
+    enabled: false
+  kubeControllerManager:
+    enabled: false
+  kubeProxy:
+    enabled: false
+  defaultRules:
+    disabled:
+      TargetDown: true
+      KubeAggregatedAPIErrors: true
+  additionalPrometheusRulesMap:
+    patched-default-rules:
+      groups:
+      - name: general.rules
+        rules:
+        - alert: TargetDown
+          annotations:
+            description: '{{ printf "%.4g" $value }}% of the {{ $labels.job }}/{{ $labels.service }} targets in {{ $labels.namespace }} namespace are down.'
+            summary: One or more targets are unreachable.
+          # Ignore virtual node
+          expr: 100 * (count by(job, namespace, service) (up{node != "virtual-node-aci-linux"} == 0) / count by(job, namespace, service) (up{node != "virtual-node-aci-linux"})) > 10
+          for: 10m
+          labels:
+            severity: warning
+    custom-rules:
+      groups:
+      - name: custom.rules
+        rules:
+        - alert: CPUUsageHigh
+          annotations:
+            description: '{{`{{`}} $value | humanizePercentage {{`}}`}} CPU usage relative to requests in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}}.'
+            summary: Container experienced elevated CPU usage relative to requests
+          expr: |-
+            sum(node_namespace_pod_container:container_cpu_usage_seconds_total:sum_irate) by (namespace, pod, container)
+              /
+            (sum(kube_pod_container_resource_requests{resource="cpu", unit="core"}) by (namespace, pod, container))
+              > ( 150 / 100 )
+          for: 15m
+          labels:
+            severity: warning
+        - alert: MemoryUsageHigh
+          annotations:
+            description: '{{`{{`}} $value | humanizePercentage {{`}}`}} memory usage relative to requests in namespace {{`{{`}} $labels.namespace {{`}}`}} for container {{`{{`}} $labels.container {{`}}`}} in pod {{`{{`}} $labels.pod {{`}}`}}.'
+            summary: Container experienced elevated memory usage relative to requests
+          expr: |-
+            sum(node_namespace_pod_container:container_memory_working_set_bytes{namespace != "kube-system"}) by (namespace, pod, container)
+              /
+            (sum(kube_pod_container_resource_requests{namespace != "kube-system", resource="memory", unit="byte"}) by (namespace, pod, container))
+              > ( 125 / 100 )
+          for: 15m
+          labels:
+            severity: warning
+  kube-state-metrics:
+    resources:
+      requests:
+        cpu: 5m
+        memory: 100Mi
+      limits:
+        memory: 100Mi
