@@ -139,6 +139,7 @@ jobs:
             ingress-nginx . \
             --namespace ingress-nginx \
             --create-namespace \
+            -f values.yaml \
             --set ingress-nginx.controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}"
         working-directory: kubernetes/charts/ingress-nginx
 
@@ -148,7 +149,8 @@ jobs:
           helm upgrade --install --wait --atomic --debug \
             cert-manager . \
             --namespace cert-manager \
-            --create-namespace
+            --create-namespace \
+            -f values.yaml
         working-directory: kubernetes/charts/cert-manager
 
       - name: Install certificate-issuers
@@ -179,6 +181,7 @@ jobs:
             oauth2-proxy . \
             --namespace oauth2-proxy \
             --create-namespace \
+            -f values.yaml \
             --set oauth2-proxy.config.clientID="${{ vars.OAUTH2_CLIENT_ID }}" \
             --set oauth2-proxy.config.clientSecret="${{ secrets.OAUTH2_CLIENT_SECRET }}" \
             --set oauth2-proxy.config.cookieSecret="${{ secrets.OAUTH2_COOKIE_SECRET }}" \
@@ -200,7 +203,8 @@ jobs:
           helm upgrade --install --wait --atomic --debug \
             vpa . \
             --namespace vpa \
-            --create-namespace
+            --create-namespace \
+            -f values.yaml
         working-directory: kubernetes/charts/vpa
 
       - name: Install persistent volume for prometheus
@@ -246,6 +250,7 @@ jobs:
             kube-prometheus-stack . \
             --namespace monitoring \
             --create-namespace \
+            -f values.yaml \
             --set kube-prometheus-stack.alertmanager.ingress.hosts[0]="${{ env.alertmanager_host }}" \
             --set kube-prometheus-stack.alertmanager.ingress.tls[0].hosts[0]="${{ env.alertmanager_host }}" \
             --set kube-prometheus-stack.alertmanager.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
@@ -388,6 +393,7 @@ jobs:
           helm upgrade --install --wait --atomic --debug \
             postgresql . \
             --namespace default \
+            -f values.yaml \
             --set postgresql.auth.postgresPassword="${{ secrets.POSTGRESQL_POSTGRES_PASSWORD }}" \
             --set postgresql.primary.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}"
         working-directory: kubernetes/charts/postgresql
@@ -490,6 +496,7 @@ jobs:
           helm upgrade --install --wait --atomic --debug \
             influxdb . \
             --namespace default \
+            -f values.yaml \
             --set influxdb.auth.admin.password="${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" \
             --set influxdb.auth.admin.token="${{ secrets.INFLUXDB_ADMIN_TOKEN }}" \
             --set influxdb.ingress.hostname="${{ env.influxdb_host }}"
