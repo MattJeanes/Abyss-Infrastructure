@@ -5,4 +5,4 @@ version: 1.0.0
 dependencies:
 - name: vpa
   repository: https://charts.fairwinds.com/stable
-  version: 4.7.0
+  version: 4.7.1
