@@ -2,7 +2,7 @@
 
 image:
   repository: teslamate/teslamate
-  tag: 1.31.1
+  tag: 1.31.1@sha256:5a6800a89fe326addb03f8fc3001b914e74119468ed80d7e84574a7c41bd1679
   pullPolicy: IfNotPresent
 env:
   DISABLE_MQTT: "false"

@@ -3,12 +3,12 @@
 image:
   repository: ghcr.io/linuxserver/qbittorrent
   pullPolicy: IfNotPresent
-  tag: version-4.6.0-r0
+  tag: version-4.6.0-r0@sha256:b96ad7ed83889420d5f6df311065c28ae465ce1d23ea42179f56196eb6ac4d4e
 controller:
   replicas: 0
 initContainers:
   init:
-    image: busybox
+    image: busybox@sha256:768e5c6f5cb6db0794eec98dc7a967f40631746c32232b78a3105fb946f3ab83
     imagePullPolicy: IfNotPresent
     command: ["/bin/sh", "-c"]
     args:
@@ -30,7 +30,7 @@ addons:
     gluetun:
       image:
         repository: ghcr.io/qdm12/gluetun
-        tag: v3.39.1
+        tag: v3.39.1@sha256:6a8058e626763cbf735ac2f78c774dbb24fec2490bd9d9f7d67e22592cb4a991
     env:
       TZ: Europe/London
       VPN_TYPE: openvpn
@@ -49,7 +49,7 @@ addons:
       timeoutSeconds: 5
 sidecars:
   rclone:
-    image: rclone/rclone:1.68.1
+    image: rclone/rclone:1.68.1@sha256:e78b765d51301e1934c376e9b5d0b42a156352099502a812b5e3b3bd37ccb33b
     imagePullPolicy: IfNotPresent
     args:
     - mount
