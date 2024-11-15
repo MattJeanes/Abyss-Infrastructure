@@ -1,25 +1,11 @@
 {
-    "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-    "enabledManagers": [
-        "helmv3",
-        "helm-values",
-        "terraform"
-    ],
-    "autodiscover": true,
-    "rangeStrategy": "auto",
-    "automerge": true,
-    "automergeType": "pr",
-    "automergeStrategy": "squash",
-    "packageRules": [
-        {
-            "matchUpdateTypes": [
-                "major"
-            ],
-            "automerge": false
-        }
-    ],
-    "platformAutomerge": true,
-    "semanticCommits": "enabled",
-    "prConcurrentLimit": 0,
-    "prHourlyLimit": 0
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:best-practices",
+    ":automergeDigest",
+    ":automergeMinor",
+  ],
+  "pinDigest": {
+    "automerge": true
+  }
 }
