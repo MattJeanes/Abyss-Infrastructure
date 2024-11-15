@@ -2,7 +2,7 @@
 
 image:
   repository: teamspeak
-  tag: 3.13.7
+  tag: 3.13.7@sha256:ddbeb29446ca423498692bd9f3ae67ff109121f80a95c7d405b1083c02c80087
   pullPolicy: IfNotPresent
 env:
   TZ: UTC
@@ -65,7 +65,7 @@ metrics:
   exporter:
     image:
       repository: quay.io/ricardbejarano/ts3exporter
-      tag: 0.0.7
+      tag: 0.0.7@sha256:3f3e2fceb82365320446728474502b1dd26de1123e6eb9ffcc0626003c743d0e
       pullPolicy: IfNotPresent
     env:
       port: 9189

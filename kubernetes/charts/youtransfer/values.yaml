@@ -1,7 +1,7 @@
 replicaCount: 1
 image:
   repository: remie/youtransfer
-  tag: stable
+  tag: stable@sha256:66bbb40efba49aa4c08d63a3d523191522115dcd5033229aefe3c9b195cf1f4d
   pullPolicy: Always
 ingress: {}
 resources:

@@ -2,7 +2,7 @@
 
 image:
   repository: sinusbot/docker
-  tag: 1.0.0-beta.14-dc94a7c
+  tag: 1.0.0-beta.14-dc94a7c@sha256:c7a4f3cc43939ef18c3d75bf14cf0a6458004a121c5635164ae0e8163d7baf45
   pullPolicy: IfNotPresent
 env:
   UID: "1001"
