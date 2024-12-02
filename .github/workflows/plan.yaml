@@ -1,6 +1,11 @@
 name: Plan
 
 on:
+  push:
+    branches:
+      - renovate/*
+    paths:
+      - terraform/**
   workflow_dispatch:
     inputs:
       runApply:
@@ -9,7 +14,7 @@ on:
         default: "false"
   pull_request:
     branches:
-      - main
+      - renovate/*
     paths:
       - terraform/**
 
