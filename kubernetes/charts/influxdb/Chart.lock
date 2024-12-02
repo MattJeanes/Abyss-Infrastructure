@@ -1,6 +1,6 @@
 dependencies:
 - name: influxdb
   repository: https://charts.bitnami.com/bitnami
-  version: 6.4.0
-digest: sha256:e37fa9006e62d3e4a72b0fc111ad26efa5085fa978b515419677d2d7a4613784
-generated: "2024-11-29T20:02:49.835264693Z"
+  version: 6.4.1
+digest: sha256:d14c847760d65a434fdb61843f3dac0a00037b579a12d3b4349248834a47acfb
+generated: "2024-12-02T22:27:18.904626002Z"
