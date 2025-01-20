@@ -16,7 +16,7 @@ locals {
         "arma" = {
           name                       = "ARMA"
           priority                   = 310
-          protocol                   = "Tcp"
+          protocol                   = "*"
           source_address_prefix      = "*"
           destination_port_range     = "2302-2306"
           destination_address_prefix = "*"
