@@ -8,7 +8,7 @@ controller:
   replicas: 0
 initContainers:
   init:
-    image: busybox@sha256:2919d0172f7524b2d8df9e50066a682669e6d170ac0f6a49676d54358fe970b5
+    image: busybox@sha256:a5d0ce49aa801d475da48f8cb163c354ab95cab073cd3c138bd458fc8257fbf1
     imagePullPolicy: IfNotPresent
     command: ["/bin/sh", "-c"]
     args:
@@ -30,7 +30,7 @@ addons:
     gluetun:
       image:
         repository: ghcr.io/qdm12/gluetun
-        tag: v3.39.1@sha256:6a8058e626763cbf735ac2f78c774dbb24fec2490bd9d9f7d67e22592cb4a991
+        tag: v3.40.0@sha256:2b42bfa046757145a5155acece417b65b4443c8033fb88661a8e9dcf7fda5a00
     env:
       TZ: Europe/London
       VPN_TYPE: openvpn
@@ -49,7 +49,7 @@ addons:
       timeoutSeconds: 5
 sidecars:
   rclone:
-    image: rclone/rclone:1.68.2@sha256:74c51b8817e5431bd6d7ed27cb2a50d8ee78d77f6807b72a41ef6f898845942b
+    image: rclone/rclone:1.69.0@sha256:4680f96c8fd7fb9c130d9e2587ac726f8d098232b7f32c5e5302fd0cb3d8922d
     imagePullPolicy: IfNotPresent
     args:
     - mount
