@@ -9,3 +9,4 @@ ingress-nginx:
       annotations:
         service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
         service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz # https://github.com/Azure/AKS/issues/2903
+    allowSnippetAnnotations: true
