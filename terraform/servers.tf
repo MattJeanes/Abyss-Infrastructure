@@ -344,7 +344,7 @@ resource "azurerm_windows_virtual_machine" "servers" {
   }
 }
 
-resource "cloudflare_record" "servers" {
+resource "cloudflare_dns_record" "servers" {
   for_each = local.servers
 
   lifecycle {
@@ -361,24 +361,24 @@ resource "cloudflare_record" "servers" {
   proxied = false
 }
 
-resource "cloudflare_record" "servers_cname" {
+resource "cloudflare_dns_record" "servers_cname" {
   for_each = { for key, val in local.servers : key => val if val.dns_name != null }
 
   zone_id = var.cloudflare_zone_id
   name    = each.value.dns_name
   type    = "CNAME"
-  content = cloudflare_record.servers[each.key].hostname
+  content = "${cloudflare_dns_record.servers[each.key].name}.${data.cloudflare_zone.main.name}"
   ttl     = 1
   proxied = false
 }
 
-resource "cloudflare_record" "servers_rcon" {
+resource "cloudflare_dns_record" "servers_rcon" {
   for_each = { for key, val in local.servers : key => val if val.dns_name != null && val.rcon }
 
   zone_id = var.cloudflare_zone_id
   name    = "rcon.${each.value.dns_name}"
   type    = "CNAME"
-  content = cloudflare_record.servers[each.key].hostname
+  content = "${cloudflare_dns_record.servers[each.key].name}.${data.cloudflare_zone.main.name}"
   ttl     = 1
   proxied = false
 }
