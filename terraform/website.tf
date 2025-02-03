@@ -1,7 +1,7 @@
 resource "azurerm_storage_share" "abyss_cdn" {
-  name                 = "cdn"
-  storage_account_name = azurerm_storage_account.abyss.name
-  quota                = 10
+  name               = "cdn"
+  storage_account_id = azurerm_storage_account.abyss.id
+  quota              = 10
 
   lifecycle {
     prevent_destroy = true

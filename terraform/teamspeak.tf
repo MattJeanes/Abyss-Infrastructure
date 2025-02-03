@@ -1,7 +1,7 @@
 resource "azurerm_storage_share" "abyss_teamspeak" {
-  name                 = "teamspeak"
-  storage_account_name = azurerm_storage_account.abyss.name
-  quota                = 20
+  name               = "teamspeak"
+  storage_account_id = azurerm_storage_account.abyss.id
+  quota              = 20
 
   lifecycle {
     prevent_destroy = true
@@ -17,9 +17,9 @@ resource "azurerm_backup_protected_file_share" "abyss_teamspeak" {
 }
 
 resource "azurerm_storage_share" "abyss_teamspeak_alt" {
-  name                 = "teamspeak-alt"
-  storage_account_name = azurerm_storage_account.abyss.name
-  quota                = 20
+  name               = "teamspeak-alt"
+  storage_account_id = azurerm_storage_account.abyss.id
+  quota              = 20
 
   lifecycle {
     prevent_destroy = true
@@ -27,9 +27,9 @@ resource "azurerm_storage_share" "abyss_teamspeak_alt" {
 }
 
 resource "azurerm_storage_share" "abyss_sinusbot" {
-  name                 = "sinusbot"
-  storage_account_name = azurerm_storage_account.abyss.name
-  quota                = 10
+  name               = "sinusbot"
+  storage_account_id = azurerm_storage_account.abyss.id
+  quota              = 10
 
   lifecycle {
     prevent_destroy = true
