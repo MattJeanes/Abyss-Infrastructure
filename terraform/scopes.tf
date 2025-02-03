@@ -4,7 +4,7 @@ resource "azurerm_role_definition" "diskaccess" {
   description = "Allows access to disks"
 
   permissions {
-    actions     = ["Microsoft.Compute/disks/read"]
+    actions     = ["Microsoft.Compute/disks/read", "Microsoft.Compute/disks/write"]
     not_actions = []
   }
 
