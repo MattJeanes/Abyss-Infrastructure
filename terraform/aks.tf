@@ -42,6 +42,16 @@ resource "azurerm_kubernetes_cluster" "abyss" {
     dns_service_ip    = "10.250.0.10"
     service_cidr      = "10.250.0.0/16"
   }
+
+  maintenance_window_auto_upgrade {
+    day_of_week = "Monday"
+    frequency   = "Weekly"
+    interval    = 1
+    duration    = 4
+    start_date  = "2025-02-11T00:00:00Z"
+    start_time  = "10:00"
+    utc_offset  = "+00:00"
+  }
 }
 
 resource "azurerm_role_assignment" "aks_abyss_networkcontributor" {
