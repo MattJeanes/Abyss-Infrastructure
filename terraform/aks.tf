@@ -52,6 +52,16 @@ resource "azurerm_kubernetes_cluster" "abyss" {
     start_time  = "10:00"
     utc_offset  = "+00:00"
   }
+
+  maintenance_window_node_os {
+    day_of_week  = "Tuesday"
+    frequency    = "Weekly"
+    interval     = 1
+    duration     = 4
+    start_date   = "2025-03-18T00:00:00Z"
+    start_time   = "10:00"
+    utc_offset   = "+00:00"
+  }
 }
 
 resource "azurerm_role_assignment" "aks_abyss_networkcontributor" {
