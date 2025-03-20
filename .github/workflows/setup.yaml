@@ -2,6 +2,11 @@ name: Setup
 
 on:
   workflow_dispatch:
+    inputs:
+      insecureKubeContext:
+        description: "Use insecure Kubernetes context"
+        type: boolean
+        default: false
 
 jobs:
   setup:
@@ -76,7 +81,7 @@ jobs:
         uses: azure/k8s-set-context@v4
         with:
           method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }}
+          kubeconfig: "${{ inputs.insecureKubeContext && secrets.KUBECONFIG_INSECURE || secrets.KUBECONFIG }}"
 
       - name: Set common variables
         run: |
