@@ -1,21 +1,22 @@
 locals {
   dns_records = [
-    "hello-world",
+    "@",
     "abyss",
-    "gpt",
     "alertmanager",
-    "grafana",
-    "prometheus",
+    "api.kubernetes",
     "auth",
-    "ts",
-    "musicbot",
-    "torrent",
-    "teslamate",
-    "influxdb",
-    "youtubedl",
-    "send",
     "cdn",
-    "@"
+    "gpt",
+    "grafana",
+    "hello-world",
+    "influxdb",
+    "musicbot",
+    "prometheus",
+    "send",
+    "teslamate",
+    "torrent",
+    "ts",
+    "youtubedl"
   ]
   proxied_records = {
     "hello-world" = true,
@@ -25,6 +26,7 @@ locals {
   }
   migrated_records = {
     "hello-world" = true
+    "api.kubernetes" = true
   }
 }
 
@@ -34,7 +36,7 @@ data "cloudflare_dns_record" "home" {
     name = {
       exact = "home.${data.cloudflare_zone.main.name}"
     }
-    type = "A"
+    type  = "A"
     match = "all"
   }
 }
@@ -51,5 +53,5 @@ resource "cloudflare_dns_record" "dns" {
 }
 
 data "cloudflare_zone" "main" {
-    zone_id = var.cloudflare_zone_id
+  zone_id = var.cloudflare_zone_id
 }

@@ -184,6 +184,20 @@ jobs:
             --namespace default
         working-directory: kubernetes/charts/migration
 
+      - name: Install kube-ingress
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            kube-ingress . \
+            --namespace default
+        working-directory: kubernetes/charts/kube-ingress
+
+      # MIGRATION IN PROGRESS - FAIL FOR NOW
+
+      - name: TEMPORARY FAIL ACTION
+        run: |
+          echo "This is a temporary fail action to prevent the workflow from continuing."
+          exit 1
+
       - name: Install oauth2-proxy
         run: |
           helm dependency update .
