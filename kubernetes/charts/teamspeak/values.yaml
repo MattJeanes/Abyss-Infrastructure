@@ -12,8 +12,6 @@ env:
 service:
   main:
     type: LoadBalancer
-    annotations:
-      service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
     externalTrafficPolicy: Local
     ports:
       http:

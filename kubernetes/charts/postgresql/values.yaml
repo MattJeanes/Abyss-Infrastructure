@@ -18,7 +18,5 @@ postgresql:
       existingClaim: postgresql
     service:
       type: LoadBalancer
-      annotations:
-        service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
   auth:
     database: postgres

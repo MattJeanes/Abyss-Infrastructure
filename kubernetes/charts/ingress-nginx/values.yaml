@@ -6,9 +6,6 @@ ingress-nginx:
         memory: 150Mi
     service:
       externalTrafficPolicy: Local
-      annotations:
-        service.beta.kubernetes.io/azure-load-balancer-resource-group: abyss
-        service.beta.kubernetes.io/azure-load-balancer-health-probe-request-path: /healthz # https://github.com/Azure/AKS/issues/2903
     config:
       annotations-risk-level: Critical
     allowSnippetAnnotations: true

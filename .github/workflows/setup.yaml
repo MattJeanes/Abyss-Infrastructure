@@ -143,8 +143,7 @@ jobs:
             ingress-nginx . \
             --namespace ingress-nginx \
             --create-namespace \
-            -f values.yaml \
-            --set ingress-nginx.controller.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}"
+            -f values.yaml
         working-directory: kubernetes/charts/ingress-nginx
 
       - name: Install cert-manager
@@ -311,7 +310,6 @@ jobs:
             teamspeak . \
             --namespace default \
             -f values.yaml \
-            --set service.main.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
             --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
         working-directory: kubernetes/charts/teamspeak
 
@@ -348,7 +346,6 @@ jobs:
             --namespace default \
             -f values.yaml \
             -f values.alt.yaml \
-            --set service.main.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}" \
             --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
         working-directory: kubernetes/charts/teamspeak
 
@@ -398,8 +395,7 @@ jobs:
             postgresql . \
             --namespace default \
             -f values.yaml \
-            --set postgresql.auth.postgresPassword="${{ secrets.POSTGRESQL_POSTGRES_PASSWORD }}" \
-            --set postgresql.primary.service.annotations.service\\.beta\\.kubernetes\\.io/azure-load-balancer-ipv4="${{ env.public_ip_address }}"
+            --set postgresql.auth.postgresPassword="${{ secrets.POSTGRESQL_POSTGRES_PASSWORD }}"
         working-directory: kubernetes/charts/postgresql
 
       - name: Install teslamate
