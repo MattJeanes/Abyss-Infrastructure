@@ -26,13 +26,11 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-      - name: HashiCorp - Setup Terraform
-        uses: hashicorp/setup-terraform@b9cd54a3c349d3f38e8881555d616ced269862dd # v3.1.2
-        with:
-          terraform_wrapper: false
+      - name: Setup OpenTofu 
+        uses: opentofu/setup-opentofu@v1
 
       - name: Terraform Init
-        run: terraform init -backend-config="storage_account_name=abyssterraform" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate" -backend-config="access_key=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}" -upgrade
+        run: tofu init -backend-config="storage_account_name=abyssterraform" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate" -backend-config="access_key=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}" -upgrade
         working-directory: terraform
 
       - name: Set Terraform variables
@@ -48,7 +46,7 @@ jobs:
         working-directory: terraform
 
       - name: Terraform Plan
-        run: terraform plan -out tfplan
+        run: tofu plan -out tfplan
         working-directory: terraform
         env:
           ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
@@ -57,7 +55,7 @@ jobs:
           ARM_SUBSCRIPTION_ID: ${{ vars.ARM_SUBSCRIPTION_ID }}
 
       - name: Terraform Validate and Apply
-        run: terraform apply tfplan
+        run: tofu apply tfplan
         working-directory: terraform
         env:
           ARM_CLIENT_ID: ${{ vars.ARM_CLIENT_ID }}
