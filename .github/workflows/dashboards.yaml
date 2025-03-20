@@ -21,11 +21,10 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Login to Kubernetes
-        uses: Azure/aks-set-context@feeca6405be94202afcb1c395616ff29b1811b9f # v4
+      - uses: azure/k8s-set-context@v4
         with:
-          resource-group: abyss
-          cluster-name: abyss
+          method: kubeconfig
+          kubeconfig: ${{ secrets.KUBECONFIG }}
 
       - name: Prepare teslamate grafana dashboards
         run: |
