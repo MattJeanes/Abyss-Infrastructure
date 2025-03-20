@@ -177,6 +177,13 @@ jobs:
         shell: pwsh
         working-directory: scripts
 
+      - name: Install migration
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            migration . \
+            --namespace default
+        working-directory: kubernetes/charts/migration
+
       - name: Install oauth2-proxy
         run: |
           helm dependency update .

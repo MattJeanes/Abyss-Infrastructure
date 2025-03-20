@@ -1,0 +1,73 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homeassistant-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homeassistant-proxy
+  template:
+    metadata:
+      labels:
+        app: homeassistant-proxy
+    spec:
+      containers:
+      - name: caddy
+        image: caddy:latest
+        volumeMounts:
+        - name: caddy-config
+          mountPath: /etc/caddy/Caddyfile
+          subPath: Caddyfile
+      volumes:
+      - name: caddy-config
+        configMap:
+          name: homeassistant-proxy-config
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: homeassistant-proxy-config
+data:
+  Caddyfile: |
+    :80 {
+      reverse_proxy 192.168.68.93:8123 {
+        trusted_proxies private_ranges
+      }
+    }
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: homeassistant-proxy
+spec:
+  selector:
+    app: homeassistant-proxy
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 80
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: homeassistant-migration
+  annotations:
+    cert-manager.io/cluster-issuer: letsencrypt-prod
+spec:
+  ingressClassName: nginx
+  tls:
+    - hosts:
+        - homeassistant.mattjeanes.com
+      secretName: homeassistant-tls
+  rules:
+  - host: homeassistant.mattjeanes.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: homeassistant-proxy
+            port:
+              number: 80
