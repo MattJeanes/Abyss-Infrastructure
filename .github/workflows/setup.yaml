@@ -12,7 +12,7 @@ jobs:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
       - name: Setup OpenTofu 
-        uses: opentofu/setup-opentofu@v1
+        uses: opentofu/setup-opentofu@592200bd4b9bbf4772ace78f887668b1aee8f716 # v1
 
 
       - name: Terraform Init
@@ -73,7 +73,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Login to Kubernetes
-        uses: azure/k8s-set-context@v4
+        uses: azure/k8s-set-context@212a19233d93f03eceaac31ae5a1d1acf650b6ef # v4
         with:
           method: kubeconfig
           kubeconfig: ${{ secrets.KUBECONFIG }}
