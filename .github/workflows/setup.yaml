@@ -80,7 +80,7 @@ jobs:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
       - name: Setup cloudflared
-        uses: AnimMouse/setup-cloudflared@v2
+        uses: AnimMouse/setup-cloudflared@b80ad7aa7850e1ec9960d75831f32ac9855df988 # v2
 
       - name: Create Cloudflared proxy
         run: |
