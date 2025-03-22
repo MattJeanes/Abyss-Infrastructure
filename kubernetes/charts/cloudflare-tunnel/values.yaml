@@ -1,2 +1,5 @@
 cloudflare-tunnel:
   replicaCount: 1
+  image:
+    repository: cloudflare/cloudflared
+    tag: 2025.2.1

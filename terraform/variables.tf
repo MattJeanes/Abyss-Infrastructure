@@ -6,11 +6,19 @@ variable "cloudflare_api_token" {
   sensitive = true
 }
 
+variable "cloudflare_account_id" {
+  sensitive = true
+}
+
 variable "cloudflare_zone_id" {
   sensitive = true
 }
 
 variable "home_ip" {
+  sensitive = true
+}
+
+variable "email" {
   sensitive = true
 }
 
