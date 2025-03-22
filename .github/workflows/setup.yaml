@@ -77,6 +77,39 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
+      - name: Setup cloudflared
+        uses: AnimMouse/setup-cloudflared@v2
+
+      - name: Create Cloudflared proxy
+        run: |
+          LOG_FILE="/tmp/cloudflared.log"
+          echo "Starting cloudflared proxy in background, logging to $LOG_FILE"
+          
+          cloudflared access tcp > "$LOG_FILE" 2>&1 &
+          
+          CLOUDFLARED_PID=$!
+          echo "Cloudflared started with PID: $CLOUDFLARED_PID"
+          echo "CLOUDFLARED_PID=$CLOUDFLARED_PID" >> $GITHUB_ENV
+          echo "CLOUDFLARED_LOG=$LOG_FILE" >> $GITHUB_ENV
+          
+          sleep 5
+          
+          if ps -p $CLOUDFLARED_PID > /dev/null; then
+            echo "Cloudflared is running successfully"
+            # Show initial log content
+            echo "Initial log output:"
+            cat "$LOG_FILE"
+          else
+            echo "Cloudflared failed to start. Log output:"
+            cat "$LOG_FILE"
+            exit 1
+          fi
+        env:
+          TUNNEL_SERVICE_HOSTNAME: kubernetes-api.${{ vars.HOST }}
+          TUNNEL_SERVICE_URL: 127.0.0.1:6443
+          TUNNEL_SERVICE_TOKEN_ID: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
       - name: Login to Kubernetes
         uses: azure/k8s-set-context@212a19233d93f03eceaac31ae5a1d1acf650b6ef # v4
         with:
@@ -115,6 +148,18 @@ jobs:
         run: |
           kubectl apply -f manifests
         working-directory: kubernetes
+
+      - name: Install cloudflare-tunnel
+        run: |
+          helm dependency update . 
+          helm upgrade --install --wait --atomic --debug \
+            cloudflare-tunnel . \
+            --namespace default \
+            --set cloudflare-tunnel.cloudflare.account="${{ vars.CLOUDFLARE_ACCOUNT_ID }}" \
+            --set cloudflare-tunnel.cloudflare.tunnelId="${{ vars.CLOUDFLARE_TUNNEL_ID }}" \
+            --set cloudflare-tunnel.cloudflare.tunnelName="${{ vars.CLOUDFLARE_TUNNEL_NAME }}" \
+            --set cloudflare-tunnel.cloudflare.secret="${{ secrets.CLOUDFLARE_TUNNEL_SECRET }}"
+        working-directory: kubernetes/charts/cloudflare-tunnel
 
       - name: Install storage-account-secret
         run: |
@@ -547,3 +592,21 @@ jobs:
             --set ingress.main.tls[0].hosts[0]="${{ env.qbittorrent_host }}" \
             --set addons.vpn.env.OPENVPN_USER="${{ secrets.MULLVAD_ACCOUNT_NUMBER }}"
         working-directory: kubernetes/charts/qbittorrent
+
+      - name: Cleanup Cloudflared proxy
+        if: always()
+        run: |
+          if [ -n "$CLOUDFLARED_PID" ]; then
+            echo "Terminating cloudflared process (PID: $CLOUDFLARED_PID)"
+            kill $CLOUDFLARED_PID 2>/dev/null || true
+            sleep 2
+            kill -9 $CLOUDFLARED_PID 2>/dev/null || true
+            echo "Process termination attempted"
+          fi
+          
+          if [ -n "$CLOUDFLARED_LOG" ] && [ -f "$CLOUDFLARED_LOG" ]; then
+            echo "== Cloudflared Log Output =="
+            cat "$CLOUDFLARED_LOG"
+          else
+            echo "No cloudflared log file found"
+          fi

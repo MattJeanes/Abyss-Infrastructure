@@ -1,0 +1,6 @@
+dependencies:
+- name: cloudflare-tunnel
+  repository: https://cloudflare.github.io/helm-charts
+  version: 0.3.2
+digest: sha256:6c087409e1f07f605a7d3be665077b9e7637ade70a024ceb513ff49f4fc07d10
+generated: "2025-03-22T03:55:24.100873Z"
