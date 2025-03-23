@@ -19,7 +19,7 @@ resource "cloudflare_zero_trust_access_policy" "allowed_users" {
 }
 locals {
   zero_trust_applications = {
-    "hello-world" = {
+    "hello-world-zero-trust" = {
       name    = "Hello World"
       service = "http://hello-world",
       secure  = false

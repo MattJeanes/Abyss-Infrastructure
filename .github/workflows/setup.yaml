@@ -122,6 +122,7 @@ jobs:
       - name: Set common variables
         run: |
           $variables = @{
+            hello_world_direct_host = "hello-world-direct.${{ vars.HOST }}"
             alertmanager_host = "alertmanager.${{ vars.HOST }}"
             grafana_host = "grafana.${{ vars.HOST }}"
             prometheus_host = "prometheus.${{ vars.HOST }}"
@@ -232,7 +233,8 @@ jobs:
         run: |
           helm upgrade --install --wait --atomic --debug \
             hello-world . \
-            --namespace default
+            --namespace default \
+            --set host="${{ env.hello_world_direct_host }}"
         working-directory: kubernetes/charts/hello-world
 
       - name: Wait for hello world certificate to be ready

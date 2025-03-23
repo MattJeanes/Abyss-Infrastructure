@@ -5,6 +5,7 @@ locals {
     "auth",
     "cdn",
     "gpt",
+    "hello-world-direct",
     "influxdb",
     "send",
     "teslamate",
@@ -17,6 +18,7 @@ locals {
     "@"   = true,
   }
   migrated_records = {
+    "hello-world-direct" = true,
     "ts" = true,
   }
 }
