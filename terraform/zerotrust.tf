@@ -29,6 +29,12 @@ locals {
       service = "tcp://kubernetes:443"
       secure  = true
     }
+    "kubernetes-dashboard" = {
+      name          = "Kubernetes Dashboard"
+      service       = "https://kubernetes-dashboard.kube-system"
+      secure        = true
+      no_tls_verify = true
+    }
     "prometheus" = {
       name    = "Prometheus"
       service = "http://kube-prometheus-stack-prometheus.monitoring:9090"
@@ -104,13 +110,14 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "ryzen7_5800u_01" {
         for app_name, app_config in local.zero_trust_applications : {
           hostname = "${app_name}.${data.cloudflare_zone.main.name}"
           service  = app_config.service
-          origin_request = app_config.secure ? {
-            access = {
+          origin_request = {
+            access = app_config.secure ? {
               required  = true
               aud_tag   = [cloudflare_zero_trust_access_application.applications[app_name].aud]
               team_name = "abyss23"
-            }
-          } : null
+            } : null
+            no_tls_verify = lookup(app_config, "no_tls_verify", false) ? true : null
+          }
         }
       ],
       [
