@@ -176,14 +176,6 @@ jobs:
             --set azure.aadClientSecret="${{ secrets.AZURE_CLOUD_PROVIDER_CLIENT_SECRET }}"
         working-directory: kubernetes/charts/azure-cloud-provider
 
-      - name: Install azuredisk-csi-driver
-        run: |
-          helm dependency update . 
-          helm upgrade --install --wait --atomic --debug \
-            azuredisk-csi-driver . \
-            --namespace kube-system
-        working-directory: kubernetes/charts/azuredisk-csi-driver
-
       - name: Install azurefile-csi-driver
         run: |
           helm dependency update . 
