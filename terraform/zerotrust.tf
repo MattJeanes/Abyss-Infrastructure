@@ -44,6 +44,11 @@ locals {
       service = "http://kube-prometheus-stack-grafana.monitoring"
       secure  = false
     }
+    "musicbot" = {
+      name    = "Music Bot"
+      service = "http://sinusbot"
+      secure  = false
+    }
     # "teslamate" = {
     #   name    = "TeslaMate"
     #   service = "http://teslamate"

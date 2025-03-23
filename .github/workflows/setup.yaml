@@ -326,13 +326,6 @@ jobs:
         shell: pwsh
         working-directory: scripts
 
-      # MIGRATION IN PROGRESS - FAIL FOR NOW
-
-      - name: TEMPORARY FAIL ACTION
-        run: |
-          echo "This is a temporary fail action to prevent the workflow from continuing."
-          exit 1
-
       - name: Install persistent volume for teamspeak
         run: |
           helm upgrade --install --wait --atomic --debug \
@@ -418,6 +411,13 @@ jobs:
         run: ./WaitKubeCertificate.ps1 -Name "sinusbot-tls"
         shell: pwsh
         working-directory: scripts
+
+      # MIGRATION IN PROGRESS - FAIL FOR NOW
+
+      - name: TEMPORARY FAIL ACTION
+        run: |
+          echo "This is a temporary fail action to prevent the workflow from continuing."
+          exit 1
 
       - name: Install persistent volume for postgresql
         run: |
