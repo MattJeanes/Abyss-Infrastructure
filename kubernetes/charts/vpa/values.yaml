@@ -6,8 +6,5 @@ vpa:
   updater:
     extraArgs:
       min-replicas: "1"
-    resources:
-      limits:
-        cpu: null
   admissionController:
     enabled: true

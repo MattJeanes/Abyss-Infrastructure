@@ -26,7 +26,10 @@ locals {
   }
   migrated_records = {
     "hello-world" = true
-    "api.kubernetes" = true
+    "api.kubernetes" = true,
+    "alertmanager" = true,
+    "grafana" = true,
+    "prometheus" = true,
   }
 }
 

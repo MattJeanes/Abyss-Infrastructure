@@ -1,0 +1,8 @@
+apiVersion: v2
+name: azurefile-csi-driver
+type: application
+version: 1.0.0
+dependencies:
+- name: azurefile-csi-driver
+  repository: https://raw.githubusercontent.com/kubernetes-sigs/azurefile-csi-driver/master/charts
+  version: v1.32.0

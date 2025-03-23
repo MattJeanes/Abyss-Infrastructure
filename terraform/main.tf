@@ -27,3 +27,7 @@ provider "cloudflare" {
 
 data "azurerm_client_config" "current" {}
 data "azurerm_subscription" "current" {}
+
+data "azurerm_subscription" "new" {
+  subscription_id = var.azure_subscription_id_new
+}

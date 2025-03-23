@@ -35,6 +35,7 @@ jobs:
           email = "${{ vars.EMAIL }}"
           windows_server_password = "${{ secrets.WINDOWS_SERVER_PASSWORD }}"
           azure_subscription_id = "${{ vars.AZURE_SUBSCRIPTION_ID }}"
+          azure_subscription_id_new = "${{ vars.AZURE_CLOUD_PROVIDER_SUBSCRIPTION_ID }}"
           EOF
         working-directory: terraform
 
@@ -163,6 +164,34 @@ jobs:
             --set cloudflare-tunnel.cloudflare.secret="${{ secrets.CLOUDFLARE_TUNNEL_SECRET }}"
         working-directory: kubernetes/charts/cloudflare-tunnel
 
+      - name: Install azure-cloud-provider
+        run: |
+          helm dependency update . 
+          helm upgrade --install --wait --atomic --debug \
+            azure-cloud-provider . \
+            --namespace kube-system \
+            --set azure.tenantId="${{ vars.AZURE_CLOUD_PROVIDER_TENANT_ID }}" \
+            --set azure.subscriptionId="${{ vars.AZURE_CLOUD_PROVIDER_SUBSCRIPTION_ID }}" \
+            --set azure.aadClientId="${{ vars.AZURE_CLOUD_PROVIDER_CLIENT_ID }}" \
+            --set azure.aadClientSecret="${{ secrets.AZURE_CLOUD_PROVIDER_CLIENT_SECRET }}" \
+        working-directory: kubernetes/charts/azure-cloud-provider
+
+      - name: Install azuredisk-csi-driver
+        run: |
+          helm dependency update . 
+          helm upgrade --install --wait --atomic --debug \
+            azuredisk-csi-driver . \
+            --namespace kube-system
+        working-directory: kubernetes/charts/azuredisk-csi-driver
+
+      - name: Install azurefile-csi-driver
+        run: |
+          helm dependency update . 
+          helm upgrade --install --wait --atomic --debug \
+            azurefile-csi-driver . \
+            --namespace kube-system
+        working-directory: kubernetes/charts/azurefile-csi-driver
+
       - name: Install storage-account-secret
         run: |
           helm upgrade --install --wait --atomic --debug \
@@ -238,35 +267,28 @@ jobs:
             --namespace default
         working-directory: kubernetes/charts/kube-ingress
 
-      # MIGRATION IN PROGRESS - FAIL FOR NOW
+      # - name: Install oauth2-proxy
+      #   run: |
+      #     helm dependency update .
+      #     helm upgrade --install --wait --atomic --debug \
+      #       oauth2-proxy . \
+      #       --namespace oauth2-proxy \
+      #       --create-namespace \
+      #       -f values.yaml \
+      #       --set oauth2-proxy.config.clientID="${{ vars.OAUTH2_CLIENT_ID }}" \
+      #       --set oauth2-proxy.config.clientSecret="${{ secrets.OAUTH2_CLIENT_SECRET }}" \
+      #       --set oauth2-proxy.config.cookieSecret="${{ secrets.OAUTH2_COOKIE_SECRET }}" \
+      #       --set oauth2-proxy.authenticatedEmailsFile.restricted_access="${{ vars.EMAIL }}" \
+      #       --set oauth2-proxy.ingress.hosts[0]="${{ env.auth_host }}" \
+      #       --set oauth2-proxy.ingress.tls[0].hosts[0]="${{ env.auth_host }}" \
+      #       --set oauth2-proxy.extraArgs.whitelist-domain=".${{ vars.HOST }}" \
+      #       --set oauth2-proxy.extraArgs.cookie-domain=".${{ vars.HOST }}"
+      #   working-directory: kubernetes/charts/oauth2-proxy
 
-      - name: TEMPORARY FAIL ACTION
-        run: |
-          echo "This is a temporary fail action to prevent the workflow from continuing."
-          exit 1
-
-      - name: Install oauth2-proxy
-        run: |
-          helm dependency update .
-          helm upgrade --install --wait --atomic --debug \
-            oauth2-proxy . \
-            --namespace oauth2-proxy \
-            --create-namespace \
-            -f values.yaml \
-            --set oauth2-proxy.config.clientID="${{ vars.OAUTH2_CLIENT_ID }}" \
-            --set oauth2-proxy.config.clientSecret="${{ secrets.OAUTH2_CLIENT_SECRET }}" \
-            --set oauth2-proxy.config.cookieSecret="${{ secrets.OAUTH2_COOKIE_SECRET }}" \
-            --set oauth2-proxy.authenticatedEmailsFile.restricted_access="${{ vars.EMAIL }}" \
-            --set oauth2-proxy.ingress.hosts[0]="${{ env.auth_host }}" \
-            --set oauth2-proxy.ingress.tls[0].hosts[0]="${{ env.auth_host }}" \
-            --set oauth2-proxy.extraArgs.whitelist-domain=".${{ vars.HOST }}" \
-            --set oauth2-proxy.extraArgs.cookie-domain=".${{ vars.HOST }}"
-        working-directory: kubernetes/charts/oauth2-proxy
-
-      - name: Wait for oauth2-proxy certificate to be ready
-        run: ./WaitKubeCertificate.ps1 -Name "oauth2-proxy-tls" -Namespace "oauth2-proxy"
-        shell: pwsh
-        working-directory: scripts
+      # - name: Wait for oauth2-proxy certificate to be ready
+      #   run: ./WaitKubeCertificate.ps1 -Name "oauth2-proxy-tls" -Namespace "oauth2-proxy"
+      #   shell: pwsh
+      #   working-directory: scripts
 
       - name: Install vpa
         run: |
@@ -311,7 +333,8 @@ jobs:
             --set name=grafana \
             --set disk.capacity=1Gi \
             --set useFileShare=true \
-            --set fileShare.name=grafana
+            --set fileShare.name=grafana \
+            --set fileShare.subscriptionId=${{ vars.AZURE_CLOUD_PROVIDER_SUBSCRIPTION_ID }} \
         working-directory: kubernetes/charts/azure-persistentvolume
 
       - name: Install prometheus
@@ -359,6 +382,13 @@ jobs:
           ./TestAuthRedirect.ps1 -Url "https://${{ env.alertmanager_host }}"
         shell: pwsh
         working-directory: scripts
+
+      # MIGRATION IN PROGRESS - FAIL FOR NOW
+
+      - name: TEMPORARY FAIL ACTION
+        run: |
+          echo "This is a temporary fail action to prevent the workflow from continuing."
+          exit 1
 
       - name: Install persistent volume for teamspeak
         run: |

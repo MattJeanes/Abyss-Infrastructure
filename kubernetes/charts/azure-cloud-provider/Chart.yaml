@@ -1,0 +1,4 @@
+apiVersion: v2
+name: azure-cloud-provider
+type: application
+version: 1.0.0

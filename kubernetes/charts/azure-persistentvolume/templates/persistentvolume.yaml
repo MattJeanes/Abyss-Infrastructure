@@ -22,6 +22,7 @@ spec:
     {{- if .Values.useFileShare }}
     driver: file.csi.azure.com
     volumeAttributes:
+      subscriptionID: {{ required "fileShare.subscriptionId is required" .Values.fileShare.subscriptionId }}
       resourceGroup: abyss
       shareName: {{ required "fileShare.name is required" .Values.fileShare.name }}
     volumeHandle: {{ .Values.name }}-{{ .Values.fileShare.name }}

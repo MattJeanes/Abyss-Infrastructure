@@ -40,6 +40,9 @@ resource "cloudflare_zero_trust_access_application" "kubernetes_api" {
   #     }
   #   ]
 
+  # This doesn't exist in the current Cloudflare provider, added manually for now
+  # instant_auth = true
+
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "ryzen7_5800u_01" {
