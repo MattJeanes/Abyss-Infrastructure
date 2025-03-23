@@ -173,7 +173,7 @@ jobs:
             --set azure.tenantId="${{ vars.AZURE_CLOUD_PROVIDER_TENANT_ID }}" \
             --set azure.subscriptionId="${{ vars.AZURE_CLOUD_PROVIDER_SUBSCRIPTION_ID }}" \
             --set azure.aadClientId="${{ vars.AZURE_CLOUD_PROVIDER_CLIENT_ID }}" \
-            --set azure.aadClientSecret="${{ secrets.AZURE_CLOUD_PROVIDER_CLIENT_SECRET }}" \
+            --set azure.aadClientSecret="${{ secrets.AZURE_CLOUD_PROVIDER_CLIENT_SECRET }}"
         working-directory: kubernetes/charts/azure-cloud-provider
 
       - name: Install azuredisk-csi-driver
@@ -300,29 +300,29 @@ jobs:
             -f values.yaml
         working-directory: kubernetes/charts/vpa
 
-      - name: Install persistent volume for prometheus
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            prometheus-persistentvolume . \
-            --namespace monitoring \
-            --create-namespace \
-            --set name=prometheus \
-            --set disk.capacity=8Gi \
-            --set disk.id="${{ env.prometheus_disk_id }}" \
-            --set persistentVolumeClaim.enabled=false
-        working-directory: kubernetes/charts/azure-persistentvolume
+      # - name: Install persistent volume for prometheus
+      #   run: |
+      #     helm upgrade --install --wait --atomic --debug \
+      #       prometheus-persistentvolume . \
+      #       --namespace monitoring \
+      #       --create-namespace \
+      #       --set name=prometheus \
+      #       --set disk.capacity=8Gi \
+      #       --set disk.id="${{ env.prometheus_disk_id }}" \
+      #       --set persistentVolumeClaim.enabled=false
+      #   working-directory: kubernetes/charts/azure-persistentvolume
 
-      - name: Install persistent volume for alertmanager
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            alertmanager-persistentvolume . \
-            --namespace monitoring \
-            --create-namespace \
-            --set name=alertmanager \
-            --set disk.capacity=4Gi \
-            --set disk.id="${{ env.alertmanager_disk_id }}" \
-            --set persistentVolumeClaim.enabled=false
-        working-directory: kubernetes/charts/azure-persistentvolume
+      # - name: Install persistent volume for alertmanager
+      #   run: |
+      #     helm upgrade --install --wait --atomic --debug \
+      #       alertmanager-persistentvolume . \
+      #       --namespace monitoring \
+      #       --create-namespace \
+      #       --set name=alertmanager \
+      #       --set disk.capacity=4Gi \
+      #       --set disk.id="${{ env.alertmanager_disk_id }}" \
+      #       --set persistentVolumeClaim.enabled=false
+      #   working-directory: kubernetes/charts/azure-persistentvolume
 
       - name: Install persistent volume for grafana
         run: |

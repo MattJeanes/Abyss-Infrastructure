@@ -1,5 +1,0 @@
-azuredisk-csi-driver:
-  controller:
-    replicas: 1
-  linux:
-    kubelet: /var/snap/microk8s/common/var/lib/kubelet

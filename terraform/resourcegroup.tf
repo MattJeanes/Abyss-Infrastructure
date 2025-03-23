@@ -6,3 +6,11 @@ resource "azurerm_resource_group" "abyss" {
     prevent_destroy = true
   }
 }
+
+output "resource_group_name" {
+  value = azurerm_resource_group.abyss.name
+}
+
+output "resource_group_location" {
+  value = azurerm_resource_group.abyss.location
+}

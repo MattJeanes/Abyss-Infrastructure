@@ -12,15 +12,8 @@ kube-prometheus-stack:
   alertmanager:
     alertmanagerSpec:
       storage:
-        volumeClaimTemplate:
-          spec:
-            volumeName: alertmanager
-            resources:
-              requests:
-                storage: 4Gi
-            accessModes:
-            - ReadWriteOnce
-            storageClassName: managed-csi
+        hostPath: 
+          path: /opt/alertmanager
     ingress:
       enabled: true
       annotations:
@@ -102,15 +95,8 @@ kube-prometheus-stack:
         limits:
           memory: 800Mi
       storageSpec:
-        volumeClaimTemplate:
-          spec:
-            volumeName: prometheus
-            resources:
-              requests:
-                storage: 8Gi
-            accessModes:
-            - ReadWriteOnce
-            storageClassName: managed-csi
+        hostPath:
+          path: /opt/prometheus
       ruleSelectorNilUsesHelmValues: false
       serviceMonitorSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false
