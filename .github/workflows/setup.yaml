@@ -293,7 +293,7 @@ jobs:
             --set disk.capacity=1Gi \
             --set useFileShare=true \
             --set fileShare.name=grafana \
-            --set fileShare.subscriptionId=${{ vars.AZURE_CLOUD_PROVIDER_SUBSCRIPTION_ID }} \
+            --set fileShare.subscriptionId=${{ vars.AZURE_CLOUD_PROVIDER_SUBSCRIPTION_ID }}
         working-directory: kubernetes/charts/azure-persistentvolume
 
       - name: Install prometheus
@@ -334,7 +334,8 @@ jobs:
             --set name=teamspeak \
             --set disk.capacity=10Gi \
             --set useFileShare=true \
-            --set fileShare.name=teamspeak
+            --set fileShare.name=teamspeak \
+            --set fileShare.subscriptionId=${{ vars.AZURE_CLOUD_PROVIDER_SUBSCRIPTION_ID }}
         working-directory: kubernetes/charts/azure-persistentvolume
 
       - name: Install teamspeak
@@ -369,7 +370,8 @@ jobs:
             --set name=teamspeak-alt \
             --set disk.capacity=10Gi \
             --set useFileShare=true \
-            --set fileShare.name=teamspeak-alt
+            --set fileShare.name=teamspeak-alt \
+            --set fileShare.subscriptionId=${{ vars.AZURE_CLOUD_PROVIDER_SUBSCRIPTION_ID }}
         working-directory: kubernetes/charts/azure-persistentvolume
 
       - name: Install teamspeak-alt
