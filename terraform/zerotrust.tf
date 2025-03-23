@@ -17,15 +17,54 @@ resource "cloudflare_zero_trust_access_policy" "allowed_users" {
     }
   }]
 }
+locals {
+  zero_trust_applications = {
+    "hello-world" = {
+      name    = "Hello World"
+      service = "http://hello-world",
+      secure  = false
+    }
+    "kubernetes-api" = {
+      name    = "Kubernetes API"
+      service = "tcp://kubernetes:443"
+      secure  = true
+    }
+    "prometheus" = {
+      name    = "Prometheus"
+      service = "http://kube-prometheus-stack-prometheus.monitoring:9090"
+      secure  = true
+    }
+    "alertmanager" = {
+      name    = "Alert Manager"
+      service = "http://kube-prometheus-stack-alertmanager.monitoring:9093"
+      secure  = true
+    }
+    "grafana" = {
+      name    = "Grafana"
+      service = "http://kube-prometheus-stack-grafana.monitoring"
+      secure  = false
+    }
+    # "teslamate" = {
+    #   name    = "TeslaMate"
+    #   service = "http://teslamate"
+    #   secure  = true
+    # }
+  }
+  
+  secure_applications = {
+    for k, v in local.zero_trust_applications : k => v if v.secure
+  }
+}
 
+resource "cloudflare_zero_trust_access_application" "applications" {
+  for_each = local.secure_applications
 
-resource "cloudflare_zero_trust_access_application" "kubernetes_api" {
   account_id = var.cloudflare_account_id
-  name       = "Kubernetes API"
+  name       = each.value.name
   type       = "self_hosted"
   destinations = [{
     type = "public"
-    uri  = "kubernetes-api.${data.cloudflare_zone.main.name}"
+    uri  = "${each.key}.${data.cloudflare_zone.main.name}"
   }]
 
   # Seems to be broken in the current Cloudflare provider, added manually for now
@@ -42,7 +81,6 @@ resource "cloudflare_zero_trust_access_application" "kubernetes_api" {
 
   # This doesn't exist in the current Cloudflare provider, added manually for now
   # instant_auth = true
-
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "ryzen7_5800u_01" {
@@ -56,29 +94,35 @@ resource "cloudflare_zero_trust_tunnel_cloudflared_config" "ryzen7_5800u_01" {
   account_id = var.cloudflare_account_id
   tunnel_id  = cloudflare_zero_trust_tunnel_cloudflared.ryzen7_5800u_01.id
   config = {
-    ingress = [
-      {
-        hostname = "kubernetes-api.${data.cloudflare_zone.main.name}"
-        service  = "tcp://kubernetes:443"
-        origin_request = {
-          access = {
-            required  = true
-            aud_tag   = [cloudflare_zero_trust_access_application.kubernetes_api.aud]
-            team_name = "abyss23"
-          }
+    ingress = concat(
+      [
+        for app_name, app_config in local.zero_trust_applications : {
+          hostname = "${app_name}.${data.cloudflare_zone.main.name}"
+          service  = app_config.service
+          origin_request = app_config.secure ? {
+            access = {
+              required  = true
+              aud_tag   = [cloudflare_zero_trust_access_application.applications[app_name].aud]
+              team_name = "abyss23"
+            }
+          } : null
         }
-      },
-      {
-        service = "http_status:404"
-      }
-    ]
+      ],
+      [
+        {
+          service = "http_status:404"
+        }
+      ]
+    )
   }
 }
 
-resource "cloudflare_dns_record" "kubernetes_api" {
+resource "cloudflare_dns_record" "zero_trust_tunnel" {
+  for_each = local.zero_trust_applications
+
   depends_on = [cloudflare_zero_trust_tunnel_cloudflared.ryzen7_5800u_01]
   zone_id    = var.cloudflare_zone_id
-  name       = "kubernetes-api"
+  name       = each.key
   type       = "CNAME"
   content    = "${cloudflare_zero_trust_tunnel_cloudflared.ryzen7_5800u_01.id}.cfargotunnel.com"
   ttl        = 1

@@ -12,15 +12,14 @@ kube-prometheus-stack:
   alertmanager:
     alertmanagerSpec:
       storage:
-        hostPath: 
-          path: /opt/alertmanager
-    ingress:
-      enabled: true
-      annotations:
-        kubernetes.io/ingress.class: nginx
-        cert-manager.io/cluster-issuer: letsencrypt-prod
-      tls:
-      - secretName: alertmanager-tls
+        volumeClaimTemplate:
+          spec:
+            resources:
+              requests:
+                storage: 4Gi
+            accessModes:
+            - ReadWriteOnce
+            storageClassName: microk8s-hostpath
     config:
       route:
         receiver: pagerduty
@@ -95,19 +94,18 @@ kube-prometheus-stack:
         limits:
           memory: 800Mi
       storageSpec:
-        hostPath:
-          path: /opt/prometheus
+        volumeClaimTemplate:
+          spec:
+            resources:
+              requests:
+                storage: 8Gi
+            accessModes:
+            - ReadWriteOnce
+            storageClassName: microk8s-hostpath
       ruleSelectorNilUsesHelmValues: false
       serviceMonitorSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false
       probeSelectorNilUsesHelmValues: false
-    ingress:
-      enabled: true
-      annotations:
-        kubernetes.io/ingress.class: nginx
-        cert-manager.io/cluster-issuer: letsencrypt-prod
-      tls:
-      - secretName: prometheus-tls
   prometheusOperator:
     prometheusConfigReloader:
       resources:

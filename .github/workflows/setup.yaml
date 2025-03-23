@@ -135,9 +135,6 @@ jobs:
             send_host = "send.${{ vars.HOST }}"
             main_host = "${{ vars.HOST }}"
             cdn_host = "cdn.${{ vars.HOST }}"
-            auth_host = "auth.${{ vars.HOST }}"
-            auth_url = "http://oauth2-proxy.oauth2-proxy.svc.cluster.local/oauth2/auth"
-            auth_signin = "https://auth.${{ vars.HOST }}/oauth2/start?rd=\`$scheme://\`$host\`$request_uri"
           }
           $variables.Keys | ForEach-Object {
               $key = $_
@@ -252,36 +249,6 @@ jobs:
             --namespace default
         working-directory: kubernetes/charts/migration
 
-      - name: Install kube-ingress
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            kube-ingress . \
-            --namespace default
-        working-directory: kubernetes/charts/kube-ingress
-
-      # - name: Install oauth2-proxy
-      #   run: |
-      #     helm dependency update .
-      #     helm upgrade --install --wait --atomic --debug \
-      #       oauth2-proxy . \
-      #       --namespace oauth2-proxy \
-      #       --create-namespace \
-      #       -f values.yaml \
-      #       --set oauth2-proxy.config.clientID="${{ vars.OAUTH2_CLIENT_ID }}" \
-      #       --set oauth2-proxy.config.clientSecret="${{ secrets.OAUTH2_CLIENT_SECRET }}" \
-      #       --set oauth2-proxy.config.cookieSecret="${{ secrets.OAUTH2_COOKIE_SECRET }}" \
-      #       --set oauth2-proxy.authenticatedEmailsFile.restricted_access="${{ vars.EMAIL }}" \
-      #       --set oauth2-proxy.ingress.hosts[0]="${{ env.auth_host }}" \
-      #       --set oauth2-proxy.ingress.tls[0].hosts[0]="${{ env.auth_host }}" \
-      #       --set oauth2-proxy.extraArgs.whitelist-domain=".${{ vars.HOST }}" \
-      #       --set oauth2-proxy.extraArgs.cookie-domain=".${{ vars.HOST }}"
-      #   working-directory: kubernetes/charts/oauth2-proxy
-
-      # - name: Wait for oauth2-proxy certificate to be ready
-      #   run: ./WaitKubeCertificate.ps1 -Name "oauth2-proxy-tls" -Namespace "oauth2-proxy"
-      #   shell: pwsh
-      #   working-directory: scripts
-
       - name: Install vpa
         run: |
           helm dependency update .
@@ -337,20 +304,12 @@ jobs:
             --namespace monitoring \
             --create-namespace \
             -f values.yaml \
-            --set kube-prometheus-stack.alertmanager.ingress.hosts[0]="${{ env.alertmanager_host }}" \
-            --set kube-prometheus-stack.alertmanager.ingress.tls[0].hosts[0]="${{ env.alertmanager_host }}" \
-            --set kube-prometheus-stack.alertmanager.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
-            --set kube-prometheus-stack.alertmanager.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}" \
             --set kube-prometheus-stack.alertmanager.config.global.pagerduty_url="${{ vars.PAGERDUTY_URL }}" \
             --set kube-prometheus-stack.alertmanager.config.receivers[0].pagerduty_configs[0].routing_key="${{ secrets.PAGERDUTY_INTEGRATION_KEY }}" \
             --set kube-prometheus-stack.alertmanager.config.receivers[1].webhook_configs[0].url="${{ secrets.DEAD_MANS_SNITCH_WEBHOOK_URL }}" \
             --set kube-prometheus-stack.grafana.ingress.hosts[0]="${{ env.grafana_host }}" \
             --set kube-prometheus-stack.grafana.ingress.tls[0].hosts[0]="${{ env.grafana_host }}" \
-            --set kube-prometheus-stack.grafana.adminPassword="${{ secrets.GRAFANA_ADMIN_PASSWORD }}" \
-            --set kube-prometheus-stack.prometheus.ingress.hosts[0]="${{ env.prometheus_host }}" \
-            --set kube-prometheus-stack.prometheus.ingress.tls[0].hosts[0]="${{ env.prometheus_host }}" \
-            --set kube-prometheus-stack.prometheus.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
-            --set kube-prometheus-stack.prometheus.ingress.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}"
+            --set kube-prometheus-stack.grafana.adminPassword="${{ secrets.GRAFANA_ADMIN_PASSWORD }}"
         working-directory: kubernetes/charts/kube-prometheus-stack
 
       - name: Install prometheus-vpa
@@ -359,14 +318,6 @@ jobs:
             prometheus-vpa . \
             --namespace monitoring
         working-directory: kubernetes/charts/prometheus-vpa
-
-      - name: Wait for kube-prometheus-stack certificates to be ready
-        run: |
-          ./WaitKubeCertificate.ps1 -Name "prometheus-tls" -Namespace "monitoring"
-          ./WaitKubeCertificate.ps1 -Name "alertmanager-tls" -Namespace "monitoring"
-          ./WaitKubeCertificate.ps1 -Name "grafana-tls" -Namespace "monitoring"
-        shell: pwsh
-        working-directory: scripts
 
       - name: Test auth redirect for kube-prometheus-stack
         run: |
@@ -497,8 +448,6 @@ jobs:
             -f values.yaml \
             --set ingress.main.hosts[0].host="${{ env.teslamate_host }}" \
             --set ingress.main.tls[0].hosts[0]="${{ env.teslamate_host }}" \
-            --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-url="${{ env.auth_url }}" \
-            --set ingress.main.annotations.nginx\\.ingress\\.kubernetes\\.io/auth-signin="${{ env.auth_signin }}" \
             --set env.DATABASE_PASS="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
             --set env.ENCRYPTION_KEY="${{ secrets.TESLAMATE_ENCRYPTION_KEY }}" \
             --set env.MQTT_HOST="${{ env.mqtt_host }}" \
