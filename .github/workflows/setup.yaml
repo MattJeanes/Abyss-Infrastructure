@@ -410,11 +410,6 @@ jobs:
             --set ingress.main.tls[0].hosts[0]="${{ env.sinusbot_host }}"
         working-directory: kubernetes/charts/sinusbot
 
-      - name: Wait for sinusbot certificate to be ready
-        run: ./WaitKubeCertificate.ps1 -Name "sinusbot-tls"
-        shell: pwsh
-        working-directory: scripts
-
       # MIGRATION IN PROGRESS - FAIL FOR NOW
 
       - name: TEMPORARY FAIL ACTION

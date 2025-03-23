@@ -52,7 +52,7 @@ locals {
     }
     "musicbot" = {
       name    = "Music Bot"
-      service = "http://sinusbot"
+      service = "http://sinusbot:8087"
       secure  = false
     }
     # "teslamate" = {
@@ -61,7 +61,7 @@ locals {
     #   secure  = true
     # }
   }
-  
+
   secure_applications = {
     for k, v in local.zero_trust_applications : k => v if v.secure
   }
