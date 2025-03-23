@@ -122,7 +122,6 @@ jobs:
       - name: Set common variables
         run: |
           $variables = @{
-            hello_world_host = "hello-world.${{ vars.HOST }}"
             alertmanager_host = "alertmanager.${{ vars.HOST }}"
             grafana_host = "grafana.${{ vars.HOST }}"
             prometheus_host = "prometheus.${{ vars.HOST }}"
@@ -233,8 +232,7 @@ jobs:
         run: |
           helm upgrade --install --wait --atomic --debug \
             hello-world . \
-            --namespace default \
-            --set host="${{ env.hello_world_host }}"
+            --namespace default
         working-directory: kubernetes/charts/hello-world
 
       - name: Wait for hello world certificate to be ready
@@ -405,9 +403,7 @@ jobs:
           helm upgrade --install --wait --atomic --debug \
             sinusbot . \
             --namespace default \
-            -f values.yaml \
-            --set ingress.main.hosts[0].host="${{ env.sinusbot_host }}" \
-            --set ingress.main.tls[0].hosts[0]="${{ env.sinusbot_host }}"
+            -f values.yaml
         working-directory: kubernetes/charts/sinusbot
 
       # MIGRATION IN PROGRESS - FAIL FOR NOW
