@@ -2,7 +2,6 @@ locals {
   dns_records = [
     "@",
     "abyss",
-    "auth",
     "cdn",
     "gpt",
     "hello-world-direct",
@@ -13,11 +12,6 @@ locals {
   proxied_records = {
     "cdn" = true,
     "@"   = true,
-  }
-  migrated_records = {
-    "hello-world-direct" = true,
-    "ts" = true,
-    "send" = true,
   }
 }
 
@@ -38,7 +32,7 @@ resource "cloudflare_dns_record" "dns" {
   zone_id = var.cloudflare_zone_id
   name    = each.key
   type    = "CNAME"
-  content = lookup(local.migrated_records, each.key, false) ? data.cloudflare_dns_record.home.name : azurerm_public_ip.abyss_public.fqdn
+  content = data.cloudflare_dns_record.home.name
   ttl     = 1
   proxied = lookup(local.proxied_records, each.key, false)
 }

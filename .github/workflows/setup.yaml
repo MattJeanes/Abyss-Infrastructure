@@ -534,8 +534,3 @@ jobs:
 
       - name: Disconnect from Kubernetes
         uses: ./.github/actions/disconnect-k8s
-        with:
-          kubeconfig: "${{ inputs.insecureKubeContext && secrets.KUBECONFIG_INSECURE || secrets.KUBECONFIG }}"
-          hostname: kubernetes-api.${{ vars.HOST }}
-          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
-          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
