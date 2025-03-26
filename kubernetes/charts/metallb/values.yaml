@@ -1,7 +1,5 @@
 metallb:
   prometheus:
-    podMonitor:
-      enabled: true
     prometheusRule:
       enabled: true
     serviceMonitor:
