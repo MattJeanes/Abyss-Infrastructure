@@ -538,6 +538,7 @@ jobs:
             --set disk.capacity=1Gi \
             --set useFileShare=true \
             --set fileShare.name=qbittorrent-config \
+            --set fileShare.subscriptionId=${{ vars.AZURE_CLOUD_PROVIDER_SUBSCRIPTION_ID }} \
             --set fileShare.uid=911 \
             --set fileShare.gid=911
         working-directory: kubernetes/charts/azure-persistentvolume
