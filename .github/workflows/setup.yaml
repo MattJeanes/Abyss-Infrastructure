@@ -135,6 +135,17 @@ jobs:
           }
         shell: pwsh
 
+      - name: Install metallb
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            metallb . \
+            --namespace metallb-system \
+            --create-namespace \
+            -f values.yaml \
+            --set ipAddress="${{ var.local_ip_address }}"
+        working-directory: kubernetes/charts/metallb
+
       - name: Install kubernetes-dashboard
         run: |
           helm dependency update .
