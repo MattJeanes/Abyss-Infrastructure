@@ -79,44 +79,13 @@ jobs:
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      - name: Setup cloudflared
-        uses: AnimMouse/setup-cloudflared@b80ad7aa7850e1ec9960d75831f32ac9855df988 # v2
-
-      - name: Create Cloudflared proxy
-        run: |
-          LOG_FILE="/tmp/cloudflared.log"
-          echo "Starting cloudflared proxy in background, logging to $LOG_FILE"
-          
-          cloudflared access tcp > "$LOG_FILE" 2>&1 &
-          
-          CLOUDFLARED_PID=$!
-          echo "Cloudflared started with PID: $CLOUDFLARED_PID"
-          echo "CLOUDFLARED_PID=$CLOUDFLARED_PID" >> $GITHUB_ENV
-          echo "CLOUDFLARED_LOG=$LOG_FILE" >> $GITHUB_ENV
-          
-          sleep 5
-          
-          if ps -p $CLOUDFLARED_PID > /dev/null; then
-            echo "Cloudflared is running successfully"
-            # Show initial log content
-            echo "Initial log output:"
-            cat "$LOG_FILE"
-          else
-            echo "Cloudflared failed to start. Log output:"
-            cat "$LOG_FILE"
-            exit 1
-          fi
-        env:
-          TUNNEL_SERVICE_HOSTNAME: kubernetes-api.${{ vars.HOST }}
-          TUNNEL_SERVICE_URL: 127.0.0.1:6443
-          TUNNEL_SERVICE_TOKEN_ID: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
-          TUNNEL_SERVICE_TOKEN_SECRET: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
-
-      - name: Login to Kubernetes
-        uses: azure/k8s-set-context@212a19233d93f03eceaac31ae5a1d1acf650b6ef # v4
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
         with:
-          method: kubeconfig
           kubeconfig: "${{ inputs.insecureKubeContext && secrets.KUBECONFIG_INSECURE || secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
 
       - name: Set common variables
         run: |
@@ -563,20 +532,10 @@ jobs:
             --set addons.vpn.env.OPENVPN_USER="${{ secrets.MULLVAD_ACCOUNT_NUMBER }}"
         working-directory: kubernetes/charts/qbittorrent
 
-      - name: Cleanup Cloudflared proxy
-        if: always()
-        run: |
-          if [ -n "$CLOUDFLARED_PID" ]; then
-            echo "Terminating cloudflared process (PID: $CLOUDFLARED_PID)"
-            kill $CLOUDFLARED_PID 2>/dev/null || true
-            sleep 2
-            kill -9 $CLOUDFLARED_PID 2>/dev/null || true
-            echo "Process termination attempted"
-          fi
-          
-          if [ -n "$CLOUDFLARED_LOG" ] && [ -f "$CLOUDFLARED_LOG" ]; then
-            echo "== Cloudflared Log Output =="
-            cat "$CLOUDFLARED_LOG"
-          else
-            echo "No cloudflared log file found"
-          fi
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s
+        with:
+          kubeconfig: "${{ inputs.insecureKubeContext && secrets.KUBECONFIG_INSECURE || secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}

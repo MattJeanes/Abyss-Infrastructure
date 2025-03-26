@@ -1,0 +1,59 @@
+name: Connect to Kubernetes
+description: Connects to the Abyss Kubernetes cluster using Cloudflare Zero Trust tunnels
+
+inputs:
+  kubeconfig:
+    description: The kubeconfig contents
+    required: true
+  hostname:
+    description: The hostname for the Cloudflare tunnel
+    required: true
+  serviceTokenId:
+    description: The service token ID for the Cloudflare tunnel
+    required: true
+  serviceTokenSecret:
+    description: The service token secret for the Cloudflare tunnel
+    required: true
+
+runs:
+  using: composite
+  steps:
+  - name: Setup cloudflared
+    uses: AnimMouse/setup-cloudflared@b80ad7aa7850e1ec9960d75831f32ac9855df988 # v2
+
+  - name: Create Cloudflared proxy
+    shell: bash
+    run: |
+      LOG_FILE="/tmp/cloudflared.log"
+      echo "Starting cloudflared proxy in background, logging to $LOG_FILE"
+      
+      cloudflared access tcp > "$LOG_FILE" 2>&1 &
+      
+      CLOUDFLARED_PID=$!
+      echo "Cloudflared started with PID: $CLOUDFLARED_PID"
+      echo "CLOUDFLARED_PID=$CLOUDFLARED_PID" >> $GITHUB_ENV
+      echo "CLOUDFLARED_LOG=$LOG_FILE" >> $GITHUB_ENV
+      
+      sleep 5
+      
+      if ps -p $CLOUDFLARED_PID > /dev/null; then
+        echo "Cloudflared is running successfully"
+        # Show initial log content
+        echo "Initial log output:"
+        cat "$LOG_FILE"
+      else
+        echo "Cloudflared failed to start. Log output:"
+        cat "$LOG_FILE"
+        exit 1
+      fi
+    env:
+      TUNNEL_SERVICE_HOSTNAME: ${{ inputs.hostname }}
+      TUNNEL_SERVICE_URL: 127.0.0.1:6443
+      TUNNEL_SERVICE_TOKEN_ID: ${{ inputs.serviceTokenId }}
+      TUNNEL_SERVICE_TOKEN_SECRET: ${{ inputs.serviceTokenSecret }}
+
+  - name: Login to Kubernetes
+    uses: azure/k8s-set-context@212a19233d93f03eceaac31ae5a1d1acf650b6ef # v4
+    with:
+      method: kubeconfig
+      kubeconfig: "${{ inputs.kubeconfig }}"

@@ -1,0 +1,24 @@
+name: Disconnect from Kubernetes
+description: Disconnects from the Abyss Kubernetes cluster using Cloudflare Zero Trust tunnels
+
+runs:
+  using: composite
+  steps:
+  - name: Cleanup Cloudflared proxy
+    shell: bash
+    if: always()
+    run: |
+      if [ -n "$CLOUDFLARED_PID" ]; then
+        echo "Terminating cloudflared process (PID: $CLOUDFLARED_PID)"
+        kill $CLOUDFLARED_PID 2>/dev/null || true
+        sleep 2
+        kill -9 $CLOUDFLARED_PID 2>/dev/null || true
+        echo "Process termination attempted"
+      fi
+      
+      if [ -n "$CLOUDFLARED_LOG" ] && [ -f "$CLOUDFLARED_LOG" ]; then
+        echo "== Cloudflared Log Output =="
+        cat "$CLOUDFLARED_LOG"
+      else
+        echo "No cloudflared log file found"
+      fi
