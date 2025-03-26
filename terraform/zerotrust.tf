@@ -37,7 +37,7 @@ locals {
     }
     "longhorn" = {
       name    = "Longhorn"
-      service = "http://longhorn-ui.longhorn-system"
+      service = "http://longhorn-frontend.longhorn-system"
       secure  = true
     }
     "prometheus" = {
