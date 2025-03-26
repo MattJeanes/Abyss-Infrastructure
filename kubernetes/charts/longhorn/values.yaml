@@ -1,4 +1,6 @@
 longhorn:
+  csi:
+    kubeletRootDir: /var/snap/microk8s/common/var/lib/kubelet
   defaultBackupStore:
     backupTargetCredentialSecret: longhorn-azblob-secret
   metrics:
