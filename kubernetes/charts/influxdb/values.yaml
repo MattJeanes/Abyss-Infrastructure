@@ -5,6 +5,10 @@ influxdb:
       enabled: true
       namespace: monitoring
   influxdb:
+    service:
+      type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: home
     updateStrategy:
       type: Recreate
     resources:

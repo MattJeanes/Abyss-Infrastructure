@@ -62,17 +62,17 @@ locals {
     }
     "teslamate" = {
       name    = "TeslaMate"
-      service = "http://teslamate"
+      service = "http://teslamate:4000"
       secure  = true
     }
     "influxdb" = {
       name    = "InfluxDB"
-      service = "http://influxdb"
+      service = "http://influxdb:8086"
       secure  = true
     }
     "torrent" = {
       name    = "Torrent"
-      service = "http://qbittorrent"
+      service = "http://qbittorrent:8080"
       secure  = true
     }
   }
