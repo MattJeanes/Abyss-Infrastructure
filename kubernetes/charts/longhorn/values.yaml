@@ -1,8 +1,16 @@
 longhorn:
   csi:
     kubeletRootDir: /var/snap/microk8s/common/var/lib/kubelet
+    attacherReplicaCount: 1
+    provisionerReplicaCount: 1
+    resizerReplicaCount: 1
+    snapshotterReplicaCount: 1
   defaultBackupStore:
     backupTargetCredentialSecret: longhorn-azblob-secret
+  defaultSettings:
+    defaultReplicaCount: 1
   metrics:
     serviceMonitor:
       enabled: true
+  persistence:
+    defaultClassReplicaCount: 1
