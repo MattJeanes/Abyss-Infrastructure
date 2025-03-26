@@ -1,6 +1,5 @@
 longhorn:
   defaultBackupStore:
-    backupTarget: AZURE
     backupTargetCredentialSecret: longhorn-azblob-secret
   metrics:
     serviceMonitor:
