@@ -19,7 +19,6 @@ jobs:
       - name: Setup OpenTofu 
         uses: opentofu/setup-opentofu@592200bd4b9bbf4772ace78f887668b1aee8f716 # v1
 
-
       - name: Terraform Init
         run: tofu init -backend-config="storage_account_name=abyssterraform" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate" -backend-config="access_key=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}" -upgrade
         working-directory: terraform
@@ -455,11 +454,6 @@ jobs:
             --set env.MQTT_PASSWORD="${{ secrets.TESLAMATE_MQTT_PASSWORD }}"
         working-directory: kubernetes/charts/teslamate
 
-      - name: Wait for teslamate certificate to be ready
-        run: ./WaitKubeCertificate.ps1 -Name "teslamate-tls"
-        shell: pwsh
-        working-directory: scripts
-
       - name: Test auth redirect for teslamate
         run: |
           ./TestAuthRedirect.ps1 -Url "https://${{ env.teslamate_host }}"
@@ -513,11 +507,6 @@ jobs:
             --set auth.username="${{ vars.YOUTRANSFER_USERNAME }}" \
             --set auth.password="${{ secrets.YOUTRANSFER_PASSWORD }}"
         working-directory: kubernetes/charts/youtransfer
-
-      - name: Wait for youtransfer certificate to be ready
-        run: ./WaitKubeCertificate.ps1 -Name "youtransfer-tls"
-        shell: pwsh
-        working-directory: scripts
 
       - name: Install persistent volume for influxdb
         run: |
