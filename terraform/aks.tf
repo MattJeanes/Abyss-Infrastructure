@@ -1,4 +1,5 @@
 resource "azurerm_kubernetes_cluster" "abyss" {
+  provider                  = azurerm.old
   name                      = "abyss"
   resource_group_name       = azurerm_resource_group.abyss.name
   location                  = azurerm_resource_group.abyss.location
@@ -54,17 +55,18 @@ resource "azurerm_kubernetes_cluster" "abyss" {
   }
 
   maintenance_window_node_os {
-    day_of_week  = "Tuesday"
-    frequency    = "Weekly"
-    interval     = 1
-    duration     = 4
-    start_date   = "2025-03-18T00:00:00Z"
-    start_time   = "10:00"
-    utc_offset   = "+00:00"
+    day_of_week = "Tuesday"
+    frequency   = "Weekly"
+    interval    = 1
+    duration    = 4
+    start_date  = "2025-03-18T00:00:00Z"
+    start_time  = "10:00"
+    utc_offset  = "+00:00"
   }
 }
 
 resource "azurerm_role_assignment" "aks_abyss_networkcontributor" {
+  provider             = azurerm.old
   scope                = azurerm_resource_group.abyss.id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.abyss.identity[0].principal_id
@@ -72,12 +74,14 @@ resource "azurerm_role_assignment" "aks_abyss_networkcontributor" {
 
 
 resource "azurerm_role_assignment" "aks_abyss_diskaccess" {
+  provider             = azurerm.old
   scope                = azurerm_resource_group.abyss.id
   role_definition_name = azurerm_role_definition.diskaccess_old.name
   principal_id         = azurerm_kubernetes_cluster.abyss.identity[0].principal_id
 }
 
 data "azurerm_user_assigned_identity" "aks_abyss_agentpool" {
+  provider            = azurerm.old
   name                = "${azurerm_kubernetes_cluster.abyss.name}-agentpool"
   resource_group_name = azurerm_kubernetes_cluster.abyss.node_resource_group
   depends_on = [
@@ -86,23 +90,27 @@ data "azurerm_user_assigned_identity" "aks_abyss_agentpool" {
 }
 
 resource "azurerm_role_assignment" "aks_abyss_agentpool_diskaccess" {
+  provider             = azurerm.old
   scope                = azurerm_resource_group.abyss.id
   role_definition_name = azurerm_role_definition.diskaccess_old.name
   principal_id         = data.azurerm_user_assigned_identity.aks_abyss_agentpool.principal_id
 }
 
 resource "azurerm_role_assignment" "aks_abyss_aci_network_contributor_subnet" {
+  provider             = azurerm.old
   scope                = azurerm_subnet.abyss_aci.id
   role_definition_name = "Network Contributor"
   principal_id         = azurerm_kubernetes_cluster.abyss.aci_connector_linux[0].connector_identity[0].object_id
 }
 
 resource "azurerm_subnet_network_security_group_association" "aks_abyss" {
+  provider                  = azurerm.old
   subnet_id                 = azurerm_subnet.abyss_aks.id
   network_security_group_id = azurerm_network_security_group.abyss.id
 }
 
 resource "azurerm_subnet_network_security_group_association" "aks_abyss_aci" {
+  provider                  = azurerm.old
   subnet_id                 = azurerm_subnet.abyss_aci.id
   network_security_group_id = azurerm_network_security_group.abyss.id
 }

@@ -183,6 +183,7 @@ locals {
 }
 
 resource "azurerm_public_ip" "servers" {
+  provider = azurerm.old
   for_each = local.servers
 
   name                = "${each.value.name}-ip"
@@ -193,6 +194,7 @@ resource "azurerm_public_ip" "servers" {
 }
 
 resource "azurerm_network_security_group" "servers" {
+  provider = azurerm.old
   for_each = local.servers
 
   name                = "${each.value.name}-nsg"
@@ -201,6 +203,7 @@ resource "azurerm_network_security_group" "servers" {
 }
 
 resource "azurerm_network_security_rule" "servers_remote_access" {
+  provider = azurerm.old
   for_each = local.servers
 
   network_security_group_name = azurerm_network_security_group.servers[each.key].name
@@ -218,6 +221,7 @@ resource "azurerm_network_security_rule" "servers_remote_access" {
 }
 
 resource "azurerm_network_security_rule" "servers_rules" {
+  provider = azurerm.old
   for_each = { for rule in local.nsg_rules : "${rule.server_key}_${rule.rule_key}" => rule }
 
   network_security_group_name = azurerm_network_security_group.servers[each.value.server_key].name
@@ -238,6 +242,7 @@ resource "azurerm_network_security_rule" "servers_rules" {
 }
 
 resource "azurerm_network_interface" "servers" {
+  provider = azurerm.old
   for_each = local.servers
 
   name                = "${each.value.name}-nic"
@@ -255,6 +260,7 @@ resource "azurerm_network_interface" "servers" {
 }
 
 resource "azurerm_network_interface_security_group_association" "servers" {
+  provider = azurerm.old
   for_each = local.servers
 
   network_interface_id      = azurerm_network_interface.servers[each.key].id
@@ -262,6 +268,7 @@ resource "azurerm_network_interface_security_group_association" "servers" {
 }
 
 resource "azurerm_linux_virtual_machine" "servers" {
+  provider = azurerm.old
   for_each = { for key, val in local.servers : key => val if val.os_type == "Linux" }
 
   lifecycle {
@@ -307,6 +314,7 @@ resource "azurerm_linux_virtual_machine" "servers" {
 }
 
 resource "azurerm_windows_virtual_machine" "servers" {
+  provider = azurerm.old
   for_each = { for key, val in local.servers : key => val if val.os_type == "Windows" }
 
   lifecycle {

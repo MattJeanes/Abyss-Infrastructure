@@ -1,4 +1,5 @@
 resource "azurerm_resource_group" "snapshots" {
+  provider = azurerm.old
   name     = "abyss_snapshots"
   location = "northeurope"
 
@@ -8,6 +9,7 @@ resource "azurerm_resource_group" "snapshots" {
 }
 
 resource "azurerm_data_protection_backup_vault" "main" {
+  provider            = azurerm.old
   name                = "backup-vault"
   resource_group_name = azurerm_resource_group.abyss.name
   location            = azurerm_resource_group.abyss.location
@@ -19,12 +21,14 @@ resource "azurerm_data_protection_backup_vault" "main" {
 }
 
 resource "azurerm_role_assignment" "snapshots_disk_snapshot_contributor" {
+  provider             = azurerm.old
   scope                = azurerm_resource_group.snapshots.id
   role_definition_name = "Disk Snapshot Contributor"
   principal_id         = azurerm_data_protection_backup_vault.main.identity[0].principal_id
 }
 
 resource "azurerm_data_protection_backup_policy_disk" "main" {
+  provider = azurerm.old
   name     = "disk-backup-policy"
   vault_id = azurerm_data_protection_backup_vault.main.id
 

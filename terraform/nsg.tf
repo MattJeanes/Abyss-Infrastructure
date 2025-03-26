@@ -1,10 +1,12 @@
 resource "azurerm_network_security_group" "abyss" {
+  provider            = azurerm.old
   name                = "abyss-nsg"
   resource_group_name = azurerm_resource_group.abyss.name
   location            = azurerm_resource_group.abyss.location
 }
 
 resource "azurerm_network_security_rule" "abyss_home" {
+  provider                    = azurerm.old
   network_security_group_name = azurerm_network_security_group.abyss.name
   resource_group_name         = azurerm_network_security_group.abyss.resource_group_name
 
@@ -20,6 +22,7 @@ resource "azurerm_network_security_rule" "abyss_home" {
 }
 
 resource "azurerm_network_security_rule" "abyss_http" {
+  provider                    = azurerm.old
   network_security_group_name = azurerm_network_security_group.abyss.name
   resource_group_name         = azurerm_network_security_group.abyss.resource_group_name
 
@@ -35,6 +38,7 @@ resource "azurerm_network_security_rule" "abyss_http" {
 }
 
 resource "azurerm_network_security_rule" "abyss_https" {
+  provider                    = azurerm.old
   network_security_group_name = azurerm_network_security_group.abyss.name
   resource_group_name         = azurerm_network_security_group.abyss.resource_group_name
 
@@ -50,6 +54,7 @@ resource "azurerm_network_security_rule" "abyss_https" {
 }
 
 resource "azurerm_network_security_rule" "abyss_teamspeak" {
+  provider                    = azurerm.old
   network_security_group_name = azurerm_network_security_group.abyss.name
   resource_group_name         = azurerm_network_security_group.abyss.resource_group_name
 
@@ -65,6 +70,7 @@ resource "azurerm_network_security_rule" "abyss_teamspeak" {
 }
 
 resource "azurerm_network_security_rule" "abyss_teamspeak_alt" {
+  provider                    = azurerm.old
   network_security_group_name = azurerm_network_security_group.abyss.name
   resource_group_name         = azurerm_network_security_group.abyss.resource_group_name
 

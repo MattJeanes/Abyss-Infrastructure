@@ -38,10 +38,13 @@ jobs:
           tee terraform.tfvars <<EOF
           ssh_public_key = "${{ secrets.SSH_PUBLIC_KEY }}"
           cloudflare_api_token = "${{ secrets.CLOUDFLARE_API_TOKEN }}"
+          cloudflare_account_id = "${{ vars.CLOUDFLARE_ACCOUNT_ID }}"
           cloudflare_zone_id = "${{ vars.CLOUDFLARE_ZONE_ID }}"
           home_ip = "${{ secrets.HOME_IP }}"
+          email = "${{ vars.EMAIL }}"
           windows_server_password = "${{ secrets.WINDOWS_SERVER_PASSWORD }}"
           azure_subscription_id = "${{ vars.AZURE_SUBSCRIPTION_ID }}"
+          azure_subscription_id_old = "${{ vars.AZURE_SUBSCRIPTION_ID_OLD }}"
           EOF
         working-directory: terraform
 

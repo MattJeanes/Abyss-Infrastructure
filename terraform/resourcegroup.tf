@@ -1,4 +1,5 @@
 resource "azurerm_resource_group" "abyss" {
+  provider = azurerm.old
   name     = "abyss"
   location = "northeurope"
 

@@ -1,5 +1,5 @@
-resource "azurerm_role_definition" "diskaccess_old" {
-  name        = "Disk Access Old"
+resource "azurerm_role_definition" "diskaccess" {
+  name        = "Disk Access"
   scope       = data.azurerm_subscription.current.id
   description = "Allows access to disks"
 
@@ -13,9 +13,9 @@ resource "azurerm_role_definition" "diskaccess_old" {
   ]
 }
 
-resource "azurerm_role_definition" "diskaccess" {
-  name        = "Disk Access"
-  scope       = data.azurerm_subscription.new.id
+resource "azurerm_role_definition" "diskaccess_old" {
+  name        = "Disk Access Old"
+  scope       = data.azurerm_subscription.old.id
   description = "Allows access to disks"
 
   permissions {
@@ -24,6 +24,6 @@ resource "azurerm_role_definition" "diskaccess" {
   }
 
   assignable_scopes = [
-    data.azurerm_subscription.new.id,
+    data.azurerm_subscription.old.id,
   ]
 }
