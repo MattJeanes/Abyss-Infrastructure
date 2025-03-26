@@ -10,6 +10,8 @@ spec:
   csi:
     driver: driver.longhorn.io
     fsType: ext4
-    volumeHandle: {{ required "volumeHandle is required" .Values.volumeHandle }}
+    {{- if .Values.volumeHandle }}
+    volumeHandle: {{ .Values.volumeHandle }}
+    {{- end }}
   persistentVolumeReclaimPolicy: Retain
   storageClassName: longhorn
