@@ -143,7 +143,7 @@ jobs:
             --namespace metallb-system \
             --create-namespace \
             -f values.yaml \
-            --set ipAddress="${{ var.local_ip_address }}"
+            --set ipAddress="${{ vars.LOCAL_IP_ADDRESS }}"
         working-directory: kubernetes/charts/metallb
 
       - name: Install kubernetes-dashboard
