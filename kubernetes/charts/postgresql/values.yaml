@@ -18,5 +18,7 @@ postgresql:
       existingClaim: postgresql
     service:
       type: LoadBalancer
+      annotations:
+        metallb.universe.tf/allow-shared-ip: home
   auth:
     database: postgres
