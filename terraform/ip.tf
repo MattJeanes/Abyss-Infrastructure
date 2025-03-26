@@ -1,5 +1,4 @@
 resource "azurerm_public_ip" "abyss_public" {
-  provider            = azurerm.old
   name                = "abyss-public-ip"
   resource_group_name = azurerm_resource_group.abyss.name
   location            = azurerm_resource_group.abyss.location

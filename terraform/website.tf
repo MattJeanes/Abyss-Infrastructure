@@ -1,5 +1,4 @@
 resource "azurerm_storage_share" "abyss_cdn" {
-  provider           = azurerm.old
   name               = "cdn"
   storage_account_id = azurerm_storage_account.abyss.id
   quota              = 10
@@ -10,7 +9,6 @@ resource "azurerm_storage_share" "abyss_cdn" {
 }
 
 resource "azurerm_backup_protected_file_share" "abyss_cdn" {
-  provider                  = azurerm.old
   resource_group_name       = azurerm_resource_group.abyss.name
   recovery_vault_name       = azurerm_recovery_services_vault.vault.name
   source_storage_account_id = azurerm_backup_container_storage_account.abyss.storage_account_id

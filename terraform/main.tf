@@ -21,23 +21,9 @@ provider "azurerm" {
   }
 }
 
-provider "azurerm" {
-  alias           = "old"
-  subscription_id = var.azure_subscription_id_old
-  features {
-    key_vault {
-      purge_soft_delete_on_destroy = true
-    }
-  }
-}
-
 provider "cloudflare" {
   api_token = var.cloudflare_api_token
 }
 
 data "azurerm_client_config" "current" {}
 data "azurerm_subscription" "current" {}
-
-data "azurerm_subscription" "old" {
-  subscription_id = var.azure_subscription_id_old
-}

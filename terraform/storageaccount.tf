@@ -1,5 +1,4 @@
 resource "azurerm_storage_account" "abyss" {
-  provider                 = azurerm.old
   name                     = "abyss"
   resource_group_name      = azurerm_resource_group.abyss.name
   location                 = azurerm_resource_group.abyss.location
@@ -13,14 +12,12 @@ resource "azurerm_storage_account" "abyss" {
 }
 
 resource "azurerm_backup_container_storage_account" "abyss" {
-  provider            = azurerm.old
   resource_group_name = azurerm_resource_group.abyss.name
   recovery_vault_name = azurerm_recovery_services_vault.vault.name
   storage_account_id  = azurerm_storage_account.abyss.id
 }
 
 resource "azurerm_storage_container" "abyss_encrypted" {
-  provider           = azurerm.old
   name               = "encrypted"
   storage_account_id = azurerm_storage_account.abyss.id
 

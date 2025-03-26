@@ -29,7 +29,3 @@ variable "windows_server_password" {
 variable "azure_subscription_id" {
   sensitive = true
 }
-
-variable "azure_subscription_id_old" {
-  sensitive = true
-}

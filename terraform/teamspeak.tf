@@ -1,5 +1,4 @@
 resource "azurerm_storage_share" "abyss_teamspeak" {
-  provider           = azurerm.old
   name               = "teamspeak"
   storage_account_id = azurerm_storage_account.abyss.id
   quota              = 20
@@ -10,7 +9,6 @@ resource "azurerm_storage_share" "abyss_teamspeak" {
 }
 
 resource "azurerm_backup_protected_file_share" "abyss_teamspeak" {
-  provider                  = azurerm.old
   resource_group_name       = azurerm_resource_group.abyss.name
   recovery_vault_name       = azurerm_recovery_services_vault.vault.name
   source_storage_account_id = azurerm_backup_container_storage_account.abyss.storage_account_id
@@ -19,7 +17,6 @@ resource "azurerm_backup_protected_file_share" "abyss_teamspeak" {
 }
 
 resource "azurerm_storage_share" "abyss_teamspeak_alt" {
-  provider           = azurerm.old
   name               = "teamspeak-alt"
   storage_account_id = azurerm_storage_account.abyss.id
   quota              = 20
@@ -30,7 +27,6 @@ resource "azurerm_storage_share" "abyss_teamspeak_alt" {
 }
 
 resource "azurerm_storage_share" "abyss_sinusbot" {
-  provider           = azurerm.old
   name               = "sinusbot"
   storage_account_id = azurerm_storage_account.abyss.id
   quota              = 10
@@ -41,7 +37,6 @@ resource "azurerm_storage_share" "abyss_sinusbot" {
 }
 
 resource "azurerm_backup_protected_file_share" "abyss_sinusbot" {
-  provider                  = azurerm.old
   resource_group_name       = azurerm_resource_group.abyss.name
   recovery_vault_name       = azurerm_recovery_services_vault.vault.name
   source_storage_account_id = azurerm_backup_container_storage_account.abyss.storage_account_id
