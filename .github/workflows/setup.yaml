@@ -421,12 +421,7 @@ jobs:
             -f values.yaml
         working-directory: kubernetes/charts/sinusbot
 
-      # MIGRATION IN PROGRESS - FAIL FOR NOW
-
-      - name: TEMPORARY FAIL ACTION
-        run: |
-          echo "This is a temporary fail action to prevent the workflow from continuing."
-          exit 1
+    
 
       - name: Install persistent volume for postgresql
         run: |
@@ -435,8 +430,8 @@ jobs:
             --namespace default \
             --set name=postgresql \
             --set disk.capacity=4Gi \
-            --set disk.id="${{ env.postgresql_disk_id }}"
-        working-directory: kubernetes/charts/azure-persistentvolume
+            --set volumeHandle=postgresql
+        working-directory: kubernetes/charts/longhorn-persistentvolume
 
       - name: Install postgresql
         run: |
@@ -447,6 +442,13 @@ jobs:
             -f values.yaml \
             --set postgresql.auth.postgresPassword="${{ secrets.POSTGRESQL_POSTGRES_PASSWORD }}"
         working-directory: kubernetes/charts/postgresql
+
+      # MIGRATION IN PROGRESS - FAIL FOR NOW
+
+      - name: TEMPORARY FAIL ACTION
+        run: |
+          echo "This is a temporary fail action to prevent the workflow from continuing."
+          exit 1
 
       - name: Install teslamate
         run: |
