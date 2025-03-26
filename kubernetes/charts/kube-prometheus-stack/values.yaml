@@ -14,12 +14,13 @@ kube-prometheus-stack:
       storage:
         volumeClaimTemplate:
           spec:
+            volumeName: alertmanager
             resources:
               requests:
                 storage: 4Gi
             accessModes:
             - ReadWriteOnce
-            storageClassName: microk8s-hostpath
+            storageClassName: longhorn
     config:
       route:
         receiver: pagerduty
@@ -96,12 +97,13 @@ kube-prometheus-stack:
       storageSpec:
         volumeClaimTemplate:
           spec:
+            volumeName: prometheus
             resources:
               requests:
                 storage: 8Gi
             accessModes:
             - ReadWriteOnce
-            storageClassName: microk8s-hostpath
+            storageClassName: longhorn
       ruleSelectorNilUsesHelmValues: false
       serviceMonitorSelectorNilUsesHelmValues: false
       podMonitorSelectorNilUsesHelmValues: false

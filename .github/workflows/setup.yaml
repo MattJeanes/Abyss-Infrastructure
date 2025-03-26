@@ -272,29 +272,29 @@ jobs:
             --set longhorn.defaultBackupStore.backupTarget="azblob://longhorn@core.windows.net/"
         working-directory: kubernetes/charts/longhorn
 
-      # - name: Install persistent volume for prometheus
-      #   run: |
-      #     helm upgrade --install --wait --atomic --debug \
-      #       prometheus-persistentvolume . \
-      #       --namespace monitoring \
-      #       --create-namespace \
-      #       --set name=prometheus \
-      #       --set disk.capacity=8Gi \
-      #       --set disk.id="${{ env.prometheus_disk_id }}" \
-      #       --set persistentVolumeClaim.enabled=false
-      #   working-directory: kubernetes/charts/azure-persistentvolume
+      - name: Install persistent volume for prometheus
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            prometheus-persistentvolume . \
+            --namespace monitoring \
+            --create-namespace \
+            --set name=prometheus \
+            --set disk.capacity=8Gi \
+            --set volumeHandle=prometheus \
+            --set persistentVolumeClaim.enabled=false
+        working-directory: kubernetes/charts/longhorn-persistentvolume
 
-      # - name: Install persistent volume for alertmanager
-      #   run: |
-      #     helm upgrade --install --wait --atomic --debug \
-      #       alertmanager-persistentvolume . \
-      #       --namespace monitoring \
-      #       --create-namespace \
-      #       --set name=alertmanager \
-      #       --set disk.capacity=4Gi \
-      #       --set disk.id="${{ env.alertmanager_disk_id }}" \
-      #       --set persistentVolumeClaim.enabled=false
-      #   working-directory: kubernetes/charts/azure-persistentvolume
+      - name: Install persistent volume for alertmanager
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            alertmanager-persistentvolume . \
+            --namespace monitoring \
+            --create-namespace \
+            --set name=alertmanager \
+            --set disk.capacity=4Gi \
+            --set volumeHandle=alertmanager \
+            --set persistentVolumeClaim.enabled=false
+        working-directory: kubernetes/charts/longhorn-persistentvolume
 
       - name: Install persistent volume for grafana
         run: |
