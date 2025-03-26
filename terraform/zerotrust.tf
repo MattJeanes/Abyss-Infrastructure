@@ -35,6 +35,11 @@ locals {
       secure        = true
       no_tls_verify = true
     }
+    "longhorn" = {
+      name    = "Longhorn"
+      service = "http://longhorn-ui.longhorn-system"
+      secure  = true
+    }
     "prometheus" = {
       name    = "Prometheus"
       service = "http://kube-prometheus-stack-prometheus.monitoring:9090"

@@ -259,6 +259,18 @@ jobs:
             -f values.yaml
         working-directory: kubernetes/charts/vpa
 
+      - name: Install longhorn
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            longhorn . \
+            --namespace longhorn-system \
+            --create-namespace \
+            -f values.yaml \
+            --set azureBlobStorageAccountName="${{ env.storage_account_name }}" \
+            --set azureBlobStorageAccountKey="${{ env.storage_account_key }}"
+        working-directory: kubernetes/charts/longhorn
+
       # - name: Install persistent volume for prometheus
       #   run: |
       #     helm upgrade --install --wait --atomic --debug \
