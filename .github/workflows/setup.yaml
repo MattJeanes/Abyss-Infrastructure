@@ -521,7 +521,7 @@ jobs:
             --set fileShare.gid=911
         working-directory: kubernetes/charts/azure-persistentvolume
 
-      - name: Install qBittorrent
+      - name: Install qbittorrent
         run: |
           helm dependency update .
           helm upgrade --install --wait --atomic --debug \
@@ -530,6 +530,16 @@ jobs:
             -f values.yaml \
             --set addons.vpn.env.OPENVPN_USER="${{ secrets.MULLVAD_ACCOUNT_NUMBER }}"
         working-directory: kubernetes/charts/qbittorrent
+
+      - name: Install plex
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            plex . \
+            --namespace default \
+            -f values.yaml \
+        working-directory: kubernetes/charts/plex
+
 
       - name: Disconnect from Kubernetes
         uses: ./.github/actions/disconnect-k8s

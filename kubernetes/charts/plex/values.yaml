@@ -1,0 +1,4 @@
+image:
+  repository: ghcr.io/skjnldsv/docker-plex
+  tag: main
+  pullPolicy: Always
