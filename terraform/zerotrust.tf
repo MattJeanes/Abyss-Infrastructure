@@ -31,7 +31,7 @@ locals {
     }
     "kubernetes-dashboard" = {
       name          = "Kubernetes Dashboard"
-      service       = "https://kubernetes-dashboard.kube-system"
+      service       = "https://kubernetes-dashboard.kubernetes-dashboard"
       secure        = true
       no_tls_verify = true
     }

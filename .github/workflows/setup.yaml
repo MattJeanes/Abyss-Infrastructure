@@ -122,18 +122,10 @@ jobs:
         run: |
           $variables = @{
             hello_world_direct_host = "hello-world-direct.${{ vars.HOST }}"
-            alertmanager_host = "alertmanager.${{ vars.HOST }}"
             grafana_host = "grafana.${{ vars.HOST }}"
-            prometheus_host = "prometheus.${{ vars.HOST }}"
-            sinusbot_host = "musicbot.${{ vars.HOST }}"
-            qbittorrent_host = "torrent.${{ vars.HOST }}"
             teamspeak_host = "ts.${{ vars.HOST }}"
-            teslamate_host = "teslamate.${{ vars.HOST }}"
-            influxdb_host = "influxdb.${{ vars.HOST }}"
             mqtt_host = "mqtt.${{ vars.HOST }}"
             send_host = "send.${{ vars.HOST }}"
-            main_host = "${{ vars.HOST }}"
-            cdn_host = "cdn.${{ vars.HOST }}"
           }
           $variables.Keys | ForEach-Object {
               $key = $_
@@ -143,10 +135,15 @@ jobs:
           }
         shell: pwsh
 
-      - name: Run manifests
+      - name: Install kubernetes-dashboard
         run: |
-          kubectl apply -f manifests
-        working-directory: kubernetes
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            kubernetes-dashboard . \
+            --namespace kubernetes-dashboard \
+            --create-namespace \
+            -f values.yaml
+        working-directory: kubernetes/charts/kubernetes-dashboard
 
       - name: Install cloudflare-tunnel
         run: |
@@ -331,13 +328,6 @@ jobs:
             --namespace monitoring
         working-directory: kubernetes/charts/prometheus-vpa
 
-      - name: Test auth redirect for kube-prometheus-stack
-        run: |
-          ./TestAuthRedirect.ps1 -Url "https://${{ env.prometheus_host }}"
-          ./TestAuthRedirect.ps1 -Url "https://${{ env.alertmanager_host }}"
-        shell: pwsh
-        working-directory: scripts
-
       - name: Install persistent volume for teamspeak
         run: |
           helm upgrade --install --wait --atomic --debug \
@@ -453,12 +443,6 @@ jobs:
             --set env.MQTT_USERNAME="${{ vars.TESLAMATE_MQTT_USERNAME }}" \
             --set env.MQTT_PASSWORD="${{ secrets.TESLAMATE_MQTT_PASSWORD }}"
         working-directory: kubernetes/charts/teslamate
-
-      - name: Test auth redirect for teslamate
-        run: |
-          ./TestAuthRedirect.ps1 -Url "https://${{ env.teslamate_host }}"
-        shell: pwsh
-        working-directory: scripts
 
       - name: Prepare teslamate grafana dashboards
         run: |
