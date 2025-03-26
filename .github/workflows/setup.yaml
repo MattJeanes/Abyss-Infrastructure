@@ -492,6 +492,11 @@ jobs:
             --set auth.password="${{ secrets.YOUTRANSFER_PASSWORD }}"
         working-directory: kubernetes/charts/youtransfer
 
+      - name: Wait for teamspeak redirect certificate to be ready
+        run: ./WaitKubeCertificate.ps1 -Name "youtransfer-tls"
+        shell: pwsh
+        working-directory: scripts
+
       - name: Install persistent volume for influxdb
         run: |
           helm upgrade --install --wait --atomic --debug \
