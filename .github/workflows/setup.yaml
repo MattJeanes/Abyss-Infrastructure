@@ -142,9 +142,19 @@ jobs:
             metallb . \
             --namespace metallb-system \
             --create-namespace \
+            -f values.yaml
+        working-directory: kubernetes/charts/metallb
+
+      - name: Install metallb-config
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            metallb-config . \
+            --namespace metallb-system \
+            --create-namespace \
             -f values.yaml \
             --set ipAddress="${{ vars.LOCAL_IP_ADDRESS }}"
-        working-directory: kubernetes/charts/metallb
+        working-directory: kubernetes/charts/metallb-config
 
       - name: Install kubernetes-dashboard
         run: |
