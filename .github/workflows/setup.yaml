@@ -519,13 +519,6 @@ jobs:
         shell: pwsh
         working-directory: scripts
 
-      # MIGRATION IN PROGRESS - FAIL FOR NOW
-
-      - name: TEMPORARY FAIL ACTION
-        run: |
-          echo "This is a temporary fail action to prevent the workflow from continuing."
-          exit 1
-
       - name: Install persistent volume for influxdb
         run: |
           helm upgrade --install --wait --atomic --debug \
@@ -533,8 +526,8 @@ jobs:
             --namespace default \
             --set name=influxdb \
             --set disk.capacity=4Gi \
-            --set disk.id="${{ env.influxdb_disk_id }}"
-        working-directory: kubernetes/charts/azure-persistentvolume
+            --set volumeHandle=influxdb
+        working-directory: kubernetes/charts/longhorn-persistentvolume
 
       - name: Install influxdb
         run: |
@@ -544,8 +537,7 @@ jobs:
             --namespace default \
             -f values.yaml \
             --set influxdb.auth.admin.password="${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" \
-            --set influxdb.auth.admin.token="${{ secrets.INFLUXDB_ADMIN_TOKEN }}" \
-            --set influxdb.ingress.hostname="${{ env.influxdb_host }}"
+            --set influxdb.auth.admin.token="${{ secrets.INFLUXDB_ADMIN_TOKEN }}"
         working-directory: kubernetes/charts/influxdb
 
       - name: Install persistent volume for qbittorrent-config
@@ -568,8 +560,6 @@ jobs:
             qbittorrent . \
             --namespace default \
             -f values.yaml \
-            --set ingress.main.hosts[0].host="${{ env.qbittorrent_host }}" \
-            --set ingress.main.tls[0].hosts[0]="${{ env.qbittorrent_host }}" \
             --set addons.vpn.env.OPENVPN_USER="${{ secrets.MULLVAD_ACCOUNT_NUMBER }}"
         working-directory: kubernetes/charts/qbittorrent
 

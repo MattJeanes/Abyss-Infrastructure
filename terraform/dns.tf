@@ -6,9 +6,7 @@ locals {
     "cdn",
     "gpt",
     "hello-world-direct",
-    "influxdb",
     "send",
-    "torrent",
     "ts",
     "youtubedl"
   ]

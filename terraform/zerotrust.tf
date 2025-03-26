@@ -65,6 +65,16 @@ locals {
       service = "http://teslamate"
       secure  = true
     }
+    "influxdb" = {
+      name    = "InfluxDB"
+      service = "http://influxdb"
+      secure  = true
+    }
+    "torrent" = {
+      name    = "Torrent"
+      service = "http://qbittorrent"
+      secure  = true
+    }
   }
 
   secure_applications = {

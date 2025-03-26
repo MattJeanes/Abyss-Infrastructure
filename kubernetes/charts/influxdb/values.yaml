@@ -13,11 +13,5 @@ influxdb:
         memory: 500Mi
       limits:
         memory: 500Mi
-  ingress:
-    enabled: true
-    tls: true
-    annotations:
-      kubernetes.io/ingress.class: nginx
-      cert-manager.io/cluster-issuer: letsencrypt-prod
   persistence:
     existingClaim: influxdb
