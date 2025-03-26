@@ -1,5 +1,6 @@
 metallb:
   prometheus:
+    namespace: monitoring
     serviceAccount: metallb-prometheus
     prometheusRule:
       enabled: true
