@@ -4,5 +4,9 @@ metallb:
     serviceAccount: metallb-prometheus
     prometheusRule:
       enabled: true
+      addressPoolExhausted:
+        enabled: false
+      addressPoolUsage:
+        enabled: false
     serviceMonitor:
       enabled: true
