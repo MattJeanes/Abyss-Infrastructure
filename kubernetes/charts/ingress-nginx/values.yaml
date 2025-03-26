@@ -5,9 +5,7 @@ ingress-nginx:
         cpu: 100m
         memory: 250Mi
     service:
-      externalTrafficPolicy: Cluster
-      annotations:
-        metallb.universe.tf/allow-shared-ip: home
+      externalTrafficPolicy: Local
     config:
       annotations-risk-level: Critical
     allowSnippetAnnotations: true

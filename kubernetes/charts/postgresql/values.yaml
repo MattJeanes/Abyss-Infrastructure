@@ -17,8 +17,9 @@ postgresql:
     persistence:
       existingClaim: postgresql
     service:
-      type: LoadBalancer
-      annotations:
-        metallb.universe.tf/allow-shared-ip: home
+      type: NodePort
+      externalTrafficPolicy: Local
+      nodePorts:
+        postgresql: 30002
   auth:
     database: postgres

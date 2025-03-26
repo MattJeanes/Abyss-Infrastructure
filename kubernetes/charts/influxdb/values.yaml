@@ -6,9 +6,11 @@ influxdb:
       namespace: monitoring
   influxdb:
     service:
-      type: LoadBalancer
-      annotations:
-        metallb.universe.tf/allow-shared-ip: home
+      type: NodePort
+      externalTrafficPolicy: Local
+      nodePorts:
+        http: 30000
+        rpc: 30001
     updateStrategy:
       type: Recreate
     resources:

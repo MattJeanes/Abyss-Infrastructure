@@ -8,10 +8,13 @@ service:
     ports:
       serverquery:
         port: 10012
+        nodePort: 30006
       filetransfer:
         port: 30034
+        nodePort: 30007
       voice:
         port: 9988
+        nodePort: 30008
 probes:
   readiness:
     custom: true

@@ -11,10 +11,8 @@ env:
   TS3SERVER_LICENSE: accept
 service:
   main:
-    type: LoadBalancer
-    externalTrafficPolicy: Cluster
-    annotations:
-      metallb.universe.tf/allow-shared-ip: home
+    type: NodePort
+    externalTrafficPolicy: Local
     ports:
       http:
         enabled: false
@@ -22,13 +20,16 @@ service:
       serverquery:
         enabled: true
         port: 10011
+        nodePort: 30003
       filetransfer:
         enabled: true
         port: 30033
+        nodePort: 30004
       voice:
         enabled: true
         primary: true
         port: 9987
+        nodePort: 30005
         protocol: UDP
 probes:
   readiness:
