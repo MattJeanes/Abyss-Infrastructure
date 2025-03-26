@@ -8,7 +8,6 @@ locals {
     "hello-world-direct",
     "influxdb",
     "send",
-    "teslamate",
     "torrent",
     "ts",
     "youtubedl"
@@ -20,6 +19,7 @@ locals {
   migrated_records = {
     "hello-world-direct" = true,
     "ts" = true,
+    "send" = true,
   }
 }
 

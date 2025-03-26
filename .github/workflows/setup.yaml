@@ -421,8 +421,6 @@ jobs:
             -f values.yaml
         working-directory: kubernetes/charts/sinusbot
 
-    
-
       - name: Install persistent volume for postgresql
         run: |
           helm upgrade --install --wait --atomic --debug \
@@ -443,13 +441,6 @@ jobs:
             --set postgresql.auth.postgresPassword="${{ secrets.POSTGRESQL_POSTGRES_PASSWORD }}"
         working-directory: kubernetes/charts/postgresql
 
-      # MIGRATION IN PROGRESS - FAIL FOR NOW
-
-      - name: TEMPORARY FAIL ACTION
-        run: |
-          echo "This is a temporary fail action to prevent the workflow from continuing."
-          exit 1
-
       - name: Install teslamate
         run: |
           helm dependency update .
@@ -457,8 +448,6 @@ jobs:
             teslamate . \
             --namespace default \
             -f values.yaml \
-            --set ingress.main.hosts[0].host="${{ env.teslamate_host }}" \
-            --set ingress.main.tls[0].hosts[0]="${{ env.teslamate_host }}" \
             --set env.DATABASE_PASS="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
             --set env.ENCRYPTION_KEY="${{ secrets.TESLAMATE_ENCRYPTION_KEY }}" \
             --set env.MQTT_HOST="${{ env.mqtt_host }}" \
@@ -529,6 +518,13 @@ jobs:
         run: ./WaitKubeCertificate.ps1 -Name "youtransfer-tls"
         shell: pwsh
         working-directory: scripts
+
+      # MIGRATION IN PROGRESS - FAIL FOR NOW
+
+      - name: TEMPORARY FAIL ACTION
+        run: |
+          echo "This is a temporary fail action to prevent the workflow from continuing."
+          exit 1
 
       - name: Install persistent volume for influxdb
         run: |

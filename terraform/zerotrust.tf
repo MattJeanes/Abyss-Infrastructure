@@ -60,11 +60,11 @@ locals {
       service = "http://sinusbot:8087"
       secure  = false
     }
-    # "teslamate" = {
-    #   name    = "TeslaMate"
-    #   service = "http://teslamate"
-    #   secure  = true
-    # }
+    "teslamate" = {
+      name    = "TeslaMate"
+      service = "http://teslamate"
+      secure  = true
+    }
   }
 
   secure_applications = {
