@@ -94,6 +94,8 @@ jobs:
             teamspeak_host = "ts.${{ vars.HOST }}"
             mqtt_host = "mqtt.${{ vars.HOST }}"
             send_host = "send.${{ vars.HOST }}"
+            homeassistant_host = "homeassistant.${{ vars.HOST }}"
+            octoprint_host = "octoprint.${{ vars.HOST }}"
           }
           $variables.Keys | ForEach-Object {
               $key = $_
@@ -226,13 +228,6 @@ jobs:
         run: ./WaitKubeCertificate.ps1 -Name "hello-world-direct-tls"
         shell: pwsh
         working-directory: scripts
-
-      - name: Install migration
-        run: |
-          helm upgrade --install --wait --atomic --debug \
-            migration . \
-            --namespace default
-        working-directory: kubernetes/charts/migration
 
       - name: Install vpa
         run: |
@@ -540,6 +535,25 @@ jobs:
             -f values.yaml \
         working-directory: kubernetes/charts/plex
 
+      - name: Install homeassistant-proxy
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            homeassistant-proxy . \
+            --namespace default \
+            -f values.yaml \
+            --set ingress.host="${{ env.homeassistant_host }}"
+        working-directory: kubernetes/charts/homeassistant-proxy
+
+      - name: Install octoprint-proxy
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            octoprint-proxy . \
+            --namespace default \
+            -f values.yaml \
+            --set ingress.host="${{ env.octoprint_host }}"
+        working-directory: kubernetes/charts/octoprint-proxy
 
       - name: Disconnect from Kubernetes
         uses: ./.github/actions/disconnect-k8s

@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: homeassistant-proxy
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: homeassistant-proxy
+  template:
+    metadata:
+      labels:
+        app: homeassistant-proxy
+    spec:
+      containers:
+      - name: caddy
+        image: caddy:latest
+        volumeMounts:
+        - name: caddy-config
+          mountPath: /etc/caddy/Caddyfile
+          subPath: Caddyfile
+      volumes:
+      - name: caddy-config
+        configMap:
+          name: homeassistant-proxy-config

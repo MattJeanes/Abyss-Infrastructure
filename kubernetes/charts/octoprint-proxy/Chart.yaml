@@ -1,4 +1,4 @@
 apiVersion: v2
-name: migration
+name: octoprint-proxy
 type: application
 version: 1.0.0
