@@ -24,12 +24,12 @@ service:
       filetransfer:
         enabled: true
         port: 30033
-        nodePort: 30004
+        nodePort: 30005
       voice:
         enabled: true
         primary: true
         port: 9987
-        nodePort: 30005
+        nodePort: 30007
         protocol: UDP
 probes:
   readiness:
