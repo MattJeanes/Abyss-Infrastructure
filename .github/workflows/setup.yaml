@@ -269,7 +269,7 @@ jobs:
             -f values.yaml \
             --set storageAccount.name="${{ env.storage_account_name }}" \
             --set storageAccount.key="${{ env.storage_account_key }}" \
-            --set longhorn.defaultBackupStore.backupTarget="azblob://${{ env.storage_account_name }}.core.windows.net/longhorn/"
+            --set longhorn.defaultBackupStore.backupTarget="azblob://longhorn@core.windows.net/"
         working-directory: kubernetes/charts/longhorn
 
       # - name: Install persistent volume for prometheus
