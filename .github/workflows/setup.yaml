@@ -92,7 +92,6 @@ jobs:
             hello_world_direct_host = "hello-world-direct.${{ vars.HOST }}"
             grafana_host = "grafana.${{ vars.HOST }}"
             teamspeak_host = "ts.${{ vars.HOST }}"
-            mqtt_host = "mqtt.${{ vars.HOST }}"
             send_host = "send.${{ vars.HOST }}"
             homeassistant_host = "homeassistant.${{ vars.HOST }}"
             octoprint_host = "octoprint.${{ vars.HOST }}"
