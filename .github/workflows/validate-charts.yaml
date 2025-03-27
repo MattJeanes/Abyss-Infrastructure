@@ -30,7 +30,7 @@ jobs:
           Write-Host "Installing kubeconform v$version"
 
           $tempDirectory = "${{ runner.temp }}"
-          $downloadUrl = "https://github.com/yannh/kubeconform/releases/download/v$version/kubeconform-linux-amd64.tar.gz
+          $downloadUrl = "https://github.com/yannh/kubeconform/releases/download/v$version/kubeconform-linux-amd64.tar.gz"
           $downloadPath = Join-Path $tempDirectory "kubeconform.tar.gz"
           $targetPath = Join-Path $tempDirectory "kubeconform"
 
