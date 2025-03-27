@@ -1,0 +1,162 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: qbittorrent
+spec:
+  replicas: {{ .Values.replicas }}
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: qbittorrent
+  template:
+    metadata:
+      labels:
+        app: qbittorrent
+    spec:
+      initContainers:
+        - args:
+          - |
+            mkdir -p /mnt/rclone/encrypted
+            wget https://github.com/WDaan/VueTorrent/releases/download/v2.1.0/vuetorrent.zip -O /tmp/vuetorrent.zip
+            rm -rf /vuetorrent/*
+            mkdir /tmp/vuetorrent
+            unzip /tmp/vuetorrent.zip -d /tmp/vuetorrent
+            mv /tmp/vuetorrent/vuetorrent/* /vuetorrent
+          command:
+          - /bin/sh
+          - -c
+          image: {{ .Values.initContainer.image.repository }}:{{ .Values.initContainer.image.tag }}
+          imagePullPolicy: {{ .Values.initContainer.image.pullPolicy }}
+          name: init
+          volumeMounts:
+          - mountPath: /vuetorrent
+            name: vuetorrent
+          - mountPath: /mnt/rclone
+            name: rclone
+      containers:
+        - name: qbittorrent
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          command:
+            - /bin/sh
+          args:
+            - -c
+            - while ! ip link show tun0 &>/dev/null; do sleep 1; done && /init
+          env:
+            - name: TZ
+              value: Europe/London
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          volumeMounts:
+            - name: config
+              mountPath: /config
+            - name: rclone
+              mountPath: /mnt/rclone
+              mountPropagation: HostToContainer
+            - name: vuetorrent
+              mountPath: /vuetorrent
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 30
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+        - name: gluetun
+          image: {{ .Values.gluetun.image.repository }}:{{ .Values.gluetun.image.tag }}
+          imagePullPolicy: IfNotPresent
+          env:
+          - name: FIREWALL_INPUT_PORTS
+            value: "8080"
+          - name: OPENVPN_USER
+            value: {{ required "openvpn.user is required" .Values.openvpn.user }}
+          - name: SERVER_CITIES
+            value: amsterdam
+          - name: TZ
+            value: Europe/London
+          - name: VPN_SERVICE_PROVIDER
+            value: mullvad
+          - name: VPN_TYPE
+            value: openvpn
+          livenessProbe:
+            exec:
+              command:
+              - /gluetun-entrypoint
+              - healthcheck
+            failureThreshold: 6
+            initialDelaySeconds: 30
+            periodSeconds: 5
+            timeoutSeconds: 5
+          securityContext:
+            capabilities:
+              add:
+              - NET_ADMIN
+              - SYS_MODULE
+        - args:
+          - mount
+          - azureblob-encrypted:/
+          - /mnt/rclone/encrypted
+          - --allow-other
+          - --cache-dir
+          - /rclone/cache
+          - --vfs-cache-mode
+          - writes
+          - -v
+          env:
+          - name: RCLONE_CONFIG
+            value: /rclone/config/rclone.conf
+          image: {{ .Values.rclone.image.repository }}:{{ .Values.rclone.image.tag }}
+          imagePullPolicy: {{ .Values.rclone.image.pullPolicy }}
+          lifecycle:
+            preStop:
+              exec:
+                command:
+                - /bin/sh
+                - -c
+                - umount -l /mnt/rclone/encrypted; true
+          name: rclone
+          securityContext:
+            allowPrivilegeEscalation: true
+            privileged: true
+          volumeMounts:
+          - mountPath: /mnt/rclone
+            mountPropagation: Bidirectional
+            name: rclone
+          - mountPath: /rclone/config
+            name: rclone-config
+          - mountPath: /rclone/cache
+            name: rclone-cache
+      volumes:
+        - name: config
+          persistentVolumeClaim:
+            claimName: qbittorrent-config
+        - name: rclone
+          emptyDir:
+            {}
+        - name: rclone-cache
+          emptyDir:
+            {}
+        - name: rclone-config
+          secret:
+            secretName: azure-storage-account-rclone
+        - name: vuetorrent
+          emptyDir:
+            {}

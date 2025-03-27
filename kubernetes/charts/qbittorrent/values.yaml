@@ -1,121 +1,27 @@
 # https://github.com/bjw-s/helm-charts/blob/a081de5/charts/library/common/values.yaml
 
+replicas: 0
 image:
   repository: ghcr.io/linuxserver/qbittorrent
   pullPolicy: IfNotPresent
   tag: version-4.6.0-r0@sha256:b96ad7ed83889420d5f6df311065c28ae465ce1d23ea42179f56196eb6ac4d4e
-controller:
-  replicas: 0
-initContainers:
-  init:
-    image: busybox@sha256:37f7b378a29ceb4c551b1b5582e27747b855bbfaa73fa11914fe0df028dc581f
-    imagePullPolicy: IfNotPresent
-    command: ["/bin/sh", "-c"]
-    args:
-    - |
-      mkdir -p /mnt/rclone/encrypted
-      wget https://github.com/WDaan/VueTorrent/releases/download/v2.1.0/vuetorrent.zip -O /tmp/vuetorrent.zip
-      rm -rf /vuetorrent/*
-      mkdir /tmp/vuetorrent
-      unzip /tmp/vuetorrent.zip -d /tmp/vuetorrent
-      mv /tmp/vuetorrent/vuetorrent/* /vuetorrent
-    volumeMounts:
-    - name: vuetorrent
-      mountPath: /vuetorrent
-    - name: rclone
-      mountPath: /mnt/rclone
-addons:
-  vpn:
-    enabled: true
-    gluetun:
-      image:
-        repository: ghcr.io/qdm12/gluetun
-        tag: v3.40.0@sha256:2b42bfa046757145a5155acece417b65b4443c8033fb88661a8e9dcf7fda5a00
-    env:
-      TZ: Europe/London
-      VPN_TYPE: openvpn
-      VPN_SERVICE_PROVIDER: mullvad
-      OPENVPN_USER: "" # set in CLI
-      SERVER_CITIES: amsterdam
-      FIREWALL_INPUT_PORTS: '8080'
-    livenessProbe:
-      exec:
-        command: 
-        - /gluetun-entrypoint
-        - healthcheck
-      failureThreshold: 6
-      initialDelaySeconds: 30
-      periodSeconds: 5
-      timeoutSeconds: 5
-sidecars:
-  rclone:
-    image: rclone/rclone:1.69.1@sha256:600f51856285df1ae5d91c8bb2682cbbe31bf109ebeeef9ecead6ca8c0ff6138
-    imagePullPolicy: IfNotPresent
-    args:
-    - mount
-    - azureblob-encrypted:/
-    - /mnt/rclone/encrypted
-    - --allow-other
-    - --cache-dir
-    - /rclone/cache
-    - --vfs-cache-mode
-    - writes
-    - -v
-    env:
-      RCLONE_CONFIG: /rclone/config/rclone.conf
-    volumeMounts:
-    - name: rclone
-      mountPath: /mnt/rclone
-      mountPropagation: Bidirectional
-    - name: rclone-config
-      mountPath: /rclone/config
-    - name: rclone-cache
-      mountPath: /rclone/cache
-    securityContext:
-      privileged: true
-      allowPrivilegeEscalation: true
-    lifecycle:
-      preStop:
-        exec:
-          command:
-          - /bin/sh
-          - -c
-          - umount -l /mnt/rclone/encrypted; true
-command:
-  - '/bin/sh'
-args:
-  - '-c'
-  - while ! ip link show tun0 &>/dev/null; do sleep 1; done && /init
-env:
-  TZ: Europe/London
-service:
-  main:
-    ports:
-      http:
-        port: 8080
-persistence:
-  config:
-    enabled: true
-    existingClaim: qbittorrent-config
-  media:
-    enabled: false
-  vuetorrent:
-    enabled: true
-    type: emptyDir
-  rclone:
-    enabled: true
-    type: emptyDir
-    mountPath: /mnt/rclone
-    mountPropagation: HostToContainer
-  rclone-config:
-    enabled: true
-    type: secret
-    name: azure-storage-account-rclone
-    mountPath: '-'
-  rclone-cache:
-    enabled: true
-    type: emptyDir
-    mountPath: '-'
+initContainer:
+  image: 
+    repository: busybox
+    tag: stable
+    pullPolicy: IfNotPresent
+gluetun:
+  image:
+    repository: ghcr.io/qdm12/gluetun
+    tag: v3.40.0@sha256:2b42bfa046757145a5155acece417b65b4443c8033fb88661a8e9dcf7fda5a00
+    pullPolicy: IfNotPresent
+rclone:
+  image:
+    repository: rclone/rclone
+    tag: 1.69.1@sha256:600f51856285df1ae5d91c8bb2682cbbe31bf109ebeeef9ecead6ca8c0ff6138
+    pullPolicy: IfNotPresent
+openvpn:
+  user: ""
 resources:
   requests:
     cpu: 5m
