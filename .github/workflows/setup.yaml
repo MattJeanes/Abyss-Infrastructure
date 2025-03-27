@@ -420,11 +420,11 @@ jobs:
             teslamate . \
             --namespace default \
             -f values.yaml \
-            --set env.DATABASE_PASS="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
-            --set env.ENCRYPTION_KEY="${{ secrets.TESLAMATE_ENCRYPTION_KEY }}" \
-            --set env.MQTT_HOST="${{ vars.MQTT_HOST }}" \
-            --set env.MQTT_USERNAME="${{ vars.TESLAMATE_MQTT_USERNAME }}" \
-            --set env.MQTT_PASSWORD="${{ secrets.TESLAMATE_MQTT_PASSWORD }}"
+            --set database.password="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
+            --set encryptionKey="${{ secrets.TESLAMATE_ENCRYPTION_KEY }}" \
+            --set mqtt.host="${{ vars.MQTT_HOST }}" \
+            --set mqtt.username="${{ vars.TESLAMATE_MQTT_USERNAME }}" \
+            --set mqtt.password="${{ secrets.TESLAMATE_MQTT_PASSWORD }}"
         working-directory: kubernetes/charts/teslamate
 
       - name: Prepare teslamate grafana dashboards
