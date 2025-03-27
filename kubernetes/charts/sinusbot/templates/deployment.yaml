@@ -1,0 +1,64 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: sinusbot
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: sinusbot
+  template:
+    metadata:
+      labels:
+        app: sinusbot
+    spec:
+      containers:
+        - name: sinusbot
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: GID
+              value: "1001"
+            - name: UID
+              value: "1001"
+          ports:
+            - name: http
+              containerPort: 8087
+              protocol: TCP
+          volumeMounts:
+            - name: sinusbot
+              subPath: data
+              mountPath: /opt/sinusbot/data
+            - name: sinusbot
+              subPath: scripts
+              mountPath: /opt/sinusbot/scripts
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: 8087
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: 8087
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 30
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            tcpSocket:
+              port: 8087
+            timeoutSeconds: 1
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: sinusbot
+          persistentVolumeClaim:
+            claimName: sinusbot
+      nodeSelector:
+        kubernetes.io/arch: amd64

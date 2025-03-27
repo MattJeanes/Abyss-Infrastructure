@@ -522,7 +522,7 @@ jobs:
             qbittorrent . \
             --namespace default \
             -f values.yaml \
-            --set addons.vpn.env.OPENVPN_USER="${{ secrets.MULLVAD_ACCOUNT_NUMBER }}"
+            --set openvpn.user="${{ secrets.MULLVAD_ACCOUNT_NUMBER }}"
         working-directory: kubernetes/charts/qbittorrent
 
       - name: Install plex
