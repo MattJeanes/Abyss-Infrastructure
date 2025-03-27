@@ -4,76 +4,12 @@ image:
   repository: teamspeak
   tag: 3.13.7@sha256:6756c50d1a0a7e48db95cf4b38d4c6d59ac0b560bc3b9e986ed069d2c16206f5
   pullPolicy: IfNotPresent
-env:
-  TZ: UTC
-  TS3SERVER_DB_PLUGIN: ts3db_sqlite3
-  TS3SERVER_DB_SQLCREATEPATH: create_sqlite
-  TS3SERVER_LICENSE: accept
-service:
-  main:
-    type: NodePort
-    externalTrafficPolicy: Local
-    ports:
-      http:
-        enabled: false
-        primary: false
-      serverquery:
-        enabled: true
-        port: 10011
-        nodePort: 30003
-      filetransfer:
-        enabled: true
-        port: 30033
-        nodePort: 30005
-      voice:
-        enabled: true
-        primary: true
-        port: 9987
-        nodePort: 30007
-        protocol: UDP
-probes:
-  readiness:
-    custom: true
-    spec:
-      tcpSocket:
-        port: 10011
-  liveness:
-    custom: true
-    spec:
-      tcpSocket:
-        port: 10011
-  startup:
-    custom: true
-    spec:
-      tcpSocket:
-        port: 10011
+ports:
+  filetransfer: 30033
+  serverquery: 10011
+  voice: 9987
 persistence:
-  data:
-    enabled: true
-    type: pvc
-    existingClaim: teamspeak
-    mountPath: /var/ts3server
-metrics:
-  enabled: true
-  serviceMonitor:
-    interval: 1m
-    scrapeTimeout: 30s
-    labels: {}
-  prometheusRule:
-    enabled: true
-    labels: {}
-    rules: []
-  exporter:
-    image:
-      repository: quay.io/ricardbejarano/ts3exporter
-      tag: 0.0.7@sha256:3f3e2fceb82365320446728474502b1dd26de1123e6eb9ffcc0626003c743d0e
-      pullPolicy: IfNotPresent
-    env:
-      port: 9189
-      remote: localhost:10011
-      enableChannelMetrics: false
-nodeSelector:
-  kubernetes.io/arch: amd64
+  existingClaim: teamspeak
 resources:
   requests:
     cpu: 20m

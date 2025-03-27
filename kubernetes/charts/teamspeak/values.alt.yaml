@@ -1,40 +1,6 @@
-env:
-  TS3SERVER_DEFAULT_VOICE_PORT: 9988
-  TS3SERVER_QUERY_PORT: 10012
-  TS3SERVER_FILETRANSFER_PORT: 30034
-  TS3SERVER_FILETRANSFER_IP: 0.0.0.0
-service:
-  main:
-    ports:
-      serverquery:
-        port: 10012
-        nodePort: 30004
-      filetransfer:
-        port: 30034
-        nodePort: 30006
-      voice:
-        port: 9988
-        nodePort: 30008
-probes:
-  readiness:
-    custom: true
-    spec:
-      tcpSocket:
-        port: 10012
-  liveness:
-    custom: true
-    spec:
-      tcpSocket:
-        port: 10012
-  startup:
-    custom: true
-    spec:
-      tcpSocket:
-        port: 10012
+ports:
+  filetransfer: 30034
+  serverquery: 10012
+  voice: 9988
 persistence:
-  data:
-    existingClaim: teamspeak-alt
-metrics:
-  exporter:
-    env:
-      remote: localhost:10012
+  existingClaim: teamspeak-alt
