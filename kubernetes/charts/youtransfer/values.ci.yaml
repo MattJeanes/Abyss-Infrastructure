@@ -1,0 +1,5 @@
+ingress:
+  host: "send.example.com"
+auth:
+  username: "dummy-user"
+  password: "dummy-password"

@@ -1,0 +1,6 @@
+teslamate:
+  database:
+    pass: "dummy-teslamate-password"
+influxdb:
+  organization: "dummy-org"
+  token: "dummy-influxdb-token"

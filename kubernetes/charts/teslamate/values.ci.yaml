@@ -1,0 +1,7 @@
+database:
+  password: "dummy-teslamate-password"
+encryptionKey: "dummy-encryption-key"
+mqtt:
+  host: "mqtt.example.com"
+  username: "dummy-username"
+  password: "dummy-password"

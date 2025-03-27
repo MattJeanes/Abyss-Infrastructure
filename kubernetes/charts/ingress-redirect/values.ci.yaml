@@ -1,0 +1,2 @@
+host: "ts.example.com"
+redirect: "ts3server://$HOST"
