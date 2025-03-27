@@ -422,7 +422,7 @@ jobs:
             -f values.yaml \
             --set env.DATABASE_PASS="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
             --set env.ENCRYPTION_KEY="${{ secrets.TESLAMATE_ENCRYPTION_KEY }}" \
-            --set env.MQTT_HOST="${{ env.mqtt_host }}" \
+            --set env.MQTT_HOST="${{ vars.MQTT_HOST }}" \
             --set env.MQTT_USERNAME="${{ vars.TESLAMATE_MQTT_USERNAME }}" \
             --set env.MQTT_PASSWORD="${{ secrets.TESLAMATE_MQTT_PASSWORD }}"
         working-directory: kubernetes/charts/teslamate
