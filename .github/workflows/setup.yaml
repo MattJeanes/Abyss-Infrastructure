@@ -367,7 +367,7 @@ jobs:
             --namespace default \
             -f values.yaml \
             -f values.alt.yaml \
-            --set env.TS3SERVER_SERVERADMIN_PASSWORD="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
+            --set serverAdminPassword="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
         working-directory: kubernetes/charts/teamspeak
 
       - name: Install persistent volume for sinusbot
