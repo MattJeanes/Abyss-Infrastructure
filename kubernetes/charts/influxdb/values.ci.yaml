@@ -1,0 +1,5 @@
+influxdb:
+  auth:
+    admin:
+      password: "dummy-admin-password"
+      token: "dummy-admin-token"

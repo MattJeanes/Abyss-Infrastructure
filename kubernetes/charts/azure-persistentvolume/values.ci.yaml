@@ -1,0 +1,9 @@
+name: "dummy-pv"
+disk:
+  capacity: "1Gi"
+useFileShare: true
+fileShare:
+  name: "dummy-share"
+  subscriptionId: "00000000-0000-0000-0000-000000000000"
+  uid: 1000
+  gid: 1000
