@@ -70,12 +70,6 @@ jobs:
               Write-Error "No chart found in $chartPath"
             }
 
-            $skipCIValidation = Test-Path (Join-Path $chartPath ".skip-ci-validation")
-            if ($skipCIValidation) {
-              Write-Host "Skipping CI validation for $chartPath"
-              return
-            }
-
             Write-Host "Validating $chartPath"
 
             if (-not (Test-Path $valuesPath)) {
@@ -105,7 +99,8 @@ jobs:
 
             $template | kubeconform --debug --summary --strict --kubernetes-version $kubernetesVersion `
               --schema-location default `
-              --schema-location "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json"
+              --schema-location "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json" `
+              --schema-location "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/{{.NormalizedKubernetesVersion}}/{{.ResourceKind}}.json"
             if ($LASTEXITCODE -ne 0) {
               Write-Error "kubeconform failed for $chartPath"
             }
