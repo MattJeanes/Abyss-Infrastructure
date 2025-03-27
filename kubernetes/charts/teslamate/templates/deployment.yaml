@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: teslamate
+spec:
+  revisionHistoryLimit: 3
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: teslamate
+  template:
+    metadata:
+      labels:
+        app: teslamate
+    spec:
+      containers:
+        - name: teslamate
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: DATABASE_HOST
+              value: {{ required "database.host is required" .Values.database.host | quote }}
+            - name: DATABASE_NAME
+              value: {{ required "database.name is required" .Values.database.name | quote }}
+            - name: DATABASE_USER
+              value: {{ required "database.username is required" .Values.database.username | quote }}
+            - name: DATABASE_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: teslamate
+                  key: database-password
+            {{- if not (typeIs "bool" .Values.mqtt.enabled) }}
+            {{- fail "mqtt.enabled must be a boolean" }}
+            {{- end }}
+            - name: DISABLE_MQTT
+              value: {{ not .Values.mqtt.enabled | quote }}
+            - name: MQTT_HOST
+              value: {{ required "mqtt.host is required" .Values.mqtt.host | quote }}
+            - name: MQTT_USERNAME
+              value: {{ required "mqtt.username is required" .Values.mqtt.username | quote }}
+            - name: MQTT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: teslamate
+                  key: mqtt-password
+            - name: ENCRYPTION_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: teslamate
+                  key: encryption-key
+            - name: LOCALE
+              value: en
+            - name: TZ
+              value: Europe/London
+          ports:
+            - name: http
+              containerPort: 4000
+              protocol: TCP
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: 4000
+            timeoutSeconds: 1
+          readinessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: 4000
+            timeoutSeconds: 1
+          startupProbe:
+            failureThreshold: 30
+            initialDelaySeconds: 0
+            periodSeconds: 5
+            tcpSocket:
+              port: 4000
+            timeoutSeconds: 1
+          resources: {{ toYaml .Values.resources | nindent 12 }}

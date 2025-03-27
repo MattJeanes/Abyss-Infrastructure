@@ -87,7 +87,10 @@ spec:
           - name: FIREWALL_INPUT_PORTS
             value: "8080"
           - name: OPENVPN_USER
-            value: {{ required "openvpn.user is required" .Values.openvpn.user | quote }}
+            valueFrom:
+              secretKeyRef:
+                name: qbittorrent
+                key: openvpn-user
           - name: SERVER_CITIES
             value: amsterdam
           - name: TZ

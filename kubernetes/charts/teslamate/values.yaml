@@ -1,29 +1,21 @@
-# https://github.com/bjw-s/helm-charts/blob/a081de5/charts/library/common/values.yaml
-
 image:
   repository: teslamate/teslamate
   tag: 1.32.0@sha256:8c282ada5c72b7b0cbd316ec7bc010a9214d5943cf1e1b36ab9b7a98f45a5809
   pullPolicy: IfNotPresent
-env:
-  DISABLE_MQTT: "false"
-  DATABASE_HOST: postgresql
-  DATABASE_USER: teslamate
-  DATABASE_PASS: "" # set in CLI
-  DATABASE_NAME: teslamate
-  TZ: Europe/London
-  LOCALE: en
+mqtt:
+  enabled: true
+  host: "" # set in CLI
+  username: "" # set in CLI
+  password: "" # set in CLI
+database:
+  host: postgresql
+  name: teslamate
+  username: teslamate
+  password: "" # set in CLI
+encryptionKey: "" # set in CLI
 resources:
   requests:
     cpu: 30m
     memory: 350Mi
   limits:
     memory: 350Mi
-service:
-  main:
-    ports:
-      http:
-        port: 4000
-persistence:
-  import:
-    enabled: false
-    mountPath: /opt/app/import
