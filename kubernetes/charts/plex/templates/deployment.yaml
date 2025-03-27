@@ -71,7 +71,7 @@ spec:
       - name: plex-transcoding
         hostPath:
           path: /tmp/transcoding
-          type: Directory
+          type: DirectoryOrCreate
       - name: device-dri
         hostPath:
           path: /dev/dri
