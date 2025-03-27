@@ -70,6 +70,12 @@ jobs:
               Write-Error "No chart found in $chartPath"
             }
 
+            $skipCIValidation = Test-Path (Join-Path $chartPath ".skip-ci-validation")
+            if ($skipCIValidation) {
+              Write-Host "Skipping CI validation for $chartPath"
+              return
+            }
+
             Write-Host "Validating $chartPath"
 
             if (-not (Test-Path $valuesPath)) {
