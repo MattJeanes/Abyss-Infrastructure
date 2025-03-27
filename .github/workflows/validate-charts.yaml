@@ -10,7 +10,7 @@ on:
   workflow_dispatch:
   pull_request:
     branches:
-      - renovate/*
+      - main
     paths:
       - kubernetes/charts/**
       - .github/workflows/validate-charts.yaml
