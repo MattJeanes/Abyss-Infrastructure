@@ -1,0 +1,20 @@
+kube-prometheus-stack:
+  alertmanager:
+    config:
+      global:
+        pagerduty_url: "https://events.pagerduty.com/v2/enqueue"
+      receivers:
+        - name: "default-receiver"
+          pagerduty_configs:
+            - routing_key: "dummy-pagerduty-key"
+        - name: "dead-mans-snitch"
+          webhook_configs:
+            - url: "https://example.com/webhook"
+  grafana:
+    ingress:
+      hosts:
+        - "grafana.example.com"
+      tls:
+        - hosts:
+            - "grafana.example.com"
+    adminPassword: "dummy-password"

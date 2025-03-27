@@ -1,0 +1,109 @@
+name: Validate charts
+
+on:
+  push:
+    branches:
+      - renovate/*
+    paths:
+      - kubernetes/charts/**
+      - .github/workflows/validate-charts.yaml
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - kubernetes/charts/**
+      - .github/workflows/validate-charts.yaml
+
+jobs:
+  validate-charts:
+    name: Validate charts
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Install kubeconform
+        shell: pwsh
+        run: |
+          $version = "0.6.1"
+          Write-Host "Installing kubeconform v$version"
+
+          $tempDirectory = "${{ runner.temp }}"
+          $downloadUrl = "https://github.com/yannh/kubeconform/releases/download/v$version/kubeconform-linux-amd64.tar.gz"
+          $downloadPath = Join-Path $tempDirectory "kubeconform.tar.gz"
+          $targetPath = Join-Path $tempDirectory "kubeconform"
+
+          $null = Invoke-WebRequest -Uri $downloadUrl -OutFile $downloadPath -UseBasicParsing
+
+          7z x $downloadPath -aoa "-o$tempDirectory"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to extract $downloadPath"
+          }
+
+          7z x (Join-Path $tempDirectory "kubeconform.tar") -aoa "-o$targetPath"
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to extract"
+          }
+
+          chmod +x (Join-Path $targetPath "kubeconform")
+          if ($LASTEXITCODE -ne 0) {
+            Write-Error "Failed to make kubeconform executable"
+          }
+
+          $targetPath >> $env:GITHUB_PATH
+
+      - name: Validate helm charts
+        shell: pwsh
+        run: |
+          $kubernetesVersion = $env:KUBERNETES_VERSION
+
+          $charts = Get-ChildItem -Path "kubernetes/charts" -Directory
+
+          $charts | ForEach-Object {
+            $chartPath = $_.FullName
+            $valuesPath = Join-Path $chartPath "values.yaml"
+            $valuesCIPath = Join-Path $chartPath "values.ci.yaml"
+
+            $chartFile = Get-ChildItem -Path $chartPath -Filter "Chart.yaml"
+            if (-not $chartFile) {
+              Write-Error "No chart found in $chartPath"
+            }
+
+            Write-Host "Validating $chartPath"
+
+            if (-not (Test-Path $valuesPath)) {
+              Write-Error "No values file found in $chartPath"
+            }
+
+            Write-Host "Updating $chartPath dependencies"
+            helm dependency update $chartPath
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "helm dependency update failed for $chartPath"
+            }
+
+            $helmArgs = @(
+              "template",
+              $chartPath,
+              "--values", $valuesPath
+            )
+
+            if (Test-Path $valuesCIPath) {
+              $helmArgs += @("--values", $valuesCIPath)
+            }
+
+            $template = helm @helmArgs
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "helm template failed for $chartPath"
+            }
+
+            $template | kubeconform --debug --summary --strict --kubernetes-version $kubernetesVersion `
+              --schema-location default `
+              --schema-location "https://raw.githubusercontent.com/datreeio/CRDs-catalog/main/{{.Group}}/{{.ResourceKind}}_{{.ResourceAPIVersion}}.json" `
+              --schema-location "https://raw.githubusercontent.com/yannh/kubernetes-json-schema/master/{{.NormalizedKubernetesVersion}}/{{.ResourceKind}}.json"
+            if ($LASTEXITCODE -ne 0) {
+              Write-Error "kubeconform failed for $chartPath"
+            }
+          }
+        env:
+          KUBERNETES_VERSION: "1.31.0"

@@ -1,0 +1,6 @@
+storageAccount:
+  name: "dummystorageaccount"
+  key: "dummy-storage-account-key"
+longhorn:
+  defaultBackupStore:
+    backupTarget: "azblob://longhorn@core.windows.net/"
