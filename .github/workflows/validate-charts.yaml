@@ -76,10 +76,10 @@ jobs:
               Write-Error "No values file found in $chartPath"
             }
 
-            Write-Host "Building $chartPath dependencies"
-            helm dependency build $chartPath
+            Write-Host "Updating $chartPath dependencies"
+            helm dependency update $chartPath
             if ($LASTEXITCODE -ne 0) {
-              Write-Error "helm dependency build failed for $chartPath"
+              Write-Error "helm dependency update failed for $chartPath"
             }
 
             $helmArgs = @(
