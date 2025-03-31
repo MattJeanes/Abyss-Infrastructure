@@ -3,3 +3,6 @@ azurefile-csi-driver:
     replicas: 1
   linux:
     kubelet: /var/snap/microk8s/common/var/lib/kubelet
+  snapshot:
+    snapshotController:
+      strategyType: Recreate
