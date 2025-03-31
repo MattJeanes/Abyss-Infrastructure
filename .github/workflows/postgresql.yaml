@@ -1,0 +1,49 @@
+name: PostgreSQL
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/postgresql/**'
+      - 'kubernetes/charts/longhorn-persistentvolume/**'
+      - '.github/workflows/postgresql.yaml'
+
+jobs:
+  deploy-postgresql:
+    name: Deploy PostgreSQL
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install persistent volume for postgresql
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            postgresql-persistentvolume . \
+            --namespace default \
+            --set name=postgresql \
+            --set disk.capacity=4Gi \
+            --set volumeHandle=postgresql
+        working-directory: kubernetes/charts/longhorn-persistentvolume
+
+      - name: Install postgresql
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            postgresql . \
+            --namespace default \
+            -f values.yaml \
+            --set postgresql.auth.postgresPassword="${{ secrets.POSTGRESQL_POSTGRES_PASSWORD }}"
+        working-directory: kubernetes/charts/postgresql
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s

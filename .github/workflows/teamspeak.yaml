@@ -1,0 +1,89 @@
+name: TeamSpeak
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/teamspeak/**'
+      - 'kubernetes/charts/ingress-redirect/**'
+      - 'kubernetes/charts/azure-persistentvolume/**'
+      - '.github/workflows/teamspeak.yaml'
+
+jobs:
+  deploy-teamspeak:
+    name: Deploy TeamSpeak
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install persistent volume for teamspeak
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            teamspeak-persistentvolume . \
+            --namespace default \
+            --set name=teamspeak \
+            --set disk.capacity=10Gi \
+            --set useFileShare=true \
+            --set fileShare.name=teamspeak \
+            --set fileShare.subscriptionId=${{ vars.AZURE_SUBSCRIPTION_ID }}
+        working-directory: kubernetes/charts/azure-persistentvolume
+
+      - name: Install teamspeak
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            teamspeak . \
+            --namespace default \
+            -f values.yaml \
+            --set serverAdminPassword="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
+        working-directory: kubernetes/charts/teamspeak
+
+      - name: Install redirect for teamspeak
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            teamspeak-redirect . \
+            --namespace default \
+            --set host="ts.${{ vars.HOST }}" \
+            --set redirect="ts3server://\$HOST"
+        working-directory: kubernetes/charts/ingress-redirect
+
+      - name: Wait for teamspeak redirect certificate to be ready
+        uses: ./.github/actions/wait-kube-certificate
+        with:
+          name: "teamspeak-redirect-tls"
+
+      - name: Install persistent volume for teamspeak-alt
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            teamspeak-alt-persistentvolume . \
+            --namespace default \
+            --set name=teamspeak-alt \
+            --set disk.capacity=10Gi \
+            --set useFileShare=true \
+            --set fileShare.name=teamspeak-alt \
+            --set fileShare.subscriptionId=${{ vars.AZURE_SUBSCRIPTION_ID }}
+        working-directory: kubernetes/charts/azure-persistentvolume
+
+      - name: Install teamspeak-alt
+        run: |
+          helm dependency update . 
+          helm upgrade --install --wait --atomic --debug \
+            teamspeak-alt . \
+            --namespace default \
+            -f values.yaml \
+            -f values.alt.yaml \
+            --set serverAdminPassword="${{ secrets.TEAMSPEAK_SERVERADMIN_PASSWORD }}"
+        working-directory: kubernetes/charts/teamspeak
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s

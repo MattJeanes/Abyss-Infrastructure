@@ -1,0 +1,58 @@
+name: Ingress & Certificate Management
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/ingress-nginx/**'
+      - 'kubernetes/charts/cert-manager/**'
+      - 'kubernetes/charts/certificate-issuers/**'
+      - '.github/workflows/ingress-certificates.yaml'
+
+jobs:
+  deploy-ingress-certs:
+    name: Deploy Ingress & Certificate Management
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install ingress-nginx
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            ingress-nginx . \
+            --namespace ingress-nginx \
+            --create-namespace \
+            -f values.yaml
+        working-directory: kubernetes/charts/ingress-nginx
+
+      - name: Install cert-manager
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            cert-manager . \
+            --namespace cert-manager \
+            --create-namespace \
+            -f values.yaml
+        working-directory: kubernetes/charts/cert-manager
+
+      - name: Install certificate-issuers
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            certificate-issuers . \
+            --namespace cert-manager \
+            --set letsEncrypt.email="${{ vars.EMAIL }}"
+        working-directory: kubernetes/charts/certificate-issuers
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s

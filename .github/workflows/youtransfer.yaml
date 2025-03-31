@@ -1,0 +1,43 @@
+name: YouTransfer
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/youtransfer/**'
+      - '.github/workflows/youtransfer.yaml'
+
+jobs:
+  deploy-youtransfer:
+    name: Deploy YouTransfer
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install youtransfer
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            youtransfer . \
+            --namespace default \
+            --set ingress.host="send.${{ vars.HOST }}" \
+            --set auth.username="${{ vars.YOUTRANSFER_USERNAME }}" \
+            --set auth.password="${{ secrets.YOUTRANSFER_PASSWORD }}"
+        working-directory: kubernetes/charts/youtransfer
+
+      - name: Wait for youtransfer certificate to be ready
+        uses: ./.github/actions/wait-kube-certificate
+        with:
+          name: "youtransfer-tls"
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s

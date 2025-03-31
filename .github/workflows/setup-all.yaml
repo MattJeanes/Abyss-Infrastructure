@@ -1,0 +1,160 @@
+name: Setup All
+
+on:
+  workflow_dispatch:
+    inputs:
+      insecureKubeContext:
+        description: "Use insecure Kubernetes context"
+        type: boolean
+        default: false
+
+jobs:
+  terraform:
+    name: Terraform Infrastructure
+    uses: ./.github/workflows/terraform.yaml
+    with:
+      runApply: true
+    secrets: inherit
+
+  setup-common:
+    name: Setup Common Resources
+    needs: terraform
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ inputs.insecureKubeContext && secrets.KUBECONFIG_INSECURE || secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Add github-registry secret
+        run: |
+          kubectl -n default create secret docker-registry github-registry \
+            --docker-server=ghcr.io \
+            --docker-username="${{ github.actor }}" \
+            --docker-password="${{ secrets.ABYSS_GITHUB_REGISTRY_PAT }}" \
+            --docker-email="${{ vars.EMAIL }}" \
+            --dry-run=client -o yaml --save-config | kubectl apply -f -
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s
+
+  # Core Infrastructure Components
+  trigger-cloudflare-tunnel:
+    name: Deploy Cloudflare Tunnel
+    needs: setup-common
+    uses: ./.github/workflows/cloudflare-tunnel.yaml
+    with:
+      insecureKubeContext: ${{ inputs.insecureKubeContext }}
+    secrets: inherit
+
+  trigger-network-infrastructure:
+    name: Deploy Network Infrastructure
+    needs: trigger-cloudflare-tunnel
+    uses: ./.github/workflows/network-infrastructure.yaml
+    secrets: inherit
+
+  trigger-ingress-certificates:
+    name: Deploy Ingress & Certificates
+    needs: trigger-network-infrastructure
+    uses: ./.github/workflows/ingress-certificates.yaml
+    secrets: inherit
+
+  trigger-azure-integration:
+    name: Deploy Azure Integration
+    needs: trigger-ingress-certificates
+    uses: ./.github/workflows/azure-integration.yaml
+    secrets: inherit
+
+  trigger-longhorn:
+    name: Deploy Longhorn
+    needs: trigger-azure-integration
+    uses: ./.github/workflows/longhorn.yaml
+    secrets: inherit
+
+  # Management Components
+  trigger-kubernetes-dashboard:
+    name: Deploy Kubernetes Dashboard
+    needs: trigger-longhorn
+    uses: ./.github/workflows/kubernetes-dashboard.yaml
+    secrets: inherit
+
+  trigger-vpa:
+    name: Deploy Vertical Pod Autoscaler
+    needs: trigger-longhorn
+    uses: ./.github/workflows/vpa.yaml
+    secrets: inherit
+
+  # Verification & Monitoring Components
+  trigger-hello-world:
+    name: Deploy Hello World
+    needs: trigger-ingress-certificates
+    uses: ./.github/workflows/hello-world.yaml
+    secrets: inherit
+
+  trigger-monitoring:
+    name: Deploy Monitoring Stack
+    needs: [trigger-longhorn, trigger-ingress-certificates]
+    uses: ./.github/workflows/monitoring.yaml
+    secrets: inherit
+
+  # Database Components
+  trigger-postgresql:
+    name: Deploy PostgreSQL
+    needs: trigger-longhorn
+    uses: ./.github/workflows/postgresql.yaml
+    secrets: inherit
+
+  trigger-influxdb:
+    name: Deploy InfluxDB
+    needs: trigger-longhorn
+    uses: ./.github/workflows/influxdb.yaml
+    secrets: inherit
+
+  # Application Components
+  trigger-teslamate:
+    name: Deploy TeslaMate
+    needs: [trigger-postgresql, trigger-monitoring]
+    uses: ./.github/workflows/teslamate.yaml
+    secrets: inherit
+
+  trigger-teamspeak:
+    name: Deploy TeamSpeak
+    needs: trigger-azure-integration
+    uses: ./.github/workflows/teamspeak.yaml
+    secrets: inherit
+
+  trigger-sinusbot:
+    name: Deploy SinusBot
+    needs: trigger-azure-integration
+    uses: ./.github/workflows/sinusbot.yaml
+    secrets: inherit
+
+  trigger-youtransfer:
+    name: Deploy YouTransfer
+    needs: trigger-ingress-certificates
+    uses: ./.github/workflows/youtransfer.yaml
+    secrets: inherit
+
+  trigger-qbittorrent:
+    name: Deploy qBittorrent
+    needs: trigger-azure-integration
+    uses: ./.github/workflows/qbittorrent.yaml
+    secrets: inherit
+
+  trigger-plex:
+    name: Deploy Plex
+    needs: trigger-ingress-certificates
+    uses: ./.github/workflows/plex.yaml
+    secrets: inherit
+
+  trigger-proxies:
+    name: Deploy Proxies
+    needs: trigger-ingress-certificates
+    uses: ./.github/workflows/proxies.yaml
+    secrets: inherit

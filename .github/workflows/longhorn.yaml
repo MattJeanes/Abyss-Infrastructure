@@ -1,0 +1,47 @@
+name: Longhorn
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/longhorn/**'
+      - '.github/workflows/longhorn.yaml'
+
+jobs:
+  deploy-longhorn:
+    name: Deploy Longhorn
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Get Terraform Outputs
+        uses: ./.github/actions/get-terraform-outputs
+        with:
+          azureCredentials: ${{ secrets.AZURE_CREDENTIALS }}
+          terraformStorageAccountKey: ${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install longhorn
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            longhorn . \
+            --namespace longhorn-system \
+            --create-namespace \
+            -f values.yaml \
+            --set storageAccount.name="${{ env.storage_account_name }}" \
+            --set storageAccount.key="${{ env.storage_account_key }}" \
+            --set longhorn.defaultBackupStore.backupTarget="azblob://longhorn@core.windows.net/"
+        working-directory: kubernetes/charts/longhorn
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s

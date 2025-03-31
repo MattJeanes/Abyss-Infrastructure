@@ -1,0 +1,91 @@
+name: Monitoring Stack
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/kube-prometheus-stack/**'
+      - 'kubernetes/charts/prometheus-vpa/**'
+      - 'kubernetes/charts/longhorn-persistentvolume/**'
+      - 'kubernetes/charts/azure-persistentvolume/**'
+      - '.github/workflows/monitoring.yaml'
+
+jobs:
+  deploy-monitoring:
+    name: Deploy Monitoring Stack
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install persistent volume for prometheus
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            prometheus-persistentvolume . \
+            --namespace monitoring \
+            --create-namespace \
+            --set name=prometheus \
+            --set disk.capacity=10Gi \
+            --set volumeHandle=prometheus \
+            --set persistentVolumeClaim.enabled=false
+        working-directory: kubernetes/charts/longhorn-persistentvolume
+
+      - name: Install persistent volume for alertmanager
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            alertmanager-persistentvolume . \
+            --namespace monitoring \
+            --create-namespace \
+            --set name=alertmanager \
+            --set disk.capacity=4Gi \
+            --set volumeHandle=alertmanager \
+            --set persistentVolumeClaim.enabled=false
+        working-directory: kubernetes/charts/longhorn-persistentvolume
+
+      - name: Install persistent volume for grafana
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            grafana-persistentvolume . \
+            --namespace monitoring \
+            --create-namespace \
+            --set name=grafana \
+            --set disk.capacity=1Gi \
+            --set useFileShare=true \
+            --set fileShare.name=grafana \
+            --set fileShare.subscriptionId=${{ vars.AZURE_SUBSCRIPTION_ID }}
+        working-directory: kubernetes/charts/azure-persistentvolume
+
+      - name: Install prometheus
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            kube-prometheus-stack . \
+            --namespace monitoring \
+            --create-namespace \
+            -f values.yaml \
+            --set kube-prometheus-stack.alertmanager.config.global.pagerduty_url="${{ vars.PAGERDUTY_URL }}" \
+            --set kube-prometheus-stack.alertmanager.config.receivers[0].pagerduty_configs[0].routing_key="${{ secrets.PAGERDUTY_INTEGRATION_KEY }}" \
+            --set kube-prometheus-stack.alertmanager.config.receivers[1].webhook_configs[0].url="${{ secrets.DEAD_MANS_SNITCH_WEBHOOK_URL }}" \
+            --set kube-prometheus-stack.grafana.ingress.hosts[0]="grafana.${{ vars.HOST }}" \
+            --set kube-prometheus-stack.grafana.ingress.tls[0].hosts[0]="grafana.${{ vars.HOST }}" \
+            --set kube-prometheus-stack.grafana.adminPassword="${{ secrets.GRAFANA_ADMIN_PASSWORD }}"
+        working-directory: kubernetes/charts/kube-prometheus-stack
+
+      - name: Install prometheus-vpa
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            prometheus-vpa . \
+            --namespace monitoring
+        working-directory: kubernetes/charts/prometheus-vpa
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s

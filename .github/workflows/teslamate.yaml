@@ -1,0 +1,81 @@
+name: TeslaMate
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/teslamate/**'
+      - 'kubernetes/charts/grafana-dashboards/**'
+      - '.github/workflows/teslamate.yaml'
+
+jobs:
+  deploy-teslamate:
+    name: Deploy TeslaMate
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install teslamate
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            teslamate . \
+            --namespace default \
+            -f values.yaml \
+            --set database.password="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
+            --set encryptionKey="${{ secrets.TESLAMATE_ENCRYPTION_KEY }}" \
+            --set mqtt.host="${{ vars.MQTT_HOST }}" \
+            --set mqtt.username="${{ vars.TESLAMATE_MQTT_USERNAME }}" \
+            --set mqtt.password="${{ secrets.TESLAMATE_MQTT_PASSWORD }}"
+        working-directory: kubernetes/charts/teslamate
+
+      - name: Prepare teslamate grafana dashboards
+        run: |
+          Install-Module powershell-yaml -Force
+
+          $tempDirectory = $env:RUNNER_TEMP
+          $teslamateVersion = "v$((Get-Content "teslamate/values.yaml" | ConvertFrom-Yaml).image.tag.Split("@")[0])"
+
+          $teslamatePath = Join-Path $tempDirectory "teslamate"
+          $dashboardsPath = Join-Path "grafana-dashboards" "dashboards" "teslamate"
+
+          git clone https://github.com/teslamate-org/teslamate.git $teslamatePath
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "git exited with code $LASTEXITCODE"
+          }
+          git -C $teslamatePath checkout $teslamateVersion
+          if ($LASTEXITCODE -ne 0) {
+              Write-Error "git exited with code $LASTEXITCODE"
+          }
+
+          $null = New-Item -Path $dashboardsPath -ItemType Directory -Force
+          Copy-Item -Path (Join-Path $teslamatePath "grafana" "dashboards" "*") -Destination $dashboardsPath -Recurse
+
+          Get-ChildItem -File -Recurse $dashboardsPath | ForEach-Object {
+              Move-Item -Path $_.FullName -Destination (Join-Path $_.DirectoryName ("teslamate-" + $_.Name))
+          }
+        shell: pwsh
+        working-directory: kubernetes/charts
+
+      - name: Install grafana-dashboards
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            grafana-dashboards . \
+            --namespace default \
+            --set teslamate.database.pass="${{ secrets.POSTGRESQL_TESLAMATE_PASSWORD }}" \
+            --set influxdb.organization="${{ vars.INFLUXDB_ORGANIZATION }}" \
+            --set influxdb.token="${{ secrets.INFLUXDB_GRAFANA_API_TOKEN }}"
+        working-directory: kubernetes/charts/grafana-dashboards
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s

@@ -1,0 +1,53 @@
+name: qBittorrent
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/qbittorrent/**'
+      - 'kubernetes/charts/azure-persistentvolume/**'
+      - '.github/workflows/qbittorrent.yaml'
+
+jobs:
+  deploy-qbittorrent:
+    name: Deploy qBittorrent
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install persistent volume for qbittorrent-config
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            qbittorrent-config-persistentvolume . \
+            --namespace default \
+            --set name=qbittorrent-config \
+            --set disk.capacity=1Gi \
+            --set useFileShare=true \
+            --set fileShare.name=qbittorrent-config \
+            --set fileShare.subscriptionId=${{ vars.AZURE_SUBSCRIPTION_ID }} \
+            --set fileShare.uid=911 \
+            --set fileShare.gid=911
+        working-directory: kubernetes/charts/azure-persistentvolume
+
+      - name: Install qbittorrent
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            qbittorrent . \
+            --namespace default \
+            -f values.yaml \
+            --set openvpn.user="${{ secrets.MULLVAD_ACCOUNT_NUMBER }}"
+        working-directory: kubernetes/charts/qbittorrent
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s
