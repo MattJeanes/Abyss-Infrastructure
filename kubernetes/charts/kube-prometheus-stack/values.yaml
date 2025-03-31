@@ -100,7 +100,7 @@ kube-prometheus-stack:
             volumeName: prometheus
             resources:
               requests:
-                storage: 8Gi
+                storage: 10Gi
             accessModes:
             - ReadWriteOnce
             storageClassName: longhorn

@@ -258,7 +258,7 @@ jobs:
             --namespace monitoring \
             --create-namespace \
             --set name=prometheus \
-            --set disk.capacity=8Gi \
+            --set disk.capacity=10Gi \
             --set volumeHandle=prometheus \
             --set persistentVolumeClaim.enabled=false
         working-directory: kubernetes/charts/longhorn-persistentvolume
