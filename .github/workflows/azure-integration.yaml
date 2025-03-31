@@ -2,6 +2,7 @@ name: Azure Integration
 
 on:
   workflow_dispatch:
+  workflow_call:
   push:
     branches: [main]
     paths:

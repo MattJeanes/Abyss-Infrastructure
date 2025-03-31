@@ -7,6 +7,12 @@ on:
         description: "Use insecure Kubernetes context"
         type: boolean
         default: false
+  workflow_call:
+    inputs:
+      insecureKubeContext:
+        description: "Use insecure Kubernetes context"
+        type: boolean
+        default: false
   push:
     branches: [main]
     paths:

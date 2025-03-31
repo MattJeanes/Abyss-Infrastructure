@@ -2,6 +2,7 @@ name: Ingress & Certificate Management
 
 on:
   workflow_dispatch:
+  workflow_call:
   push:
     branches: [main]
     paths:
