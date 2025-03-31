@@ -1,0 +1,56 @@
+name: 'Setup Terraform Outputs'
+description: 'Sets up Terraform, initializes the backend, and retrieves outputs as environment variables'
+inputs:
+  azureCredentials:
+    description: 'Azure credentials'
+    required: true
+  terraformStorageAccountName:
+    description: 'Storage account name for the Terraform backend'
+    required: false
+    default: 'abyssterraform'
+  terraformContainerName:
+    description: 'Container name for the Terraform backend'
+    required: false
+    default: 'terraform'
+  terraformStateKey:
+    description: 'Key for the Terraform backend'
+    required: false
+    default: 'terraform.tfstate'
+  terraformStorageAccountKey:
+    description: 'Access key for the Terraform backend'
+    required: true
+  workingDirectory:
+    description: 'Directory containing Terraform files'
+    required: false
+    default: 'terraform'
+
+runs:
+  using: "composite"
+  steps:
+    - name: Initialize Terraform
+      uses: ./.github/actions/init-terraform
+      with:
+        azureCredentials: ${{ inputs.azureCredentials }}
+        terraformStorageAccountName: ${{ inputs.terraformStorageAccountName }}
+        terraformContainerName: ${{ inputs.terraformContainerName }}
+        terraformStateKey: ${{ inputs.terraformStateKey }}
+        terraformStorageAccountKey: ${{ inputs.terraformStorageAccountKey }}
+        workingDirectory: ${{ inputs.workingDirectory }}
+
+    - name: Retrieve terraform outputs
+      run: |
+        $outputs = tofu output -json | ConvertFrom-Json -AsHashTable
+        $outputs.Keys | ForEach-Object {
+            $key = $_
+            $output = $outputs[$key]
+            $value = $output.value
+            $sensitive = $output.sensitive
+            
+            Write-Host "$key = $(($sensitive ? "***" : $value))"
+            if ($sensitive) {
+              Write-Host "::add-mask::$value"
+            }
+            "$key=$value" >> $env:GITHUB_ENV
+        }
+      shell: pwsh
+      working-directory: ${{ inputs.workingDirectory }}
