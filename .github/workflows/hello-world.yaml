@@ -33,9 +33,9 @@ jobs:
         working-directory: kubernetes/charts/hello-world
 
       - name: Wait for hello world certificate to be ready
-        run: ./WaitKubeCertificate.ps1 -Name "hello-world-direct-tls"
-        shell: pwsh
-        working-directory: scripts
+        uses: ./.github/actions/wait-kube-certificate
+        with:
+          name: "hello-world-direct-tls"
 
       - name: Disconnect from Kubernetes
         uses: ./.github/actions/disconnect-k8s

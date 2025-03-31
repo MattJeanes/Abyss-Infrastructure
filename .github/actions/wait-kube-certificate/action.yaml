@@ -1,0 +1,59 @@
+name: Wait for Kubernetes Certificate
+description: Waits for a Kubernetes certificate to be ready
+
+inputs:
+  name:
+    description: 'Certificate name'
+    required: true
+  namespace:
+    description: 'Kubernetes namespace'
+    required: false
+    default: 'default'
+  timeout-seconds:
+    description: 'Timeout in seconds'
+    required: false
+    default: '300'
+  check-interval:
+    description: 'Check interval in seconds'
+    required: false
+    default: '10'
+
+runs:
+  using: composite
+  steps:
+    - name: Wait for certificate to be ready
+      shell: bash
+      run: |
+        attempts=0
+        max_attempts=$((${{ inputs.timeout-seconds }} / ${{ inputs.check-interval }}))
+        
+        while true; do
+          certificate=$(kubectl get certificate ${{ inputs.name }} --namespace ${{ inputs.namespace }} -o json 2>/dev/null)
+          if [ $? -ne 0 ]; then
+            echo "Certificate ${{ inputs.name }} in namespace ${{ inputs.namespace }} not found. Waiting..."
+            attempts=$((attempts + 1))
+            if [ $attempts -ge $max_attempts ]; then
+              echo "::error::Certificate ${{ inputs.name }} in namespace ${{ inputs.namespace }} not found after ${{ inputs.timeout-seconds }} seconds"
+              exit 1
+            fi
+            sleep ${{ inputs.check-interval }}
+            continue
+          fi
+
+          ready_status=$(echo $certificate | jq -r '.status.conditions[] | select(.type == "Ready") | .status')
+          
+          if [ "$ready_status" == "True" ]; then
+            echo "Certificate ${{ inputs.name }} in namespace ${{ inputs.namespace }} is ready"
+            break
+          fi
+          
+          attempts=$((attempts + 1))
+          echo "[$attempts/$max_attempts] Certificate ${{ inputs.name }} in namespace ${{ inputs.namespace }} is not yet ready"
+          
+          if [ $attempts -ge $max_attempts ]; then
+            echo "::error::Certificate ${{ inputs.name }} in namespace ${{ inputs.namespace }} is not ready after ${{ inputs.timeout-seconds }} seconds"
+            exit 1
+          fi
+          
+          sleep ${{ inputs.check-interval }}
+        done
