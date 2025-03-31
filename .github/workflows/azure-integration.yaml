@@ -1,0 +1,67 @@
+name: Azure Integration
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/azure-cloud-provider/**'
+      - 'kubernetes/charts/azurefile-csi-driver/**'
+      - 'kubernetes/charts/storage-account-secret/**'
+      - '.github/workflows/azure-integration.yaml'
+
+jobs:
+  deploy-azure-integration:
+    name: Deploy Azure Integration
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+      
+      - name: Get Terraform Outputs
+        uses: ./.github/actions/get-terraform-outputs
+        with:
+          azureCredentials: ${{ secrets.AZURE_CREDENTIALS }}
+          terraformStorageAccountKey: ${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install azure-cloud-provider
+        run: |
+          helm dependency update . 
+          helm upgrade --install --wait --atomic --debug \
+            azure-cloud-provider . \
+            --namespace kube-system \
+            --set azure.tenantId="${{ vars.AZURE_TENANT_ID }}" \
+            --set azure.subscriptionId="${{ vars.AZURE_SUBSCRIPTION_ID }}" \
+            --set azure.aadClientId="${{ vars.AZURE_CLOUD_PROVIDER_CLIENT_ID }}" \
+            --set azure.aadClientSecret="${{ secrets.AZURE_CLOUD_PROVIDER_CLIENT_SECRET }}"
+        working-directory: kubernetes/charts/azure-cloud-provider
+
+      - name: Install azurefile-csi-driver
+        run: |
+          helm dependency update . 
+          helm upgrade --install --wait --atomic --debug \
+            azurefile-csi-driver . \
+            --namespace kube-system
+        working-directory: kubernetes/charts/azurefile-csi-driver
+
+      - name: Install storage-account-secret
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            storage-account-secret . \
+            --namespace default \
+            --set storageAccount.name="${{ env.storage_account_name }}" \
+            --set storageAccount.key="${{ env.storage_account_key }}" \
+            --set crypt.obscuredPassword="${{ secrets.RCLONE_CRYPT_PASSWORD }}" \
+            --set crypt.obscuredSalt="${{ secrets.RCLONE_CRYPT_SALT }}"
+        working-directory: kubernetes/charts/storage-account-secret
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s
