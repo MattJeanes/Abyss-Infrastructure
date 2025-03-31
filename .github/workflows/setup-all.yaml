@@ -44,8 +44,7 @@ jobs:
       - name: Disconnect from Kubernetes
         uses: ./.github/actions/disconnect-k8s
 
-  # Core Infrastructure Components
-  trigger-cloudflare-tunnel:
+  cloudflare-tunnel:
     name: Deploy Cloudflare Tunnel
     needs: setup-common
     uses: ./.github/workflows/cloudflare-tunnel.yaml
@@ -53,108 +52,104 @@ jobs:
       insecureKubeContext: ${{ inputs.insecureKubeContext }}
     secrets: inherit
 
-  trigger-network-infrastructure:
+  network-infrastructure:
     name: Deploy Network Infrastructure
-    needs: trigger-cloudflare-tunnel
+    needs: cloudflare-tunnel
     uses: ./.github/workflows/network-infrastructure.yaml
     secrets: inherit
 
-  trigger-ingress-certificates:
+  ingress-certificates:
     name: Deploy Ingress & Certificates
-    needs: trigger-network-infrastructure
+    needs: network-infrastructure
     uses: ./.github/workflows/ingress-certificates.yaml
     secrets: inherit
 
-  trigger-azure-integration:
+  azure-integration:
     name: Deploy Azure Integration
-    needs: trigger-ingress-certificates
+    needs: ingress-certificates
     uses: ./.github/workflows/azure-integration.yaml
     secrets: inherit
 
-  trigger-longhorn:
-    name: Deploy Longhorn
-    needs: trigger-azure-integration
-    uses: ./.github/workflows/longhorn.yaml
-    secrets: inherit
-
-  # Management Components
-  trigger-kubernetes-dashboard:
-    name: Deploy Kubernetes Dashboard
-    needs: trigger-longhorn
-    uses: ./.github/workflows/kubernetes-dashboard.yaml
-    secrets: inherit
-
-  trigger-vpa:
-    name: Deploy Vertical Pod Autoscaler
-    needs: trigger-longhorn
-    uses: ./.github/workflows/vpa.yaml
-    secrets: inherit
-
-  # Verification & Monitoring Components
-  trigger-hello-world:
+  hello-world:
     name: Deploy Hello World
-    needs: trigger-ingress-certificates
+    needs: ingress-certificates
     uses: ./.github/workflows/hello-world.yaml
     secrets: inherit
 
-  trigger-monitoring:
-    name: Deploy Monitoring Stack
-    needs: [trigger-longhorn, trigger-ingress-certificates]
-    uses: ./.github/workflows/monitoring.yaml
-    secrets: inherit
-
-  # Database Components
-  trigger-postgresql:
-    name: Deploy PostgreSQL
-    needs: trigger-longhorn
-    uses: ./.github/workflows/postgresql.yaml
-    secrets: inherit
-
-  trigger-influxdb:
-    name: Deploy InfluxDB
-    needs: trigger-longhorn
-    uses: ./.github/workflows/influxdb.yaml
-    secrets: inherit
-
-  # Application Components
-  trigger-teslamate:
-    name: Deploy TeslaMate
-    needs: [trigger-postgresql, trigger-monitoring]
-    uses: ./.github/workflows/teslamate.yaml
-    secrets: inherit
-
-  trigger-teamspeak:
-    name: Deploy TeamSpeak
-    needs: trigger-azure-integration
-    uses: ./.github/workflows/teamspeak.yaml
-    secrets: inherit
-
-  trigger-sinusbot:
-    name: Deploy SinusBot
-    needs: trigger-azure-integration
-    uses: ./.github/workflows/sinusbot.yaml
-    secrets: inherit
-
-  trigger-youtransfer:
+  youtransfer:
     name: Deploy YouTransfer
-    needs: trigger-ingress-certificates
+    needs: ingress-certificates
     uses: ./.github/workflows/youtransfer.yaml
     secrets: inherit
 
-  trigger-qbittorrent:
-    name: Deploy qBittorrent
-    needs: trigger-azure-integration
-    uses: ./.github/workflows/qbittorrent.yaml
-    secrets: inherit
-
-  trigger-plex:
+  plex:
     name: Deploy Plex
-    needs: trigger-ingress-certificates
+    needs: ingress-certificates
     uses: ./.github/workflows/plex.yaml
     secrets: inherit
 
-  trigger-proxies:
+  proxies:
     name: Deploy Proxies
-    needs: trigger-ingress-certificates
+    needs: ingress-certificates
     uses: ./.github/workflows/proxies.yaml
+    secrets: inherit
+
+  teamspeak:
+    name: Deploy TeamSpeak
+    needs: azure-integration
+    uses: ./.github/workflows/teamspeak.yaml
+    secrets: inherit
+
+  sinusbot:
+    name: Deploy SinusBot
+    needs: azure-integration
+    uses: ./.github/workflows/sinusbot.yaml
+    secrets: inherit
+
+  qbittorrent:
+    name: Deploy qBittorrent
+    needs: azure-integration
+    uses: ./.github/workflows/qbittorrent.yaml
+    secrets: inherit
+
+  longhorn:
+    name: Deploy Longhorn
+    needs: azure-integration
+    uses: ./.github/workflows/longhorn.yaml
+    secrets: inherit
+
+  kubernetes-dashboard:
+    name: Deploy Kubernetes Dashboard
+    needs: longhorn
+    uses: ./.github/workflows/kubernetes-dashboard.yaml
+    secrets: inherit
+
+  vpa:
+    name: Deploy Vertical Pod Autoscaler
+    needs: longhorn
+    uses: ./.github/workflows/vpa.yaml
+    secrets: inherit
+
+  postgresql:
+    name: Deploy PostgreSQL
+    needs: longhorn
+    uses: ./.github/workflows/postgresql.yaml
+    secrets: inherit
+
+  influxdb:
+    name: Deploy InfluxDB
+    needs: longhorn
+    uses: ./.github/workflows/influxdb.yaml
+    secrets: inherit
+
+  monitoring:
+    name: Deploy Monitoring Stack
+    needs: [longhorn, ingress-certificates]
+    uses: ./.github/workflows/monitoring.yaml
+    secrets: inherit
+
+  teslamate:
+    name: Deploy TeslaMate
+    needs: postgresql
+    uses: ./.github/workflows/teslamate.yaml
     secrets: inherit
