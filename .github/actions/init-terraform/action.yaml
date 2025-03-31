@@ -34,7 +34,6 @@ runs:
 
     - name: Setup OpenTofu
       uses: opentofu/setup-opentofu@592200bd4b9bbf4772ace78f887668b1aee8f716 # v1
-      shell: bash
 
     - name: Terraform Init
       run: tofu init -backend-config="storage_account_name=${{ inputs.terraformStorageAccountName }}" -backend-config="container_name=${{ inputs.terraformContainerName }}" -backend-config="key=${{ inputs.terraformStateKey }}" -backend-config="access_key=${{ inputs.terraformStorageAccountKey }}" -upgrade
