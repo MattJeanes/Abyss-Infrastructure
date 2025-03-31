@@ -1,0 +1,50 @@
+name: InfluxDB
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/influxdb/**'
+      - 'kubernetes/charts/longhorn-persistentvolume/**'
+      - '.github/workflows/influxdb.yaml'
+
+jobs:
+  deploy-influxdb:
+    name: Deploy InfluxDB
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install persistent volume for influxdb
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            influxdb-persistentvolume . \
+            --namespace default \
+            --set name=influxdb \
+            --set disk.capacity=4Gi \
+            --set volumeHandle=influxdb
+        working-directory: kubernetes/charts/longhorn-persistentvolume
+
+      - name: Install influxdb
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            influxdb . \
+            --namespace default \
+            -f values.yaml \
+            --set influxdb.auth.admin.password="${{ secrets.INFLUXDB_ADMIN_PASSWORD }}" \
+            --set influxdb.auth.admin.token="${{ secrets.INFLUXDB_ADMIN_TOKEN }}"
+        working-directory: kubernetes/charts/influxdb
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s
