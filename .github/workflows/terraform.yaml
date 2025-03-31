@@ -1,4 +1,4 @@
-name: Plan
+name: Terraform
 
 on:
   push:
@@ -10,8 +10,14 @@ on:
     inputs:
       runApply:
         description: "Terraform run apply"
-        required: true
-        default: "false"
+        default: false
+        type: boolean
+  workflow_call:
+    inputs:
+      runApply:
+        description: "Terraform run apply"
+        default: false
+        type: boolean
   pull_request:
     branches:
       - main
@@ -19,19 +25,18 @@ on:
       - terraform/**
 
 jobs:
-  plan:
-    name: Plan
+  terraform:
+    name: Terraform
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
-
-      - name: Setup OpenTofu 
-        uses: opentofu/setup-opentofu@592200bd4b9bbf4772ace78f887668b1aee8f716 # v1
-
-      - name: Terraform Init
-        run: tofu init -lock=false -backend-config="storage_account_name=abyssterraform" -backend-config="container_name=terraform" -backend-config="key=terraform.tfstate" -backend-config="access_key=${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}" -upgrade
-        working-directory: terraform
+      
+      - name: Initialize Terraform
+        uses: ./.github/actions/init-terraform
+        with:
+          azureCredentials: ${{ secrets.AZURE_CREDENTIALS }}
+          terraformStorageAccountKey: ${{ secrets.TERRAFORM_STORAGE_ACCOUNT_KEY }}
 
       - name: Set Terraform variables
         run: |
@@ -64,4 +69,4 @@ jobs:
           ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
           ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
           ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
-        if: github.event.inputs.runApply == 'true'
+        if: github.event.inputs.runApply == 'true' || inputs.runApply
