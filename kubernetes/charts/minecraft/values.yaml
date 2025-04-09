@@ -4,7 +4,7 @@ image:
   pullPolicy: IfNotPresent
 debug: false
 timezone: Europe/London
-memory: 14G
+memory: 13G
 version: 1.21.1
 type: NEOFORGE
 modPlatform: AUTO_CURSEFORGE
