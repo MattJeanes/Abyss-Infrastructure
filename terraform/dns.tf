@@ -6,8 +6,7 @@ locals {
     "gpt",
     "hello-world-direct",
     "send",
-    "ts",
-    "youtubedl"
+    "ts"
   ]
   proxied_records = {
     "cdn" = true,
