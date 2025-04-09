@@ -57,7 +57,7 @@ jobs:
             minecraft . \
             --namespace default \
             -f values.yaml \
-            --set curseforge.apiKey="${{ secrets.CURSEFORGE_API_KEY }}"
+            --set curseforge.apiKey='${{ secrets.CURSEFORGE_API_KEY }}'
         working-directory: kubernetes/charts/minecraft
 
       - name: Disconnect from Kubernetes
