@@ -1,0 +1,31 @@
+image:
+  repository: itzg/minecraft-server
+  tag: java21@sha256:8e53d92c6f346f624d12d6b6f5d1892ae603c330562bf77c98790245490e024d
+  pullPolicy: IfNotPresent
+debug: false
+timezone: Europe/London
+memory: 14G
+version: 1.21.1
+type: NEOFORGE
+modPlatform: AUTO_CURSEFORGE
+probes: true
+curseforge:
+  apiKey: "" # Set in pipeline
+  pageUrl: https://www.curseforge.com/minecraft/modpacks/all-the-mods-10/files/6378501
+  overrides:
+    exclusions: shaderpacks/**
+  extraMods:
+  - https://www.curseforge.com/minecraft/mc-mods/chunky-pregenerator-forge/files/6383261
+  - https://www.curseforge.com/minecraft/mc-mods/chunky-border-forge/files/5437062
+serverProperties:
+  motd: Welcome to The Abyss!
+  difficulty: normal
+  whitelist: Divided23
+  ops: Divided23
+  seed: "777836211"
+resources:
+  requests:
+    cpu: 4
+    memory: 16Gi
+  limits:
+    memory: 16Gi

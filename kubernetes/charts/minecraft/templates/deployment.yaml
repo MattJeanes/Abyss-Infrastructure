@@ -1,0 +1,104 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: minecraft
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: minecraft
+  template:
+    metadata:
+      labels:
+        app: minecraft
+    spec:
+      containers:
+        - name: minecraft
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          {{- if .Values.debug }}
+          command:
+          - "/bin/sh"
+          - "-c"
+          - "echo 'Container in debug mode, doing nothing'; sleep infinity"
+          {{- end }}
+          env:
+            - name: EULA
+              value: "TRUE"
+            - name: USE_AIKAR_FLAGS
+              value: "true"
+            - name: TZ
+              value: {{ .Values.timezone | quote }}
+            - name: MEMORY
+              value: {{ .Values.memory | quote }}
+            - name: VERSION
+              value: {{ .Values.version | quote }}
+            - name: TYPE
+              value: {{ .Values.type | quote }}
+            - name: MOD_PLATFORM
+              value: {{ .Values.modPlatform | quote }}
+            - name: CF_API_KEY
+              value: {{ .Values.curseforge.apiKey | quote }}
+            - name: CF_PAGE_URL
+              value: {{ .Values.curseforge.pageUrl | quote }}
+            - name: CF_OVERRIDES_EXCLUSIONS
+              value: {{ .Values.curseforge.overrides.exclusions | quote }}
+            - name: CURSEFORGE_FILES
+              value: {{ join " " .Values.curseforge.extraMods | quote }}
+            - name: MOTD
+              value: {{ .Values.serverProperties.motd | quote }}
+            - name: DIFFICULTY
+              value: {{ .Values.serverProperties.difficulty | quote }}
+            - name: WHITELIST
+              value: {{ .Values.serverProperties.whitelist | quote }}
+            - name: OPS
+              value: {{ .Values.serverProperties.ops | quote }}
+            - name: SEED
+              value: {{ .Values.serverProperties.seed | quote }}
+          ports:
+            - containerPort: 25565
+              hostPort: 25565
+              protocol: TCP
+          volumeMounts:
+            - name: minecraft-server
+              mountPath: /data
+            - name: minecraft-world
+              mountPath: /data/world
+            - name: minecraft-backups
+              mountPath: /data/simplebackups
+            {{- if .Values.debug }}
+            - name: das
+              mountPath: /das
+          {{- if .Values.probes }}
+          livenessProbe:
+            failureThreshold: 5
+            periodSeconds: 30
+            timeoutSeconds: 5
+            tcpSocket:
+              port: 25565
+          startupProbe:
+            failureThreshold: 26
+            initialDelaySeconds: 120
+            periodSeconds: 30
+            timeoutSeconds: 10
+            tcpSocket:
+              port: 25565
+          {{- end }}
+          terminationGracePeriodSeconds: 120
+          resources: {{ toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: minecraft-server
+          persistentVolumeClaim:
+            claimName: minecraft-server
+        - name: minecraft-world
+          persistentVolumeClaim:
+            claimName: minecraft-world
+        - name: minecraft-backups
+          persistentVolumeClaim:
+            claimName: minecraft-backups
+        - name: das
+          hostPath:
+            path: /mnt/das
+            type: Directory

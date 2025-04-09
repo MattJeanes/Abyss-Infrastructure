@@ -1,0 +1,64 @@
+name: Minecraft
+
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  deploy-minecraft:
+    name: Deploy Minecraft
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install persistent volume for minecraft-server
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            minecraft-server-persistentvolume . \
+            --namespace default \
+            --set name=minecraft-server \
+            --set disk.capacity=10Gi \
+            --set volumeHandle=minecraft-server
+        working-directory: kubernetes/charts/longhorn-persistentvolume
+
+      - name: Install persistent volume for minecraft-world
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            minecraft-world-persistentvolume . \
+            --namespace default \
+            --set name=minecraft-world \
+            --set disk.capacity=10Gi \
+            --set volumeHandle=minecraft-world
+        working-directory: kubernetes/charts/longhorn-persistentvolume
+
+      - name: Install persistent volume for minecraft-backups
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            minecraft-backups-persistentvolume . \
+            --namespace default \
+            --set name=minecraft-backups \
+            --set disk.capacity=10Gi \
+            --set volumeHandle=minecraft-backups
+        working-directory: kubernetes/charts/longhorn-persistentvolume
+
+      - name: Install minecraft
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            minecraft . \
+            --namespace default \
+            -f values.yaml \
+            --set curseforge.apiKey="${{ secrets.CURSEFORGE_API_KEY }}"
+        working-directory: kubernetes/charts/sinusbot
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s
