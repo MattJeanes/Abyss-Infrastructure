@@ -20,9 +20,9 @@ spec:
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           {{- if .Values.debug }}
           command:
-          - "/bin/sh"
-          - "-c"
-          - "echo 'Container in debug mode, doing nothing'; sleep infinity"
+            - "/bin/sh"
+            - "-c"
+            - "echo 'Container in debug mode, doing nothing'; sleep infinity"
           {{- end }}
           env:
             - name: EULA
@@ -40,7 +40,10 @@ spec:
             - name: MOD_PLATFORM
               value: {{ .Values.modPlatform | quote }}
             - name: CF_API_KEY
-              value: {{ .Values.curseforge.apiKey | quote }}
+              valueFrom:
+                secretKeyRef:
+                  name: minecraft
+                  key: curseforge-api-key
             - name: CF_PAGE_URL
               value: {{ .Values.curseforge.pageUrl | quote }}
             - name: CF_OVERRIDES_EXCLUSIONS
@@ -71,6 +74,7 @@ spec:
             {{- if .Values.debug }}
             - name: das
               mountPath: /das
+            {{- end }}
           {{- if .Values.probes }}
           livenessProbe:
             failureThreshold: 5
@@ -98,7 +102,9 @@ spec:
         - name: minecraft-backups
           persistentVolumeClaim:
             claimName: minecraft-backups
+        {{- if .Values.debug }}
         - name: das
           hostPath:
             path: /mnt/das
             type: Directory
+        {{- end }}
