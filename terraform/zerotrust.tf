@@ -82,31 +82,40 @@ locals {
   }
 }
 
+data "cloudflare_zero_trust_access_identity_providers" "main" {
+  account_id = var.cloudflare_account_id
+}
+
 resource "cloudflare_zero_trust_access_application" "applications" {
   for_each = local.secure_applications
 
-  account_id = var.cloudflare_account_id
-  name       = each.value.name
-  type       = "self_hosted"
+  account_id                   = var.cloudflare_account_id
+  name                         = each.value.name
+  type                         = "self_hosted"
+  auto_redirect_to_identity    = true
+  options_preflight_bypass     = false
+  skip_app_launcher_login_page = false
+  tags                         = []
+  allowed_idps = [
+    data.cloudflare_zero_trust_access_identity_providers.main.result[0].id
+  ]
   destinations = [{
     type = "public"
     uri  = "${each.key}.${data.cloudflare_zone.main.name}"
   }]
 
-  # Seems to be broken in the current Cloudflare provider, added manually for now
-  #   policies = [
-  #     {
-  #       id         = cloudflare_zero_trust_access_policy.allowed_users.id
-  #       precedence = 0
-  #     },
-  #     {
-  #       id         = cloudflare_zero_trust_access_policy.access_tokens.id
-  #       precedence = 1
-  #     }
-  #   ]
-
-  # This doesn't exist in the current Cloudflare provider, added manually for now
-  # instant_auth = true
+  policies = [
+    {
+      id         = cloudflare_zero_trust_access_policy.allowed_users.id
+      precedence = 1
+      decision   = "allow",
+    },
+    {
+      id         = cloudflare_zero_trust_access_policy.access_tokens.id
+      precedence = 2
+      decision   = "non_identity"
+    }
+  ]
 }
 
 resource "cloudflare_zero_trust_tunnel_cloudflared" "ryzen7_5800u_01" {

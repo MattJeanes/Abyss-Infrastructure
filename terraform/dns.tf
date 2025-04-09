@@ -6,7 +6,8 @@ locals {
     "gpt",
     "hello-world-direct",
     "send",
-    "ts"
+    "ts",
+    "minecraft"
   ]
   proxied_records = {
     "cdn" = true,
