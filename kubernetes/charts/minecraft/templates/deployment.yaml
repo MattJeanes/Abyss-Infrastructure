@@ -89,6 +89,8 @@ spec:
               mountPath: /data/world
             - name: minecraft-backups
               mountPath: /data/simplebackups
+            - name: minecraft-bluemap
+              mountPath: /data/bluemap
             {{- if .Values.debug }}
             - name: das
               mountPath: /das
@@ -120,6 +122,9 @@ spec:
         - name: minecraft-backups
           persistentVolumeClaim:
             claimName: minecraft-backups
+        - name: minecraft-bluemap
+          persistentVolumeClaim:
+            claimName: minecraft-bluemap
         {{- if .Values.debug }}
         - name: das
           hostPath:

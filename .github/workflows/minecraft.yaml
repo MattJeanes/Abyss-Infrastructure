@@ -46,8 +46,18 @@ jobs:
             minecraft-backups-persistentvolume . \
             --namespace default \
             --set name=minecraft-backups \
-            --set disk.capacity=10Gi \
+            --set disk.capacity=25Gi \
             --set volumeHandle=minecraft-backups
+        working-directory: kubernetes/charts/longhorn-persistentvolume
+
+      - name: Install persistent volume for minecraft-bluemap
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            minecraft-bluemap-persistentvolume . \
+            --namespace default \
+            --set name=minecraft-bluemap \
+            --set disk.capacity=10Gi \
+            --set volumeHandle=minecraft-bluemap
         working-directory: kubernetes/charts/longhorn-persistentvolume
 
       - name: Install minecraft
