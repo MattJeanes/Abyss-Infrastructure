@@ -113,7 +113,11 @@ spec:
               port: 25565
           {{- end }}
           resources: {{ toYaml .Values.resources | nindent 12 }}
+      {{- if .Values.debug }}
+      terminationGracePeriodSeconds: 1
+      {{- else }}
       terminationGracePeriodSeconds: 120
+      {{- end }}
       volumes:
         - name: minecraft-server
           persistentVolumeClaim:
