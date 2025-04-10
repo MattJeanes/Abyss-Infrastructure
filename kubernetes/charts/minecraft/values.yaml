@@ -18,6 +18,7 @@ curseforge:
   - https://www.curseforge.com/minecraft/mc-mods/chunky-pregenerator-forge/files/6383261
   - https://www.curseforge.com/minecraft/mc-mods/chunky-border-forge/files/5437062
   - https://www.curseforge.com/minecraft/mc-mods/bluemap/files/6239407
+  - https://www.curseforge.com/minecraft/mc-mods/shutdowner/files/6128590
 serverProperties:
   motd: Welcome to The Abyss!
   difficulty: normal
