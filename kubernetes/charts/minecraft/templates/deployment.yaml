@@ -101,8 +101,8 @@ spec:
             tcpSocket:
               port: 25565
           {{- end }}
-          terminationGracePeriodSeconds: 120
           resources: {{ toYaml .Values.resources | nindent 12 }}
+      terminationGracePeriodSeconds: 120
       volumes:
         - name: minecraft-server
           persistentVolumeClaim:
