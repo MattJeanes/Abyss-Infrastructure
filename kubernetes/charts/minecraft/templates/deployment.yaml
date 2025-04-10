@@ -60,6 +60,8 @@ spec:
               value: {{ .Values.serverProperties.ops | quote }}
             - name: SEED
               value: {{ .Values.serverProperties.seed | quote }}
+            - name: ALLOW_FLIGHT
+              value: {{ .Values.serverProperties.allowFlight | quote }}
             - name: VIEW_DISTANCE
               value: {{ .Values.serverProperties.viewDistance | quote }}
             - name: SIMULATION_DISTANCE

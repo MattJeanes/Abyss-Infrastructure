@@ -24,6 +24,7 @@ serverProperties:
   whitelist: Divided23
   ops: Divided23
   seed: "777836211"
+  allowFlight: true
   viewDistance: 16
   simulationDistance: 10
 rcon:
