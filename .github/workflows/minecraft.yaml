@@ -2,6 +2,12 @@ name: Minecraft
 
 on:
   workflow_dispatch:
+    inputs:
+      debug:
+        description: 'Enable debug mode'
+        required: false
+        type: boolean
+        default: false
   workflow_call:
 
 jobs:
@@ -69,7 +75,8 @@ jobs:
             -f values.yaml \
             --set curseforge.apiKey='${{ secrets.CURSEFORGE_API_KEY }}' \
             --set rcon.password='${{ secrets.MINECRAFT_RCON_PASSWORD }}' \
-            --set ingress.host="minecraft.${{ vars.HOST }}"
+            --set ingress.host="minecraft.${{ vars.HOST }}" \
+            --set debug="${{ github.event.inputs.debug }}"
         working-directory: kubernetes/charts/minecraft
 
       - name: Disconnect from Kubernetes
