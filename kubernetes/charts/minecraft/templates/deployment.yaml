@@ -97,7 +97,7 @@ spec:
             - name: das
               mountPath: /das
             {{- end }}
-          {{- if .Values.probes }}
+          {{- if and .Values.probes (not .Values.debug) }}
           livenessProbe:
             failureThreshold: 5
             periodSeconds: 30
