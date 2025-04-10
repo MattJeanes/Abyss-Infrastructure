@@ -60,6 +60,10 @@ spec:
               value: {{ .Values.serverProperties.ops | quote }}
             - name: SEED
               value: {{ .Values.serverProperties.seed | quote }}
+            - name: VIEW_DISTANCE
+              value: {{ .Values.serverProperties.viewDistance | quote }}
+            - name: SIMULATION_DISTANCE
+              value: {{ .Values.serverProperties.simulationDistance | quote }}
             - name: RCON_PASSWORD
               valueFrom:
                 secretKeyRef:
@@ -74,6 +78,9 @@ spec:
               protocol: TCP
             - containerPort: 25575
               name: rcon
+              protocol: TCP
+            - containerPort: 8100
+              name: map
               protocol: TCP
           volumeMounts:
             - name: minecraft-server

@@ -17,15 +17,20 @@ curseforge:
   extraMods:
   - https://www.curseforge.com/minecraft/mc-mods/chunky-pregenerator-forge/files/6383261
   - https://www.curseforge.com/minecraft/mc-mods/chunky-border-forge/files/5437062
+  - https://www.curseforge.com/minecraft/mc-mods/bluemap/files/6239407
 serverProperties:
   motd: Welcome to The Abyss!
   difficulty: normal
   whitelist: Divided23
   ops: Divided23
   seed: "777836211"
+  viewDistance: 16
+  simulationDistance: 10
 rcon:
   password: "" # Set in pipeline
   broadcastToOps: true
+ingress:
+  host: "" # Set in pipeline
 resources:
   requests:
     cpu: 4

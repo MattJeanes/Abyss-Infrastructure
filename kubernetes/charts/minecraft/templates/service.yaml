@@ -11,5 +11,8 @@ spec:
     - port: 25575
       name: rcon
       protocol: TCP
+    - port: 8100
+      name: map
+      protocol: TCP
   selector:
     app: minecraft
