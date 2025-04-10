@@ -70,8 +70,10 @@ spec:
           ports:
             - containerPort: 25565
               hostPort: 25565
+              name: minecraft
               protocol: TCP
             - containerPort: 25575
+              name: rcon
               protocol: TCP
           volumeMounts:
             - name: minecraft-server
