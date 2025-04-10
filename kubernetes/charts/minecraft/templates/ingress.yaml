@@ -8,10 +8,10 @@ metadata:
 spec:
   tls:
   - hosts:
-    - {{ required "host is required" .Values.ingress.host }}
+    - {{ required "ingress.host is required" .Values.ingress.host }}
     secretName: minecraft-tls
   rules:
-  - host: {{ required "host is required" .Values.ingress.host }}
+  - host: {{ required "ingress.host is required" .Values.ingress.host }}
     http:
       paths:
       - path: /
