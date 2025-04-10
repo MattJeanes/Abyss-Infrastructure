@@ -60,9 +60,18 @@ spec:
               value: {{ .Values.serverProperties.ops | quote }}
             - name: SEED
               value: {{ .Values.serverProperties.seed | quote }}
+            - name: RCON_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minecraft
+                  key: rcon-password
+            - name: BROADCAST_RCON_TO_OPS
+              value: {{ .Values.rcon.broadcastToOps | quote }}
           ports:
             - containerPort: 25565
               hostPort: 25565
+              protocol: TCP
+            - containerPort: 25575
               protocol: TCP
           volumeMounts:
             - name: minecraft-server

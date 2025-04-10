@@ -23,6 +23,9 @@ serverProperties:
   whitelist: Divided23
   ops: Divided23
   seed: "777836211"
+rcon:
+  password: "" # Set in pipeline
+  broadcastToOps: true
 resources:
   requests:
     cpu: 4

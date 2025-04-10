@@ -1,2 +1,4 @@
 curseforge:
   apiKey: dummy-api-key
+rcon:
+  password: dummy-rcon-password
