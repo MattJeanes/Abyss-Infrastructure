@@ -4,8 +4,10 @@ ingress-nginx:
       requests:
         cpu: 100m
         memory: 250Mi
+    hostPort:
+      enabled: true
     service:
-      externalTrafficPolicy: Local
+      type: ClusterIP
     config:
       annotations-risk-level: Critical
     allowSnippetAnnotations: true
