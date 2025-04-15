@@ -1,3 +1,6 @@
+filebrowser:
+  username: dummy-username
+  password: dummy-password
 curseforge:
   apiKey: dummy-api-key
 rcon:

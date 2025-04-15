@@ -2,6 +2,19 @@ image:
   repository: itzg/minecraft-server
   tag: java21@sha256:565b7665ae2318acd412485e3ed944503c53848fc2ded2eea90b2f4328e4de9e
   pullPolicy: IfNotPresent
+filebrowser:
+  image:
+    repository: hurlenko/filebrowser
+    tag: v2.32.0@sha256:0effff71b8616cc1ef7ea962ebeaff0a1599464906d8e112f5952acb01d96104
+    pullPolicy: IfNotPresent
+  resources:
+    requests:
+      cpu: 10m
+      memory: 50Mi
+    limits:
+      memory: 50Mi
+  username: "" # Set in pipeline
+  password: "" # Set in pipeline
 debug: false
 timezone: Europe/London
 memory: 13G

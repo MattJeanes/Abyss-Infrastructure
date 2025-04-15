@@ -74,6 +74,8 @@ jobs:
             --namespace default \
             --timeout 600s \
             -f values.yaml \
+            --set filebrowser.username='${{ vars.MINECRAFT_FILEBROWSER_USERNAME }}' \
+            --set filebrowser.password='${{ secrets.MINECRAFT_FILEBROWSER_PASSWORD }}' \
             --set curseforge.apiKey='${{ secrets.CURSEFORGE_API_KEY }}' \
             --set rcon.password='${{ secrets.MINECRAFT_RCON_PASSWORD }}' \
             --set ingress.host="minecraft.${{ vars.HOST }}" \

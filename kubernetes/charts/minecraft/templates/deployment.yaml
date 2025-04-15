@@ -113,6 +113,41 @@ spec:
               port: 25565
           {{- end }}
           resources: {{ toYaml .Values.resources | nindent 12 }}
+        - name: filebrowser
+          image: {{ .Values.filebrowser.repository }}:{{ .Values.filebrowser.tag }}
+          imagePullPolicy: {{ .Values.filebrowser.pullPolicy }}
+          env:
+            - name: FB_BASEURL
+              value: /filebrowser
+            - name: FB_USERNAME
+              value: {{ .Values.filebrowser.username | quote }}
+            - name: FB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: minecraft
+                  key: filebrowser-password
+          ports:
+            - containerPort: 8080
+              name: filebrowser
+              protocol: TCP
+          volumeMounts:
+            - name: minecraft-server
+              mountPath: /data
+            - name: minecraft-world
+              mountPath: /data/world
+            - name: minecraft-backups
+              mountPath: /data/simplebackups
+            - name: minecraft-bluemap
+              mountPath: /data/bluemap
+          resources: {{ toYaml .Values.filebrowser.resources | nindent 12 }}
+          {{- if and .Values.probes (not .Values.debug) }}
+          livenessProbe:
+            failureThreshold: 5
+            periodSeconds: 30
+            timeoutSeconds: 5
+            tcpSocket:
+              port: 8080
+          {{- end }}
       {{- if .Values.debug }}
       terminationGracePeriodSeconds: 1
       {{- else }}

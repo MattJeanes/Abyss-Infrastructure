@@ -21,3 +21,10 @@ spec:
             name: minecraft
             port:
               number: 8100
+      - path: /filebrowser
+        pathType: Prefix
+        backend:
+          service:
+            name: minecraft
+            port:
+              number: 8080

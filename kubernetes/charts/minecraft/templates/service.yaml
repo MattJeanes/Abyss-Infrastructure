@@ -14,5 +14,8 @@ spec:
     - port: 8100
       name: map
       protocol: TCP
+    - port: 8080
+      name: filebrowser
+      protocol: TCP
   selector:
     app: minecraft
