@@ -1,0 +1,55 @@
+name: AdGuard Home
+
+on:
+  workflow_dispatch:
+  workflow_call:
+  push:
+    branches: [main]
+    paths:
+      - 'kubernetes/charts/adguard-home/**'
+      - 'kubernetes/charts/azure-persistentvolume/**'
+      - '.github/workflows/adguard-home.yaml'
+
+jobs:
+  deploy-adguard-home:
+    name: Deploy AdGuard Home
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
+
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
+        with:
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
+
+      - name: Install persistent volume for adguard-home
+        run: |
+          helm upgrade --install --wait --atomic --debug \
+            adguard-home-persistentvolume . \
+            --namespace default \
+            --set name=adguard-home \
+            --set disk.capacity=1Gi \
+            --set volumeHandle=adguard-home
+        working-directory: kubernetes/charts/longhorn-persistentvolume
+
+      - name: Install adguard home
+        run: |
+          helm dependency update .
+          helm upgrade --install --wait --atomic --debug \
+            adguard-home . \
+            --namespace default \
+            -f values.yaml \
+            --set origin.username="${{ vars.ADGUARD_ORIGIN_USERNAME }}" \
+            --set origin.password="${{ secrets.ADGUARD_ORIGIN_PASSWORD }}" \
+            --set replica.username="${{ vars.ADGUARD_REPLICA_USERNAME }}" \
+            --set replica.password="${{ secrets.ADGUARD_REPLICA_PASSWORD }}" \
+            --set syncapi.username="${{ vars.ADGUARD_SYNCAPI_USERNAME }}" \
+            --set syncapi.password="${{ secrets.ADGUARD_SYNCAPI_PASSWORD }}"
+        working-directory: kubernetes/charts/adguard-home
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s

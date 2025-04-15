@@ -1,0 +1,87 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: adguard-home
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: adguard-home
+  template:
+    metadata:
+      labels:
+        app: adguard-home
+    spec:
+      containers:
+        - name: adguard-home
+          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          ports:
+            - name: dns
+              containerPort: 53
+              protocol: UDP
+              hostPort: 53
+            - name: http
+              containerPort: 80
+              protocol: TCP
+          volumeMounts:
+            - name: adguard-home
+              subPath: work
+              mountPath: /opt/adguardhome/work
+            - name: adguard-home
+              subPath: conf
+              mountPath: /opt/adguardhome/conf
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: 80
+            timeoutSeconds: 1
+          resources: {{ toYaml .Values.resources.adguardhome | nindent 12 }}
+        - name: adguard-home-sync
+          image: {{ .Values.syncapi.image.repository }}:{{ .Values.syncapi.image.tag }}
+          imagePullPolicy: {{ .Values.syncapi.image.pullPolicy }}
+          ports:
+            - name: sync-http
+              containerPort: 8080
+              protocol: TCP
+          env:
+            - name: ORIGIN_URL
+              value: {{ .Values.origin.url }}
+            - name: ORIGIN_USERNAME
+              value: {{ .Values.origin.username }}
+            - name: ORIGIN_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: adguard-home
+                  key: origin-password
+            - name: REPLICA1_URL
+              value: http://localhost:80
+            - name: REPLICA1_USERNAME
+              value: {{ .Values.replica.username }}
+            - name: REPLICA1_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: adguard-home
+                  key: replica-password
+            - name: CRON
+              value: {{ .Values.cron }}
+            - name: RUN_ON_START
+              value: {{ .Values.runOnStart | quote }}
+            - name: API_USERNAME
+              value: {{ .Values.syncapi.username }}
+            - name: API_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: adguard-home
+                  key: api-password
+            - name: API_DARK_MODE
+              value: {{ .Values.syncapi.darkMode | quote }}
+          resources: {{ toYaml .Values.resources.sync | nindent 12 }}
+      volumes:
+        - name: adguard-home
+          persistentVolumeClaim:
+            claimName: adguard-home

@@ -1,0 +1,34 @@
+image:
+  repository: adguard/adguardhome
+  tag: v0.107.60@sha256:a29c6da1f77a603d0f60c04e575692d7f221bd030ddec28352002dbf609aa9ad
+  pullPolicy: IfNotPresent
+cron: "0 * * * *"
+runOnStart: true
+origin:
+  url: http://192.168.68.93:58745
+  username: "" # Set in pipeline
+  password: "" # Set in pipeline
+replica:
+  username: "" # Set in pipeline
+  password: "" # Set in pipeline
+syncapi:
+  image:
+    repository: ghcr.io/bakito/adguardhome-sync
+    tag: latest
+    pullPolicy: IfNotPresent
+  username: "" # Set in pipeline
+  password: "" # Set in pipeline
+  darkMode: true
+resources:
+  adguardhome:
+    requests:
+      cpu: 30m
+      memory: 128Mi
+    limits:
+      memory: 128Mi
+  sync:
+    requests:
+      cpu: 5m
+      memory: 30Mi
+    limits:
+      memory: 30Mi
