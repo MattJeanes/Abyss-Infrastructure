@@ -85,6 +85,13 @@ spec:
                   key: syncapi-password
             - name: API_DARK_MODE
               value: {{ .Values.syncapi.darkMode | quote }}
+          livenessProbe:
+            failureThreshold: 3
+            initialDelaySeconds: 0
+            periodSeconds: 10
+            tcpSocket:
+              port: 8080
+            timeoutSeconds: 1
           resources: {{ toYaml .Values.resources.sync | nindent 12 }}
       volumes:
         - name: adguard-home
