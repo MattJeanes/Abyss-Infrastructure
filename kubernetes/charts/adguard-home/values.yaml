@@ -25,12 +25,12 @@ resources:
   adguardhome:
     requests:
       cpu: 30m
-      memory: 128Mi
+      memory: 256Mi
     limits:
-      memory: 128Mi
+      memory: 512Mi
   sync:
     requests:
       cpu: 5m
-      memory: 30Mi
+      memory: 50Mi
     limits:
-      memory: 30Mi
+      memory: 50Mi
