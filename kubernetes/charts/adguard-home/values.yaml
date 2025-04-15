@@ -2,9 +2,9 @@ image:
   repository: adguard/adguardhome
   tag: v0.107.60@sha256:a29c6da1f77a603d0f60c04e575692d7f221bd030ddec28352002dbf609aa9ad
   pullPolicy: IfNotPresent
-cron: "0 * * * *"
-runOnStart: true
-continueOnError: true
+cron: "*/5 * * * *"
+runOnStart: false
+continueOnError: false
 origin:
   url: http://192.168.68.93:58745
   username: "" # Set in pipeline
