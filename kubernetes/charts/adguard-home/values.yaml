@@ -1,6 +1,6 @@
 image:
   repository: adguard/adguardhome
-  tag: v0.107.60@sha256:a29c6da1f77a603d0f60c04e575692d7f221bd030ddec28352002dbf609aa9ad
+  tag: v0.107.60@sha256:f793df60142d249f2b869e95da4516acb96104aaa799bc3efb090622964242bd
   pullPolicy: IfNotPresent
 cron: "*/5 * * * *"
 runOnStart: false
