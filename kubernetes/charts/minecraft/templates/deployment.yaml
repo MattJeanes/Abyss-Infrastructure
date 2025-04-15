@@ -114,8 +114,8 @@ spec:
           {{- end }}
           resources: {{ toYaml .Values.resources | nindent 12 }}
         - name: filebrowser
-          image: {{ .Values.filebrowser.repository }}:{{ .Values.filebrowser.tag }}
-          imagePullPolicy: {{ .Values.filebrowser.pullPolicy }}
+          image: {{ .Values.filebrowser.image.repository }}:{{ .Values.filebrowser.image.tag }}
+          imagePullPolicy: {{ .Values.filebrowser.image.pullPolicy }}
           env:
             - name: FB_BASEURL
               value: /filebrowser
