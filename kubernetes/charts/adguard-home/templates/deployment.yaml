@@ -72,6 +72,8 @@ spec:
               value: {{ .Values.cron }}
             - name: RUN_ON_START
               value: {{ .Values.runOnStart | quote }}
+            - name: CONTINUE_ON_ERROR
+              value: {{ .Values.continueOnError | quote }}
             - name: API_USERNAME
               value: {{ .Values.syncapi.username }}
             - name: API_PASSWORD
