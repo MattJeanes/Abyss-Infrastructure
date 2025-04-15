@@ -3,15 +3,11 @@ kind: Service
 metadata:
   name: adguard-home
 spec:
-  type: ClusterIP
+  type: LoadBalancer
   ports:
-    - port: 80
-      targetPort: http
-      protocol: TCP
-      name: http
-    - port: 8080
-      targetPort: sync-http
-      protocol: TCP
-      name: sync-http
+    - port: 53
+      targetPort: 53
+      protocol: UDP
+      name: dns
   selector:
     app: adguard-home
