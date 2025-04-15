@@ -1,0 +1,9 @@
+origin:
+  username: dummy-username
+  password: dummy-password
+replica:
+  username: dummy-username
+  password: dummy-password
+syncapi:
+  username: dummy-username
+  password: dummy-password
