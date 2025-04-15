@@ -75,6 +75,11 @@ locals {
       service = "http://qbittorrent:8080"
       secure  = true
     }
+    "adguardhomesync" = {
+      name    = "AdGuard Home Sync"
+      service = "http://adguard-home:8080"
+      secure  = true
+    }
   }
 
   secure_applications = {
