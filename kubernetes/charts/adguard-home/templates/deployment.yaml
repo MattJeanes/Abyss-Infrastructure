@@ -69,7 +69,7 @@ spec:
             - name: REPLICA1_AUTO_SETUP
               value: {{ .Values.replica.autoSetup | quote }}
             - name: CRON
-              value: {{ .Values.cron }}
+              value: {{ .Values.cron | quote }}
             - name: RUN_ON_START
               value: {{ .Values.runOnStart | quote }}
             - name: CONTINUE_ON_ERROR
