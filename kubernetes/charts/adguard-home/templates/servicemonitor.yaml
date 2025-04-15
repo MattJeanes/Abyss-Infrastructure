@@ -1,0 +1,17 @@
+
+{{- if .Values.syncapi.metrics.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: adguard-home
+  namespace: monitoring
+spec:
+  endpoints:
+  - port: sync-http
+  namespaceSelector:
+    matchNames:
+    - default
+  selector:
+    matchLabels:
+      app: adguard-home
+{{- end }}
