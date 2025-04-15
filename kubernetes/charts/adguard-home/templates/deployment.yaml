@@ -38,7 +38,7 @@ spec:
             initialDelaySeconds: 0
             periodSeconds: 10
             tcpSocket:
-              port: 80
+              port: 3000
             timeoutSeconds: 1
           resources: {{ toYaml .Values.resources.adguardhome | nindent 12 }}
         - name: adguard-home-sync
@@ -59,7 +59,7 @@ spec:
                   name: adguard-home
                   key: origin-password
             - name: REPLICA1_URL
-              value: http://localhost:80
+              value: http://localhost:3000
             - name: REPLICA1_USERNAME
               value: {{ .Values.replica.username }}
             - name: REPLICA1_PASSWORD
@@ -67,6 +67,8 @@ spec:
                 secretKeyRef:
                   name: adguard-home
                   key: replica-password
+            - name: REPLICA1_AUTO_SETUP
+              value: {{ .Values.replica.autoSetup | quote }}
             - name: CRON
               value: {{ .Values.cron }}
             - name: RUN_ON_START

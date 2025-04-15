@@ -11,6 +11,7 @@ origin:
 replica:
   username: "" # Set in pipeline
   password: "" # Set in pipeline
+  autoSetup: true
 syncapi:
   image:
     repository: ghcr.io/bakito/adguardhome-sync
