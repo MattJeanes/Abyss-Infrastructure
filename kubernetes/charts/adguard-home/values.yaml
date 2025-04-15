@@ -33,6 +33,6 @@ resources:
   sync:
     requests:
       cpu: 5m
-      memory: 50Mi
+      memory: 128Mi
     limits:
-      memory: 50Mi
+      memory: 128Mi
