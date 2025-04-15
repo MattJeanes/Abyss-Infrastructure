@@ -77,7 +77,7 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: adguard-home
-                  key: api-password
+                  key: syncapi-password
             - name: API_DARK_MODE
               value: {{ .Values.syncapi.darkMode | quote }}
           resources: {{ toYaml .Values.resources.sync | nindent 12 }}
