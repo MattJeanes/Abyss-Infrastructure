@@ -118,6 +118,9 @@ spec:
         - name: filebrowser
           image: {{ .Values.filebrowser.image.repository }}:{{ .Values.filebrowser.image.tag }}
           imagePullPolicy: {{ .Values.filebrowser.image.pullPolicy }}
+          securityContext:
+            runAsUser: 1000
+            runAsGroup: 1000
           env:
             - name: FB_BASEURL
               value: /filebrowser
