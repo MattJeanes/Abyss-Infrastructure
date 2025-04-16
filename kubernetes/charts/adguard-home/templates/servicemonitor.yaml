@@ -4,6 +4,8 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: adguard-home
+  labels:
+    app: adguard-home
 spec:
   endpoints:
   - port: sync-http
