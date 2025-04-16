@@ -8,6 +8,13 @@ metadata:
 spec:
   endpoints:
   - port: sync-http
+    basicAuth:
+      username:
+        name: adguard-home
+        key: syncapi-username
+      password:
+        name: adguard-home
+        key: syncapi-password
   namespaceSelector:
     matchNames:
     - default
