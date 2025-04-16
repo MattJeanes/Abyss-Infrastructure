@@ -11,6 +11,8 @@ spec:
       app: qbittorrent
   template:
     metadata:
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
       labels:
         app: qbittorrent
     spec:

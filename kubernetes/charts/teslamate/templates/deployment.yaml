@@ -12,6 +12,8 @@ spec:
       app: teslamate
   template:
     metadata:
+      annotations:
+        checksum/secret: {{ include (print $.Template.BasePath "/secret.yaml") . | sha256sum }}
       labels:
         app: teslamate
     spec:
