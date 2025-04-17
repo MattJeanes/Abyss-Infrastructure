@@ -30,7 +30,7 @@ resource "cloudflare_dns_record" "dns" {
   for_each = toset(local.dns_records)
 
   zone_id = var.cloudflare_zone_id
-  name    = each.key
+  name    = each.key == "@" ? data.cloudflare_zone.main.name : "${each.key}.${data.cloudflare_zone.main.name}"
   type    = "CNAME"
   content = data.cloudflare_dns_record.home.name
   ttl     = 1

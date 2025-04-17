@@ -163,7 +163,7 @@ resource "cloudflare_dns_record" "zero_trust_tunnel" {
 
   depends_on = [cloudflare_zero_trust_tunnel_cloudflared.ryzen7_5800u_01]
   zone_id    = var.cloudflare_zone_id
-  name       = each.key
+  name       = "${each.key}.${data.cloudflare_zone.main.name}"
   type       = "CNAME"
   content    = "${cloudflare_zero_trust_tunnel_cloudflared.ryzen7_5800u_01.id}.cfargotunnel.com"
   ttl        = 1

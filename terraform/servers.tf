@@ -354,7 +354,7 @@ resource "cloudflare_dns_record" "servers" {
   }
 
   zone_id = var.cloudflare_zone_id
-  name    = each.key
+  name    = "${each.key}.${data.cloudflare_zone.main.name}"
   type    = "A"
   content = coalesce(azurerm_public_ip.servers[each.key].ip_address, "192.0.2.0") # IPv4 reserved test address
   ttl     = 60
@@ -365,9 +365,9 @@ resource "cloudflare_dns_record" "servers_cname" {
   for_each = { for key, val in local.servers : key => val if val.dns_name != null }
 
   zone_id = var.cloudflare_zone_id
-  name    = each.value.dns_name
+  name    = "${each.value.dns_name}.${data.cloudflare_zone.main.name}"
   type    = "CNAME"
-  content = "${cloudflare_dns_record.servers[each.key].name}.${data.cloudflare_zone.main.name}"
+  content = "${cloudflare_dns_record.servers[each.key].name}"
   ttl     = 1
   proxied = false
 }
@@ -376,9 +376,9 @@ resource "cloudflare_dns_record" "servers_rcon" {
   for_each = { for key, val in local.servers : key => val if val.dns_name != null && val.rcon }
 
   zone_id = var.cloudflare_zone_id
-  name    = "rcon.${each.value.dns_name}"
+  name    = "rcon.${each.value.dns_name}.${data.cloudflare_zone.main.name}"
   type    = "CNAME"
-  content = "${cloudflare_dns_record.servers[each.key].name}.${data.cloudflare_zone.main.name}"
+  content = "${cloudflare_dns_record.servers[each.key].name}"
   ttl     = 1
   proxied = false
 }
