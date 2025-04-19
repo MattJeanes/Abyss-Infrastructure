@@ -1,4 +1,4 @@
 image:
   repository: ghcr.io/skjnldsv/docker-plex
-  tag: main@sha256:30f95a8f36aa631984d33f8de327ed21a6a95c3be1a9b4829899e2d4afff691a
+  tag: main@sha256:eb7516432a2f1e64d5e9384bed5af1ba47016ac231c904d615c2452c1c8f8ec9
   pullPolicy: IfNotPresent
