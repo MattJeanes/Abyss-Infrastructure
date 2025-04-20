@@ -42,7 +42,7 @@ jobs:
             minecraft-world-persistentvolume . \
             --namespace default \
             --set name=minecraft-world \
-            --set disk.capacity=10Gi \
+            --set disk.capacity=15Gi \
             --set volumeHandle=minecraft-world
         working-directory: kubernetes/charts/longhorn-persistentvolume
 
@@ -52,7 +52,7 @@ jobs:
             minecraft-backups-persistentvolume . \
             --namespace default \
             --set name=minecraft-backups \
-            --set disk.capacity=25Gi \
+            --set disk.capacity=40Gi \
             --set volumeHandle=minecraft-backups
         working-directory: kubernetes/charts/longhorn-persistentvolume
 
@@ -62,7 +62,7 @@ jobs:
             minecraft-bluemap-persistentvolume . \
             --namespace default \
             --set name=minecraft-bluemap \
-            --set disk.capacity=10Gi \
+            --set disk.capacity=15Gi \
             --set volumeHandle=minecraft-bluemap
         working-directory: kubernetes/charts/longhorn-persistentvolume
 
