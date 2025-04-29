@@ -1,4 +1,8 @@
 kube-prometheus-stack:
+  crds:
+    enabled: true
+    upgradeJob:
+      enabled: true
   prometheus-node-exporter:
     affinity:
       nodeAffinity:
