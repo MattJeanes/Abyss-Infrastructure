@@ -241,6 +241,26 @@ kube-prometheus-stack:
           labels:
             issue: Longhorn node {{$labels.node}} experiences high CPU pressure.
             severity: warning
+      - name: adguardsync.rules
+        rules:
+        - alert: AdGuardSyncFailed
+          annotations:
+            description: '{{`{{`}} $labels.instance {{`}}`}} has not reported a successful AdGuard sync in the past 10 minutes or the sync failed.'
+            summary: AdGuard sync failed or metric missing
+          expr: |-
+            absent_over_time(adguard_home_sync_sync_successful[10m]) or (adguard_home_sync_sync_successful == 0)
+          for: 1m
+          labels:
+            severity: critical
+        - alert: AdGuardSyncSlow
+          annotations:
+            description: 'AdGuard sync on {{`{{`}} $labels.instance {{`}}`}} has taken longer than 5 seconds consistently for 5 minutes.'
+            summary: AdGuard sync is slow
+          expr: |-
+            adguard_home_sync_sync_duration_seconds > 5 and on(instance) adguard_home_sync_sync_successful
+          for: 5m
+          labels:
+            severity: warning
   kube-state-metrics:
     resources:
       requests:
