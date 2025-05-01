@@ -164,6 +164,7 @@
               "mode": "off"
             }
           },
+          "decimals": 0,
           "mappings": [],
           "noValue": "0",
           "thresholds": {
@@ -1621,5 +1622,5 @@
   "timezone": "",
   "title": "Minecraft",
   "uid": "minecraft",
-  "version": 6
+  "version": 7
 }
