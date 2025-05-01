@@ -16,16 +16,13 @@ jobs:
     steps:
       - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4
 
-      - name: Azure Login
-        uses: Azure/login@a457da9ea143d694b1b9c7c869ebb04ebe844ef5 # v2
+      - name: Connect to Kubernetes
+        uses: ./.github/actions/connect-k8s
         with:
-          creds: ${{ secrets.AZURE_CREDENTIALS }}
-
-      - name: Login to Kubernetes
-        uses: azure/k8s-set-context@212a19233d93f03eceaac31ae5a1d1acf650b6ef # v4
-        with:
-          method: kubeconfig
-          kubeconfig: ${{ secrets.KUBECONFIG }}
+          kubeconfig: "${{ secrets.KUBECONFIG }}"
+          hostname: kubernetes-api.${{ vars.HOST }}
+          serviceTokenId: ${{ vars.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_ID }}
+          serviceTokenSecret: ${{ secrets.CLOUDFLARE_TUNNEL_SERVICE_TOKEN_SECRET }}
 
       - name: Prepare teslamate grafana dashboards
         run: |
@@ -64,3 +61,6 @@ jobs:
             --set influxdb.organization="${{ vars.INFLUXDB_ORGANIZATION }}" \
             --set influxdb.token="${{ secrets.INFLUXDB_GRAFANA_API_TOKEN }}"
         working-directory: kubernetes/charts
+
+      - name: Disconnect from Kubernetes
+        uses: ./.github/actions/disconnect-k8s
