@@ -471,7 +471,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "mc_entities_total",
+          "expr": "sum(mc_entities_total) by (type)",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -1757,5 +1757,5 @@
   "timezone": "",
   "title": "Minecraft",
   "uid": "minecraft",
-  "version": 13
+  "version": 14
 }
