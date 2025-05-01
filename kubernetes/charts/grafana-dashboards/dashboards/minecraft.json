@@ -470,7 +470,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "mc_entities_total",
+          "expr": "mc_entities_total{dim=~\"[[dimension]]\"}",
           "format": "time_series",
           "instant": true,
           "interval": "",
@@ -587,7 +587,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "mc_dimension_chunks_loaded",
+          "expr": "mc_dimension_chunks_loaded{name=~\"[[dimension]]\"}",
           "instant": true,
           "legendFormat": "{{name}}",
           "range": false,
@@ -869,7 +869,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(rate(mc_dimension_tick_seconds_sum[1m]) / rate(mc_dimension_tick_seconds_count[1m])) by (name)",
+          "expr": "sum(rate(mc_dimension_tick_seconds_sum{name=~\"[[dimension]]\"}[1m]) / rate(mc_dimension_tick_seconds_count{name=~\"[[dimension]]\"}[1m])) by (name)",
           "legendFormat": "{{name}}",
           "range": true,
           "refId": "A"
@@ -962,7 +962,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(histogram_quantile(0.95, rate(mc_dimension_tick_seconds_bucket[1m]))) by (name)",
+          "expr": "sum(histogram_quantile(0.95, rate(mc_dimension_tick_seconds_bucket{name=~\"[[dimension]]\"}[1m]))) by (name)",
           "legendFormat": "{{name}}",
           "range": true,
           "refId": "A"
@@ -1056,7 +1056,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "sum(mc_entities_total) by (type)",
+          "expr": "sum(mc_entities_total{dim=~\"[[dimension]]\"}) by (type)",
           "instant": false,
           "legendFormat": "{{type}}",
           "range": true,
@@ -1150,7 +1150,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "sum(mc_dimension_chunks_loaded) by (name)",
+          "expr": "sum(mc_dimension_chunks_loaded{name=~\"[[dimension]]\"}) by (name)",
           "legendFormat": "{{name}}",
           "range": true,
           "refId": "A"
@@ -1607,6 +1607,28 @@
         "filters": [],
         "name": "Filters",
         "type": "adhoc"
+      },
+      {
+        "allValue": "",
+        "allowCustomValue": true,
+        "current": {
+          "text": "All",
+          "value": "$__all"
+        },
+        "definition": "label_values(mc_dimension_chunks_loaded,name)",
+        "includeAll": true,
+        "label": "Dimension",
+        "name": "dimension",
+        "options": [],
+        "query": {
+          "qryType": 1,
+          "query": "label_values(mc_dimension_chunks_loaded,name)",
+          "refId": "PrometheusVariableQueryEditor-VariableQuery"
+        },
+        "refresh": 1,
+        "regex": "",
+        "sort": 1,
+        "type": "query"
       }
     ]
   },
@@ -1618,5 +1640,5 @@
   "timezone": "",
   "title": "Minecraft",
   "uid": "minecraft",
-  "version": 8
+  "version": 9
 }
