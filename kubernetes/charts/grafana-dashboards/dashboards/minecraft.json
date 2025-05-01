@@ -494,7 +494,89 @@
           },
           "mappings": []
         },
-        "overrides": []
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "overworld"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-green",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "the_nether"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "semi-dark-red",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "__systemRef": "hideSeriesFrom",
+            "matcher": {
+              "id": "byNames",
+              "options": {
+                "mode": "exclude",
+                "names": [
+                  "mining",
+                  "otherside",
+                  "starlight",
+                  "the_other",
+                  "compact_world",
+                  "twilight_forest",
+                  "overworld",
+                  "the_end",
+                  "reality_marble",
+                  "the_bumblezone",
+                  "spatial_storage",
+                  "undergarden",
+                  "the_beyond"
+                ],
+                "prefix": "All except:",
+                "readOnly": true
+              }
+            },
+            "properties": [
+              {
+                "id": "custom.hideFrom",
+                "value": {
+                  "legend": false,
+                  "tooltip": false,
+                  "viz": true
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "the_end"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#6c7750",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
       },
       "gridPos": {
         "h": 16,
@@ -532,8 +614,10 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
+          "editorMode": "code",
           "expr": "mc_dimension_chunks_loaded",
           "legendFormat": "{{name}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1531,5 +1615,5 @@
   "timezone": "",
   "title": "Minecraft",
   "uid": "minecraft",
-  "version": 4
+  "version": 5
 }
