@@ -467,8 +467,12 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
+          "editorMode": "code",
+          "exemplar": false,
           "expr": "mc_entities_total{dim=\"overworld\"}",
+          "instant": true,
           "legendFormat": "{{type}}",
+          "range": false,
           "refId": "A"
         }
       ],
@@ -615,9 +619,11 @@
       "targets": [
         {
           "editorMode": "code",
+          "exemplar": false,
           "expr": "mc_dimension_chunks_loaded",
+          "instant": true,
           "legendFormat": "{{name}}",
-          "range": true,
+          "range": false,
           "refId": "A"
         }
       ],
@@ -1615,5 +1621,5 @@
   "timezone": "",
   "title": "Minecraft",
   "uid": "minecraft",
-  "version": 5
+  "version": 6
 }
