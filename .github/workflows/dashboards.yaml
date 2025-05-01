@@ -1,13 +1,13 @@
 name: Dashboards
 
 on:
+  workflow_dispatch:
+  workflow_call:
   push:
-    branches:
-    - main
+    branches: [main]
     paths:
     - 'kubernetes/charts/grafana-dashboards/dashboards/**'
     - '.github/workflows/dashboards.yaml'
-  workflow_dispatch:
 
 jobs:
   dashboards:

@@ -148,6 +148,12 @@ jobs:
     uses: ./.github/workflows/monitoring.yaml
     secrets: inherit
 
+  dashboards:
+    name: Deploy Dashboards
+    needs: monitoring
+    uses: ./.github/workflows/dashboards.yaml
+    secrets: inherit
+
   teslamate:
     name: Deploy TeslaMate
     needs: postgresql
