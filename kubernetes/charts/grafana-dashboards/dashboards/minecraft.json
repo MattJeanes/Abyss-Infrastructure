@@ -305,7 +305,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "container_memory_working_set_bytes{container=\"minecraft\"}",
+          "expr": "sum(container_memory_working_set_bytes{container=\"minecraft\"})",
           "legendFormat": "Pod Memory",
           "range": true,
           "refId": "A"
@@ -401,7 +401,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(container_cpu_usage_seconds_total{container=\"minecraft\"}[1m])",
+          "expr": "sum(rate(container_cpu_usage_seconds_total{container=\"minecraft\"}[1m]))",
           "legendFormat": "CPU Usage",
           "range": true,
           "refId": "A"
@@ -470,14 +470,16 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "mc_entities_total{dim=\"overworld\"}",
+          "expr": "mc_entities_total",
+          "format": "time_series",
           "instant": true,
+          "interval": "",
           "legendFormat": "{{type}}",
           "range": false,
           "refId": "A"
         }
       ],
-      "title": "Entities in Overworld (Current)",
+      "title": "Entities (Current)",
       "type": "piechart"
     },
     {
@@ -526,42 +528,6 @@
                 "value": {
                   "fixedColor": "semi-dark-red",
                   "mode": "fixed"
-                }
-              }
-            ]
-          },
-          {
-            "__systemRef": "hideSeriesFrom",
-            "matcher": {
-              "id": "byNames",
-              "options": {
-                "mode": "exclude",
-                "names": [
-                  "mining",
-                  "otherside",
-                  "starlight",
-                  "the_other",
-                  "compact_world",
-                  "twilight_forest",
-                  "overworld",
-                  "the_end",
-                  "reality_marble",
-                  "the_bumblezone",
-                  "spatial_storage",
-                  "undergarden",
-                  "the_beyond"
-                ],
-                "prefix": "All except:",
-                "readOnly": true
-              }
-            },
-            "properties": [
-              {
-                "id": "custom.hideFrom",
-                "value": {
-                  "legend": false,
-                  "tooltip": false,
-                  "viz": true
                 }
               }
             ]
@@ -716,7 +682,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(mc_server_tick_seconds_sum[1m]) / rate(mc_server_tick_seconds_count[1m])",
+          "expr": "sum(rate(mc_server_tick_seconds_sum[1m]) / rate(mc_server_tick_seconds_count[1m])) by (name)",
           "legendFormat": "Tick Duration (Avg)",
           "range": true,
           "refId": "A"
@@ -810,7 +776,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, rate(mc_server_tick_seconds_bucket[1m]))",
+          "expr": "sum(histogram_quantile(0.95, rate(mc_server_tick_seconds_bucket[1m]))) by (name)",
           "legendFormat": "Tick Duration (95th)",
           "range": true,
           "refId": "A"
@@ -903,7 +869,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(mc_dimension_tick_seconds_sum[1m]) / rate(mc_dimension_tick_seconds_count[1m])",
+          "expr": "sum(rate(mc_dimension_tick_seconds_sum[1m]) / rate(mc_dimension_tick_seconds_count[1m])) by (name)",
           "legendFormat": "{{name}}",
           "range": true,
           "refId": "A"
@@ -996,7 +962,7 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, rate(mc_dimension_tick_seconds_bucket[1m]))",
+          "expr": "sum(histogram_quantile(0.95, rate(mc_dimension_tick_seconds_bucket[1m]))) by (name)",
           "legendFormat": "{{name}}",
           "range": true,
           "refId": "A"
@@ -1090,14 +1056,14 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "mc_entities_total{dim=\"overworld\"}",
+          "expr": "sum(mc_entities_total) by (type)",
           "instant": false,
           "legendFormat": "{{type}}",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Entities in Overworld",
+      "title": "Entities",
       "type": "timeseries"
     },
     {
@@ -1183,8 +1149,10 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
-          "expr": "mc_dimension_chunks_loaded",
+          "editorMode": "code",
+          "expr": "sum(mc_dimension_chunks_loaded) by (name)",
           "legendFormat": "{{name}}",
+          "range": true,
           "refId": "A"
         }
       ],
@@ -1275,14 +1243,16 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "jvm_memory_bytes_used{area=\"heap\"}",
+          "expr": "sum(jvm_memory_bytes_used{area=\"heap\"})",
           "legendFormat": "Used Heap",
           "range": true,
           "refId": "A"
         },
         {
-          "expr": "jvm_memory_bytes_max{area=\"heap\"}",
+          "editorMode": "code",
+          "expr": "sum(jvm_memory_bytes_max{area=\"heap\"})",
           "legendFormat": "Max Heap",
+          "range": true,
           "refId": "B"
         }
       ],
@@ -1372,8 +1342,8 @@
       "targets": [
         {
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "jvm_threads_current{container=\"minecraft\"}",
+          "editorMode": "code",
+          "expr": "sum(jvm_threads_current{container=\"minecraft\"})",
           "fullMetaSearch": false,
           "includeNullMetadata": true,
           "legendFormat": "Current Threads",
@@ -1387,8 +1357,8 @@
             "uid": "prometheus"
           },
           "disableTextWrap": false,
-          "editorMode": "builder",
-          "expr": "jvm_threads_peak{container=\"minecraft\"}",
+          "editorMode": "code",
+          "expr": "sum(jvm_threads_peak{container=\"minecraft\"})",
           "fullMetaSearch": false,
           "hide": false,
           "includeNullMetadata": true,
@@ -1487,10 +1457,36 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "rate(jvm_gc_collection_seconds_sum[1m])",
-          "legendFormat": "GC Time/sec",
+          "expr": "sum(rate(jvm_gc_collection_seconds_sum{gc=\"G1 Concurrent GC\"}[1m]))",
+          "legendFormat": "G1 Concurrent GC",
           "range": true,
           "refId": "A"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(jvm_gc_collection_seconds_sum{gc=\"G1 Old Generation\"}[1m]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "G1 Old Generation",
+          "range": true,
+          "refId": "B"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "sum(rate(jvm_gc_collection_seconds_sum{gc=\"G1 Young Generation\"}[1m]))",
+          "hide": false,
+          "instant": false,
+          "legendFormat": "G1 Young Generation",
+          "range": true,
+          "refId": "C"
         }
       ],
       "title": "Garbage Collection Duration",
@@ -1579,14 +1575,14 @@
       "targets": [
         {
           "editorMode": "code",
-          "expr": "process_open_fds{container=\"minecraft\"}",
+          "expr": "sum(process_open_fds{container=\"minecraft\"})",
           "legendFormat": "Open FDs",
           "range": true,
           "refId": "A"
         },
         {
           "editorMode": "code",
-          "expr": "process_max_fds{container=\"minecraft\"}",
+          "expr": "sum(process_max_fds{container=\"minecraft\"})",
           "legendFormat": "Max FDs",
           "range": true,
           "refId": "B"
@@ -1622,5 +1618,5 @@
   "timezone": "",
   "title": "Minecraft",
   "uid": "minecraft",
-  "version": 7
+  "version": 8
 }
