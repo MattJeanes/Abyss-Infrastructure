@@ -40,6 +40,7 @@
             "inspect": false
           },
           "mappings": [],
+          "noValue": "No players online",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1756,5 +1757,5 @@
   "timezone": "",
   "title": "Minecraft",
   "uid": "minecraft",
-  "version": 12
+  "version": 13
 }
