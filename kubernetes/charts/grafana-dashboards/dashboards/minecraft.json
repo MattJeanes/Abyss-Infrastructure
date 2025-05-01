@@ -1196,6 +1196,10 @@
       "type": "timeseries"
     },
     {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -1256,7 +1260,7 @@
         "x": 12,
         "y": 32
       },
-      "id": 8,
+      "id": 20,
       "options": {
         "legend": {
           "calcs": [],
@@ -1273,9 +1277,33 @@
       "pluginVersion": "11.6.1",
       "targets": [
         {
-          "expr": "jvm_threads_current",
-          "legendFormat": "Threads",
-          "refId": "A"
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "jvm_threads_current{container=\"minecraft\"}",
+          "fullMetaSearch": false,
+          "includeNullMetadata": true,
+          "legendFormat": "Current Threads",
+          "range": true,
+          "refId": "A",
+          "useBackend": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "disableTextWrap": false,
+          "editorMode": "builder",
+          "expr": "jvm_threads_peak{container=\"minecraft\"}",
+          "fullMetaSearch": false,
+          "hide": false,
+          "includeNullMetadata": true,
+          "instant": false,
+          "interval": "",
+          "legendFormat": "Peak Threads",
+          "range": true,
+          "refId": "B",
+          "useBackend": false
         }
       ],
       "title": "JVM Threads",
@@ -1579,6 +1607,7 @@
   "templating": {
     "list": [
       {
+        "baseFilters": [],
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
@@ -1597,5 +1626,5 @@
   "timezone": "",
   "title": "Minecraft",
   "uid": "minecraft",
-  "version": 1
+  "version": 2
 }
