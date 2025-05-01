@@ -86,6 +86,9 @@ spec:
             - containerPort: 8100
               name: map
               protocol: TCP
+            - containerPort: 19565
+              name: metrics
+              protocol: TCP
           volumeMounts:
             - name: minecraft-server
               mountPath: /data
