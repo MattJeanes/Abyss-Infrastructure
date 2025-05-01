@@ -165,6 +165,7 @@
             }
           },
           "mappings": [],
+          "noValue": "0",
           "thresholds": {
             "mode": "absolute",
             "steps": [
@@ -1530,5 +1531,5 @@
   "timezone": "",
   "title": "Minecraft",
   "uid": "minecraft",
-  "version": 3
+  "version": 4
 }
