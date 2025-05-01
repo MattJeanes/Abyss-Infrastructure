@@ -33,6 +33,8 @@ curseforge:
   - https://www.curseforge.com/minecraft/mc-mods/bluemap/files/6239407
   - https://www.curseforge.com/minecraft/mc-mods/shutdowner/files/6128590
   - https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter/files/5657655
+  - https://www.curseforge.com/minecraft/mc-mods/better-chunk-loading-forge-fabric/files/6210181
+  - https://www.curseforge.com/minecraft/mc-mods/ksyxis/files/6174567
 serverProperties:
   motd: Welcome to The Abyss!
   difficulty: normal
