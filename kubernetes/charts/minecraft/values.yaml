@@ -35,6 +35,7 @@ curseforge:
   - https://www.curseforge.com/minecraft/mc-mods/prometheus-exporter/files/5657655
   - https://www.curseforge.com/minecraft/mc-mods/better-chunk-loading-forge-fabric/files/6210181
   - https://www.curseforge.com/minecraft/mc-mods/ksyxis/files/6174567
+  - https://www.curseforge.com/minecraft/mc-mods/smooth-chunk-save/files/6296628
 serverProperties:
   motd: Welcome to The Abyss!
   difficulty: normal
