@@ -5,4 +5,4 @@ version: 1.0.0
 dependencies:
 - name: influxdb
   repository: https://charts.bitnami.com/bitnami
-  version: 7.0.2
+  version: 7.0.3
