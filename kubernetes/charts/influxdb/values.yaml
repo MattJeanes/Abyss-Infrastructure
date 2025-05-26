@@ -4,20 +4,19 @@ influxdb:
     serviceMonitor:
       enabled: true
       namespace: monitoring
-  influxdb:
-    service:
-      type: NodePort
-      externalTrafficPolicy: Local
-      nodePorts:
-        http: 30000
-        rpc: 30001
-    updateStrategy:
-      type: Recreate
-    resources:
-      requests:
-        cpu: 10m
-        memory: 500Mi
-      limits:
-        memory: 500Mi
+  service:
+    type: NodePort
+    externalTrafficPolicy: Local
+    nodePorts:
+      http: 30000
+      rpc: 30001
+  updateStrategy:
+    type: Recreate
+  resources:
+    requests:
+      cpu: 10m
+      memory: 500Mi
+    limits:
+      memory: 500Mi
   persistence:
     existingClaim: influxdb
