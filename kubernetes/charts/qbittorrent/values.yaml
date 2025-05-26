@@ -6,7 +6,7 @@ image:
 initContainer:
   image: 
     repository: busybox
-    tag: stable@sha256:e246aa22ad2cbdfbd19e2a6ca2b275e26245a21920e2b2d0666324cee3f15549
+    tag: stable@sha256:c3ef74e9b647910e409925f2af51a2fc11fe6cbd9df29f9a9f41d953d03bd189
     pullPolicy: IfNotPresent
 gluetun:
   image:
@@ -16,7 +16,7 @@ gluetun:
 rclone:
   image:
     repository: rclone/rclone
-    tag: 1.69.2@sha256:df9f8f0115e2816b18099c28a629e6914c84915b55aeddd2db58df8cf6b76d34
+    tag: 1.69.3@sha256:1f497a86a6466395e62a5886613a14b7b18809543566ef9fa35fa1371a7ecc0f
     pullPolicy: IfNotPresent
 openvpn:
   user: ""
