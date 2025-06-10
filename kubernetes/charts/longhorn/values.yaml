@@ -9,6 +9,8 @@ longhorn:
     backupTargetCredentialSecret: longhorn-azblob-secret
   defaultSettings:
     defaultReplicaCount: 1
+    storageMinimalAvailablePercentage: 5
+    storageReservedPercentageForDefaultDisk: 10
   metrics:
     serviceMonitor:
       enabled: true
