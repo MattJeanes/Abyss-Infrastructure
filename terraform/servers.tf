@@ -114,7 +114,7 @@ locals {
       rcon         = true
       vm_size      = "Standard_D2ds_v5",
       os_type      = "Linux",
-      disk_size_gb = 64,
+      disk_size_gb = 128,
       source_image_reference = {
         publisher = "canonical",
         offer     = "0001-com-ubuntu-server-jammy",
