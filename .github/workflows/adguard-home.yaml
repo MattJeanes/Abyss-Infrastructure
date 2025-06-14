@@ -32,7 +32,7 @@ jobs:
             adguard-home-persistentvolume . \
             --namespace default \
             --set name=adguard-home \
-            --set disk.capacity=1Gi \
+            --set disk.capacity=2Gi \
             --set volumeHandle=adguard-home
         working-directory: kubernetes/charts/longhorn-persistentvolume
 
